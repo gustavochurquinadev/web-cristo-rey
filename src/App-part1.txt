@@ -1,0 +1,1 @@
+Primera parte del código que contiene imports y el componente hasta la sección de loading
