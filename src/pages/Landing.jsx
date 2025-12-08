@@ -96,19 +96,16 @@ const Landing = () => {
       <Toaster position="top-center" richColors />
 
       {/* --- PRELOADER --- */}
-      {/* Z-index 9999 asegura que tape todo. Flex para centrar. */}
-      <div
-        ref={loaderRef}
-        className="fixed inset-0 z-[9999] bg-cristo-primary flex flex-col items-center justify-center w-full h-screen"
-      >
-        {/* LOGO: Sin clases 'opacity-0'. Visible 100% por defecto. */}
+      {/* Usamos la clase .loader-overlay que definimos en CSS para forzar el tamaño */}
+      <div ref={loaderRef} className="loader-overlay">
+
+        {/* LOGO */}
         <div ref={logoRef} className="w-32 h-32 mb-6 relative">
-          {/* Efecto de brillo opcional */}
           <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full animate-pulse"></div>
           <img src="/images/logo.png" alt="Logo" className="w-full h-full object-contain drop-shadow-2xl relative z-10" />
         </div>
 
-        {/* TEXTO: Visible por defecto */}
+        {/* TEXTO */}
         <div ref={textRef} className="text-center text-white px-4">
           <h1 className="font-serif text-xl md:text-2xl tracking-[0.3em] uppercase opacity-90">Colegio Católico</h1>
           <p className="font-serif text-4xl md:text-5xl text-cristo-accent italic mt-2 font-medium">Cristo Rey</p>
