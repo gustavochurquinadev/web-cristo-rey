@@ -11,8 +11,8 @@ const Pastoral = () => {
   const pastoralImages = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => ({
       id: i,
-      src: `/images/pastoral/foto${i + 1}.jpg`,
-      height: i % 3 === 0 ? 'h-64' : (i % 2 === 0 ? 'h-48' : 'h-80') 
+      src: `/images/pastoral/foto${i + 1}.webp`,
+      height: i % 3 === 0 ? 'h-64' : (i % 2 === 0 ? 'h-48' : 'h-80')
     }));
   }, []);
 
@@ -27,7 +27,7 @@ const Pastoral = () => {
         ease: "none",
         scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 1 }
       });
-      gsap.fromTo(".pastoral-col-2", 
+      gsap.fromTo(".pastoral-col-2",
         { y: -80 }, { y: 20, ease: "none", scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 1.5 } }
       );
       gsap.to(".pastoral-col-3", {
@@ -75,7 +75,7 @@ const Pastoral = () => {
                 {col1.map((img) => (
                   <div key={img.id} className={`overflow-hidden rounded-xl shadow-xl ${img.height} relative group`}>
                     <div className="absolute inset-0 bg-cristo-primary/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
-                    <img src={img.src} alt="Pastoral" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" onError={(e) => {e.target.src = '/images/hero-colegio.jpg'}} loading="lazy" />
+                    <img src={img.src} alt="Pastoral" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" onError={(e) => { e.target.src = '/images/hero-colegio.webp' }} loading="lazy" />
                   </div>
                 ))}
               </div>
@@ -83,7 +83,7 @@ const Pastoral = () => {
                 {col2.map((img) => (
                   <div key={img.id} className={`overflow-hidden rounded-xl shadow-xl ${img.height} relative group`}>
                     <div className="absolute inset-0 bg-cristo-primary/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
-                    <img src={img.src} alt="Pastoral" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" onError={(e) => {e.target.src = '/images/hero-colegio.jpg'}} loading="lazy" />
+                    <img src={img.src} alt="Pastoral" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" onError={(e) => { e.target.src = '/images/hero-colegio.webp' }} loading="lazy" />
                   </div>
                 ))}
               </div>
@@ -91,7 +91,7 @@ const Pastoral = () => {
                 {col3.map((img) => (
                   <div key={img.id} className={`overflow-hidden rounded-xl shadow-xl ${img.height} relative group`}>
                     <div className="absolute inset-0 bg-cristo-primary/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
-                    <img src={img.src} alt="Pastoral" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" onError={(e) => {e.target.src = '/images/hero-colegio.jpg'}} loading="lazy" />
+                    <img src={img.src} alt="Pastoral" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" onError={(e) => { e.target.src = '/images/hero-colegio.webp' }} loading="lazy" />
                   </div>
                 ))}
               </div>

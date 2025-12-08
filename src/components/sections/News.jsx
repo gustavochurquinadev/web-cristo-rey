@@ -13,21 +13,21 @@ const News = () => {
     {
       title: 'Huellas de Cristo Rey en la Eucaristía 2025',
       date: '20 Nov, 2025',
-      image: '/images/noticias/1.jpg',
+      image: '/images/noticias/1.webp',
       category: 'Festejos',
       description: 'La comunidad celebró la Eucaristía de Cristo Rey 2025, agradeciendo a todos los que participaron en su organización.'
     },
     {
       title: 'Huellas de fiesta, juegos y talentos',
       date: '19 Nov, 2025',
-      image: '/images/noticias/2.jpg',
+      image: '/images/noticias/2.webp',
       category: 'Celebración',
       description: 'Jornada con diversas actividades artísticas, culturales y lúdicas que reflejaron el espíritu celebrativo.'
     },
     {
       title: 'Huellas de Cristo Rey',
       date: '17 Nov, 2025',
-      image: '/images/noticias/3.jpg',
+      image: '/images/noticias/3.webp',
       category: 'Comunidad',
       description: 'La comunidad expresó su gratitud hacia los estudiantes de la promoción 2025 que realizaron catequesis.'
     }
@@ -50,7 +50,7 @@ const News = () => {
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      
+
       // 1. Animación del Título
       gsap.fromTo(titleRef.current,
         { y: 50, opacity: 0 },
@@ -106,10 +106,10 @@ const News = () => {
             <span className="text-cristo-accent font-bold tracking-widest text-xs uppercase">Novedades</span>
             <h2 className="font-serif text-4xl text-cristo-primary mt-2">Últimas Noticias</h2>
           </div>
-          
+
           <div className="news-grid grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {newsItems.map((news, index) => (
-              <article 
+              <article
                 key={index}
                 className="news-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer group h-full flex flex-col border border-transparent hover:border-cristo-accent/30 transition-colors"
                 onMouseEnter={handleMouseEnter}

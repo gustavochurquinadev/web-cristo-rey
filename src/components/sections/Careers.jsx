@@ -8,13 +8,15 @@ const Careers = () => {
     email: '',
     phone: '',
     position: '',
-    cv: null // Aquí guardaremos el objeto File
+    antiguedad: '',   // 👈 NUEVO CAMPO
+    cv: null
   });
+
   const [fileName, setFileName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 🔴 ¡PEGA AQUÍ TU URL DE APPS SCRIPT! 🔴
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbbQYWpWChYL8_2hrvH-JPxTDvheVtgdtZpME9Th5D_1JJ1_2siG4VXQTBLIhDHb4Z/exec"; 
+  // 🔴 TU URL DE APPS SCRIPT
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbbQYWpWChYL8_2hrvH-JPxTDvheVtgdtZpME9Th5D_1JJ1_2siG4VXQTBLIhDHb4Z/exec";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +26,7 @@ const Careers = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB límite
+      if (file.size > 5 * 1024 * 1024) {
         toast.error("El archivo es muy pesado. Máximo 5MB.");
         return;
       }
@@ -33,13 +35,11 @@ const Careers = () => {
     }
   };
 
-  // Función auxiliar para convertir archivo a Base64
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        // Quitamos el prefijo "data:application/pdf;base64," para enviar solo los datos puros
         const base64 = reader.result.split(',')[1];
         resolve(base64);
       };
@@ -58,33 +58,35 @@ const Careers = () => {
     const toastId = toast.loading("Enviando documentación al colegio...");
 
     try {
-      // 1. Convertir el archivo a formato que Google entienda
       const base64File = await fileToBase64(formData.cv);
 
-      // 2. Preparar el paquete de datos
       const payload = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         position: formData.position,
+        antiguedad: formData.antiguedad,   // 👈 ENVIADO
         fileName: formData.cv.name,
         fileMimeType: formData.cv.type,
         fileData: base64File
       };
 
-      // 3. Enviar a Google Apps Script (usando no-cors para evitar bloqueos simples)
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify(payload)
       });
 
-      // Nota: Con mode 'no-cors' no podemos leer el JSON de respuesta, 
-      // pero si no da error de red, asumimos éxito en Apps Script.
-      
       toast.success("¡Postulación recibida correctamente!", { id: toastId });
-      
-      // Limpiar formulario
-      setFormData({ name: '', email: '', phone: '', position: '', cv: null });
+
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        position: '',
+        antiguedad: '',
+        cv: null
+      });
+
       setFileName('');
 
     } catch (error) {
@@ -99,21 +101,19 @@ const Careers = () => {
     <section id="careers" className="py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-6 relative z-10">
         <div className="flex flex-col lg:flex-row gap-16 items-start">
-          
+
           {/* Columna Izquierda */}
           <div className="lg:w-1/3 lg:sticky lg:top-32">
             <span className="text-cristo-accent font-bold tracking-widest text-xs uppercase mb-2 block">Trabaja con Nosotros</span>
-            <h2 className="font-serif text-4xl text-cristo-primary mb-6">Vocación de Servicio</h2>
+            <h2 className="font-serif text-4xl text-cristo-primary mb-6">Vocacion de Servicio</h2>
             <p className="text-gray-600 leading-relaxed mb-8 text-lg">
-              Buscamos docentes y profesionales comprometidos con los valores cristianos y la excelencia educativa.
+              Buscamos personas que deseen educar desde los valores cristianos y acompañar el crecimiento integral de nuestros estudiantes.
             </p>
-            
+
             <div className="bg-gray-50 p-8 border-l-4 border-cristo-accent rounded-r-xl shadow-sm">
               <h4 className="text-cristo-primary font-serif text-xl mb-4 font-bold">Documentación Requerida</h4>
               <ul className="text-sm text-gray-600 space-y-3">
                 <li className="flex items-start"><CheckCircle className="w-4 h-4 text-cristo-accent mr-2 mt-0.5" /> CV Actualizado con foto</li>
-                <li className="flex items-start"><CheckCircle className="w-4 h-4 text-cristo-accent mr-2 mt-0.5" /> Títulos legalizados (copia)</li>
-                <li className="flex items-start"><CheckCircle className="w-4 h-4 text-cristo-accent mr-2 mt-0.5" /> Antecedentes penales</li>
               </ul>
             </div>
           </div>
@@ -121,7 +121,7 @@ const Careers = () => {
           {/* Columna Derecha: Formulario */}
           <div className="lg:w-2/3 bg-white rounded-2xl shadow-xl border border-gray-100 p-8 md:p-10">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              
+
               {/* Inputs Personales */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -132,6 +132,7 @@ const Careers = () => {
                     placeholder="Ej: María González"
                   />
                 </div>
+
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Teléfono</label>
                   <input 
@@ -151,6 +152,7 @@ const Careers = () => {
                     placeholder="correo@ejemplo.com"
                   />
                 </div>
+
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Cargo</label>
                   <select 
@@ -165,6 +167,26 @@ const Careers = () => {
                     <option value="Maestranza">Maestranza / Servicios</option>
                   </select>
                 </div>
+              </div>
+
+              {/* NUEVO CAMPO: Antigüedad */}
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                  Años de antigüedad docente
+                </label>
+                <input
+                  type="number"
+                  name="antiguedad"
+                  value={formData.antiguedad}
+                  onChange={handleChange}
+                  min="0"
+                  max="50"
+                  required
+                  className="w-full bg-gray-50 border border-gray-200 p-4 rounded-lg 
+                             focus:outline-none focus:border-cristo-primary focus:ring-1 
+                             focus:ring-cristo-primary transition-all"
+                  placeholder="Ej: 5"
+                />
               </div>
 
               {/* Input de Archivo (CV) */}
@@ -194,7 +216,7 @@ const Careers = () => {
                 </div>
               </div>
 
-              {/* Botón de Envío */}
+              {/* Botón */}
               <button 
                 type="submit" 
                 disabled={isSubmitting}
@@ -212,12 +234,13 @@ const Careers = () => {
                   </>
                 )}
               </button>
-              
+
               <div className="text-center">
                 <p className="text-xs text-gray-400 flex items-center justify-center">
                   <AlertCircle className="w-3 h-3 mr-1" /> Información protegida por Google Workspace for Education
                 </p>
               </div>
+
             </form>
           </div>
 

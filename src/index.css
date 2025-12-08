@@ -3,26 +3,38 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply box-border;
-  }
-  
-  html {
-    /* IMPORTANTE: scroll-behavior debe ser auto para que Lenis tome el control */
-    scroll-behavior: auto;
-  }
-  
+
+  html,
   body {
-    @apply antialiased overflow-x-hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1B365D;
+    /* Azul Cristo Rey */
+    /* Evita el rebote de scroll en Mac/iOS */
+    overscroll-behavior: none;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 }
 
-@layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+/* Loader Fijo y Robusto */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #1B365D;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  /* dvh asegura que cubra la pantalla completa en móviles */
 }

@@ -1,34 +1,59 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useLayoutEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
-// Importamos las "Páginas" principales
+// Páginas y Componentes
 import Landing from './pages/Landing';
 import Staff from './components/sections/Staff';
 import ReceiptProcessor from './components/admin/ReceiptProcessor';
+import PageTransition from './components/layout/PageTransition';
+
+// Componente para resetear el scroll al cambiar de ruta
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
+// Wrapper auxiliar para limpiar el código de las rutas
+const WithTransition = ({ children }) => (
+  <PageTransition>
+    {children}
+  </PageTransition>
+);
 
 const App = () => {
   return (
     <Router>
-      {/* Notificaciones globales disponibles en todas las rutas */}
+      <ScrollToTop />
       <Toaster position="top-center" richColors />
-      
+
       <Routes>
-        {/* Ruta 1: La Web Principal (http://localhost:3000/) */}
-        <Route path="/" element={<Landing />} />
-        
-        {/* Ruta 2: El Portal Docente (http://localhost:3000/portal) */}
-        <Route path="/portal" element={
-          <div className="bg-gray-50 min-h-screen">
-            {/* Aquí podrías agregar un Header simplificado si quisieras */}
-            <Staff />
-          </div>
+        {/* Ruta 1: Landing Page */}
+        <Route path="/" element={
+          <WithTransition>
+            <Landing />
+          </WithTransition>
         } />
-        
-        {/* Ruta 3: Tu Panel Secreto (http://localhost:3000/admin) */}
+
+        {/* Ruta 2: Portal Docente */}
+        <Route path="/portal" element={
+          <WithTransition>
+            <div className="bg-gray-50 min-h-screen">
+              <Staff />
+            </div>
+          </WithTransition>
+        } />
+
+        {/* Ruta 3: Admin */}
         <Route path="/admin" element={
-          <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-            <ReceiptProcessor />
-          </div>
+          <WithTransition>
+            <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+              <ReceiptProcessor />
+            </div>
+          </WithTransition>
         } />
       </Routes>
     </Router>
