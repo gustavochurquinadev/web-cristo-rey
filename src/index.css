@@ -3,18 +3,23 @@
 @tailwind utilities;
 
 @layer base {
+
+  /* NIVEL 1: El Navegador */
   html {
     background-color: #1B365D;
+    /* Todo el universo es azul */
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
     overscroll-behavior: none;
-    /* Bloquea rebote en Mac */
+    /* Sin rebotes elásticos */
   }
 
+  /* NIVEL 2: El Cuerpo */
   body {
     background-color: #1B365D;
+    /* Azul también */
     margin: 0;
     padding: 0;
     width: 100%;
@@ -22,33 +27,33 @@
     overflow-x: hidden;
   }
 
+  /* NIVEL 3: La Raíz de React */
   #root {
     width: 100%;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: #ffffff;
+    background-color: #1B365D;
+    /* Azul también */
   }
 }
 
-/* Loader Absoluto */
+/* Loader Fijo */
 .loader-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  /* Fallback */
+  width: 100vw;
   height: 100dvh;
-  /* Altura dinámica real */
+  /* Altura dinámica para móviles */
   z-index: 9999;
   background-color: #1B365D;
+  /* Azul */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   touch-action: none;
-  /* Bloquea gestos táctiles en el loader */
 }
 
 html.lenis,

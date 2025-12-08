@@ -30,9 +30,8 @@ const Landing = () => {
   const textRef = useRef(null);
   const lenisRef = useRef(null);
 
-  // 1. Configuración de Scroll y Lenis
+  // 1. Configuración de Scroll y Reset
   useEffect(() => {
-    // FORZADO DE SCROLL: Al cargar, ir arriba de inmediato.
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
@@ -43,7 +42,6 @@ const Landing = () => {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       direction: 'vertical',
       smooth: true,
-      // Importante: prevenir overscroll en el eje Y
       overscroll: false
     });
 
@@ -51,35 +49,34 @@ const Landing = () => {
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
 
-    // Bloqueamos el scroll de Lenis al inicio
+    // Bloqueamos scroll al inicio
     lenis.stop();
 
     return () => { lenis.destroy(); gsap.ticker.remove((time) => lenis.raf(time * 1000)); };
   }, []);
 
-  // 2. ANIMACIÓN DE ENTRADA (Sin movimiento vertical del loader)
+  // 2. ANIMACIÓN DE ENTRADA (Sólida y sin saltos)
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
 
       const tl = gsap.timeline({
         onComplete: () => {
-          // AL TERMINAR:
-          window.scrollTo(0, 0); // Forzamos scroll arriba otra vez por seguridad
-          if (lenisRef.current) lenisRef.current.start(); // Activamos Lenis
-          document.body.style.overflow = 'auto'; // Activamos scroll nativo
-          setIntroComplete(true); // Avisamos al Hero
-          gsap.set(loaderRef.current, { display: 'none' }); // Borramos loader
+          // Reactivar scroll
+          if (lenisRef.current) lenisRef.current.start();
+          document.body.style.overflow = 'auto';
+          setIntroComplete(true);
+          gsap.set(loaderRef.current, { display: 'none' });
         }
       });
 
-      // A. Entrada del Logo (Rebote suave)
+      // A. Entrada del Logo
       tl.from(logoRef.current, {
         scale: 0,
         opacity: 0,
         duration: 1.2,
         ease: "elastic.out(1, 0.5)"
       })
-        // B. Entrada del Texto
+        // B. Texto
         .from(textRef.current, {
           y: 20,
           opacity: 0,
@@ -90,8 +87,7 @@ const Landing = () => {
         // C. Pausa de lectura
         .to({}, { duration: 1.5 })
 
-        // D. SALIDA: SOLO OPACIDAD (Sin movimiento 'y')
-        // Al no moverlo, no se puede ver nada blanco abajo.
+        // D. SALIDA: Solo Opacidad (Fade Out)
         .to(loaderRef.current, {
           opacity: 0,
           duration: 1,
@@ -108,14 +104,12 @@ const Landing = () => {
   };
 
   return (
-    <div className="bg-white text-gray-800 font-sans selection:bg-cristo-accent selection:text-white relative min-h-screen">
+    // CAMBIO IMPORTANTE: Quitamos bg-white de aquí. El fondo base es azul por CSS.
+    <div className="font-sans selection:bg-cristo-accent selection:text-white relative min-h-screen">
       <Toaster position="top-center" richColors />
 
-      {/* --- PRELOADER --- */}
-      <div
-        ref={loaderRef}
-        className="loader-overlay"
-      >
+      {/* --- PRELOADER (Azul sobre Azul) --- */}
+      <div ref={loaderRef} className="loader-overlay">
         <div ref={logoRef} className="w-32 h-32 mb-6 relative">
           <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full animate-pulse"></div>
           <img src="/images/logo.png" alt="Logo" className="w-full h-full object-contain drop-shadow-2xl relative z-10" />
@@ -127,26 +121,29 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* --- CONTENIDO --- */}
-      <Header activeSection={activeSection} onNavigate={handleNavigate} />
+      {/* --- CONTENEDOR BLANCO DEL SITIO --- */}
+      {/* Aquí es donde empieza lo blanco. Debajo de esto, todo es azul. */}
+      <div className="bg-white relative z-0 w-full">
+        <Header activeSection={activeSection} onNavigate={handleNavigate} />
 
-      <main>
-        <Hero onNavigate={handleNavigate} startAnimation={introComplete} />
+        <main>
+          <Hero onNavigate={handleNavigate} startAnimation={introComplete} />
 
-        <Suspense fallback={<SectionLoader />}>
-          <History />
-          <Levels />
-          <Pastoral />
-          <News />
-          <Fees />
-          <Careers />
-          <Contact />
+          <Suspense fallback={<SectionLoader />}>
+            <History />
+            <Levels />
+            <Pastoral />
+            <News />
+            <Fees />
+            <Careers />
+            <Contact />
+          </Suspense>
+        </main>
+
+        <Suspense fallback={null}>
+          <Footer />
         </Suspense>
-      </main>
-
-      <Suspense fallback={null}>
-        <Footer />
-      </Suspense>
+      </div>
     </div>
   );
 };
