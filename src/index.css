@@ -3,27 +3,23 @@
 @tailwind utilities;
 
 @layer base {
-
-  /* PINTAMOS EL FONDO DEL NAVEGADOR DE AZUL */
   html {
     background-color: #1B365D;
-    /* Esto elimina la línea blanca abajo */
     margin: 0;
     padding: 0;
+    width: 100%;
     height: 100%;
-    overscroll-behavior-y: none;
-    /* Evita el rebote elástico en Mac/Chrome */
+    overscroll-behavior: none;
+    /* Bloquea rebote en Mac */
   }
 
   body {
+    background-color: #1B365D;
     margin: 0;
     padding: 0;
     width: 100%;
     min-height: 100%;
-    background-color: #1B365D;
-    /* Coincide con el html */
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
   }
 
   #root {
@@ -31,29 +27,30 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: #ffffff;
   }
 }
 
-/* Loader Overlay - Posicionamiento Absoluto */
+/* Loader Absoluto */
 .loader-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  /* Anclado a los 4 lados */
+  width: 100%;
+  height: 100%;
+  /* Fallback */
+  height: 100dvh;
+  /* Altura dinámica real */
   z-index: 9999;
   background-color: #1B365D;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Garantiza que cubra todo, incluso barras de navegación móviles */
-  height: 100dvh;
-  width: 100vw;
+  touch-action: none;
+  /* Bloquea gestos táctiles en el loader */
 }
 
-/* Configuraciones de Lenis */
 html.lenis,
 html.lenis body {
   height: auto;
