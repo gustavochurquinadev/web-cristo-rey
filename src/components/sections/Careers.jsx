@@ -16,7 +16,7 @@ const Careers = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 🔴 TU URL DE APPS SCRIPT
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbbQYWpWChYL8_2hrvH-JPxTDvheVtgdtZpME9Th5D_1JJ1_2siG4VXQTBLIhDHb4Z/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_TzRZwm4HMJGpW0qEU8DpIgVfN3i3IeFunqFzG5z4lWYhuFJRMcbFR2Syqr5tx6Gixw/exec";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -126,8 +126,8 @@ const Careers = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nombre Completo</label>
-                  <input 
-                    type="text" name="name" value={formData.name} onChange={handleChange} required 
+                  <input
+                    type="text" name="name" value={formData.name} onChange={handleChange} required
                     className="w-full bg-gray-50 border border-gray-200 p-4 rounded-lg focus:outline-none focus:border-cristo-primary focus:ring-1 focus:ring-cristo-primary transition-all"
                     placeholder="Ej: María González"
                   />
@@ -135,8 +135,8 @@ const Careers = () => {
 
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Teléfono</label>
-                  <input 
-                    type="tel" name="phone" value={formData.phone} onChange={handleChange} required 
+                  <input
+                    type="tel" name="phone" value={formData.phone} onChange={handleChange} required
                     className="w-full bg-gray-50 border border-gray-200 p-4 rounded-lg focus:outline-none focus:border-cristo-primary focus:ring-1 focus:ring-cristo-primary transition-all"
                     placeholder="Ej: 388 1234567"
                   />
@@ -146,8 +146,8 @@ const Careers = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Email</label>
-                  <input 
-                    type="email" name="email" value={formData.email} onChange={handleChange} required 
+                  <input
+                    type="email" name="email" value={formData.email} onChange={handleChange} required
                     className="w-full bg-gray-50 border border-gray-200 p-4 rounded-lg focus:outline-none focus:border-cristo-primary focus:ring-1 focus:ring-cristo-primary transition-all"
                     placeholder="correo@ejemplo.com"
                   />
@@ -155,7 +155,7 @@ const Careers = () => {
 
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Cargo</label>
-                  <select 
+                  <select
                     name="position" value={formData.position} onChange={handleChange} required
                     className="w-full bg-gray-50 border border-gray-200 p-4 rounded-lg focus:outline-none focus:border-cristo-primary focus:ring-1 focus:ring-cristo-primary transition-all text-gray-700"
                   >
@@ -193,11 +193,11 @@ const Careers = () => {
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Curriculum Vitae (PDF)</label>
                 <div className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer group transition-colors ${fileName ? 'border-cristo-accent bg-cristo-secondary/10' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'}`}>
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
-                    accept=".pdf,.doc,.docx" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                    accept=".pdf,.doc,.docx"
                   />
                   <div className="flex flex-col items-center relative z-10">
                     {fileName ? (
@@ -217,8 +217,8 @@ const Careers = () => {
               </div>
 
               {/* Botón */}
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSubmitting}
                 className={`w-full py-4 bg-cristo-primary text-white font-bold tracking-wide rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all ${isSubmitting ? 'opacity-80 cursor-not-allowed' : 'hover:bg-cristo-dark hover:shadow-xl active:scale-[0.98]'}`}
               >

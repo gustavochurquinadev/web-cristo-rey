@@ -7,14 +7,14 @@ const Staff = () => {
   const [view, setView] = useState('login');
   const [user, setUser] = useState(null);
   const [receipts, setReceipts] = useState([]);
-  const [documents, setDocuments] = useState([]); 
+  const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [loginData, setLoginData] = useState({ dni: '', password: '' });
   const [registerData, setRegisterData] = useState({ dni: '', name: '', password: '', token: '' });
 
   // 🔴 URL DE TU SCRIPT (Verifica que sea la correcta)
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbbQYWpWChYL8_2hrvH-JPxTDvheVtgdtZpME9Th5D_1JJ1_2siG4VXQTBLIhDHb4Z/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_TzRZwm4HMJGpW0qEU8DpIgVfN3i3IeFunqFzG5z4lWYhuFJRMcbFR2Syqr5tx6Gixw/exec";
 
   // --- LOGIN ---
   const handleLogin = async (e) => {
@@ -115,21 +115,21 @@ const Staff = () => {
               {view === 'login' ? 'Acceso exclusivo personal docente' : 'Complete sus datos institucionales'}
             </p>
           </div>
-          
+
           {view === 'login' ? (
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">DNI</label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input type="text" value={loginData.dni} onChange={(e) => setLoginData({...loginData, dni: e.target.value})} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary transition-all" placeholder="Sin puntos" required />
+                  <input type="text" value={loginData.dni} onChange={(e) => setLoginData({ ...loginData, dni: e.target.value })} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary transition-all" placeholder="Sin puntos" required />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Contraseña</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input type="password" value={loginData.password} onChange={(e) => setLoginData({...loginData, password: e.target.value})} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary transition-all" placeholder="••••••••" required />
+                  <input type="password" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary transition-all" placeholder="••••••••" required />
                 </div>
               </div>
               <button type="submit" disabled={loading} className="w-full py-3 bg-cristo-primary text-white font-bold rounded-lg hover:bg-cristo-dark transition-all flex justify-center items-center gap-2 shadow-lg">
@@ -143,21 +143,21 @@ const Staff = () => {
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nombre Completo</label>
-                <input type="text" value={registerData.name} onChange={(e) => setRegisterData({...registerData, name: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="Ej: María Perez" required />
+                <input type="text" value={registerData.name} onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="Ej: María Perez" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">DNI</label>
-                <input type="text" value={registerData.dni} onChange={(e) => setRegisterData({...registerData, dni: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="Sin puntos" required />
+                <input type="text" value={registerData.dni} onChange={(e) => setRegisterData({ ...registerData, dni: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="Sin puntos" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Crear Contraseña</label>
-                <input type="password" value={registerData.password} onChange={(e) => setRegisterData({...registerData, password: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="••••••••" required />
+                <input type="password" value={registerData.password} onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="••••••••" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Código de Invitación</label>
                 <div className="relative">
                   <Key className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input type="text" value={registerData.token} onChange={(e) => setRegisterData({...registerData, token: e.target.value})} className="w-full pl-10 pr-4 py-3 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:border-cristo-primary text-blue-800" placeholder="Solicitar a Administración" required />
+                  <input type="text" value={registerData.token} onChange={(e) => setRegisterData({ ...registerData, token: e.target.value })} className="w-full pl-10 pr-4 py-3 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:border-cristo-primary text-blue-800" placeholder="Solicitar a Administración" required />
                 </div>
               </div>
               <button type="submit" disabled={loading} className="w-full py-3 bg-cristo-accent text-white font-bold rounded-lg hover:bg-yellow-600 transition-all flex justify-center items-center gap-2 shadow-lg">
@@ -177,7 +177,7 @@ const Staff = () => {
   return (
     <section id="staff-dashboard" className="py-24 bg-gray-50 min-h-screen">
       <div className="container mx-auto px-6 max-w-7xl">
-        
+
         {/* HEADER DE BIENVENIDA */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
           <div>
@@ -193,7 +193,7 @@ const Staff = () => {
 
         {/* --- GRID PRINCIPAL (DOS COLUMNAS) --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          
+
           {/* COLUMNA 1: RECIBOS DE HABERES */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full max-h-[800px]">
             {/* Título de Sección */}
@@ -211,7 +211,7 @@ const Staff = () => {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {receipts.length > 0 ? receipts.map((receipt) => (
                   <div key={receipt.id} className="bg-white p-5 rounded-xl border border-gray-100 hover:border-blue-300 shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col items-center text-center relative overflow-hidden">
-                    
+
                     {/* Decoración de fondo */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
 
@@ -220,20 +220,20 @@ const Staff = () => {
                       <span className="text-[10px] uppercase opacity-70 leading-none mb-0.5">MES</span>
                       <span className="text-lg leading-none">{receipt.periodo.substring(0, 3)}</span>
                     </div>
-                    
+
                     {/* Info */}
                     <h4 className="font-bold text-gray-800 text-sm uppercase tracking-wide mb-1">
                       {receipt.periodo.replace(/_/g, ' ')}
                     </h4>
-                    
+
                     <div className="text-[10px] text-gray-500 uppercase tracking-wide mb-4 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
                       Leg: {receipt.legajo}
                     </div>
-                    
+
                     {/* Botón */}
-                    <a 
-                      href={receipt.url} 
-                      target="_blank" 
+                    <a
+                      href={receipt.url}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="w-full px-3 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:border-blue-500 hover:text-blue-600 transition-all flex items-center justify-center gap-2"
                     >
@@ -260,7 +260,7 @@ const Staff = () => {
                 <h3 className="font-serif text-xl text-cristo-primary font-bold">Documentación Institucional</h3>
               </div>
             </div>
-            
+
             {/* Contenido Scrolleable */}
             <div className="p-6 overflow-y-auto custom-scrollbar flex-grow">
               <div className="grid grid-cols-1 gap-3">

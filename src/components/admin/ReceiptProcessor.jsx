@@ -10,7 +10,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 const ReceiptProcessor = () => {
   const [processing, setProcessing] = useState(false);
   const [logs, setLogs] = useState([]);
-  
+
   // Estados para gestión de carpetas
   const [folders, setFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState(''); // ID de la carpeta
@@ -19,7 +19,7 @@ const ReceiptProcessor = () => {
   const [loadingFolders, setLoadingFolders] = useState(false);
 
   // 🔴 URL DE TU SCRIPT
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbbQYWpWChYL8_2hrvH-JPxTDvheVtgdtZpME9Th5D_1JJ1_2siG4VXQTBLIhDHb4Z/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_TzRZwm4HMJGpW0qEU8DpIgVfN3i3IeFunqFzG5z4lWYhuFJRMcbFR2Syqr5tx6Gixw/exec";
   const DNI_COLEGIO = "68738952";
 
   // Cargar carpetas al iniciar
@@ -69,7 +69,7 @@ const ReceiptProcessor = () => {
   const processPDF = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     if (!selectedFolder) {
       toast.error("¡ALTO! Primero debes seleccionar o crear una carpeta de destino.");
       e.target.value = null; // Limpiar input
@@ -91,7 +91,7 @@ const ReceiptProcessor = () => {
       for (let i = 0; i < totalPages; i++) {
         const pageText = await pdfTextDoc.getPage(i + 1);
         const textContent = await pageText.getTextContent();
-        
+
         // 1. Encontrar DNI Docente por posición X/Y (Lógica robusta V4)
         let targetCuil = null;
         for (const item of textContent.items) {
@@ -122,10 +122,10 @@ const ReceiptProcessor = () => {
           const singleDoc = await PDFDocument.create();
           const [copiedPage] = await singleDoc.copyPages(pdfDoc, [i]);
           const { width, height } = copiedPage.getSize();
-          const cutX = (width / 2) - 25; 
+          const cutX = (width / 2) - 25;
           copiedPage.setCropBox(cutX, 0, width - cutX, height);
           singleDoc.addPage(copiedPage);
-          
+
           const pdfBytes = await singleDoc.save();
           const base64 = await blobToBase64(new Blob([pdfBytes]));
 
@@ -133,16 +133,16 @@ const ReceiptProcessor = () => {
           // Formato: CARPETA_DNI_LEG_LEGAJO.pdf
           // Ej: NOVIEMBRE_2025_33627935_LEG_0008.pdf
           const fileName = `${selectedFolderName}_${dni}_LEG_${legajo}.pdf`;
-          
+
           setLogs(prev => [`📤 Subiendo a ${selectedFolderName}: ${fileName}...`, ...prev]);
-          
+
           // Enviamos folderId para que se guarde en la subcarpeta correcta
           await uploadToDrive(fileName, base64, selectedFolder);
-          
+
           setLogs(prev => [`✅ OK: ${fileName}`, ...prev]);
           processedCount++;
         } else {
-          setLogs(prev => [`⚠️ Pág ${i+1}: Sin datos.`, ...prev]);
+          setLogs(prev => [`⚠️ Pág ${i + 1}: Sin datos.`, ...prev]);
         }
       }
       toast.success(`Proceso terminado. ${processedCount} recibos en "${selectedFolderName}".`);
@@ -163,9 +163,9 @@ const ReceiptProcessor = () => {
   const uploadToDrive = async (name, data, folderId) => {
     await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({ 
-        action: 'uploadReceipt', 
-        fileName: name, 
+      body: JSON.stringify({
+        action: 'uploadReceipt',
+        fileName: name,
         fileData: data,
         folderId: folderId // ¡Importante!
       })
@@ -174,7 +174,7 @@ const ReceiptProcessor = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white rounded-2xl shadow-xl border border-gray-200 my-10">
-      
+
       {/* HEADER */}
       <div className="flex items-center gap-3 mb-8">
         <div className="p-3 bg-cristo-primary text-white rounded-lg">
@@ -191,12 +191,12 @@ const ReceiptProcessor = () => {
         <h4 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
           <Folder className="w-4 h-4 text-cristo-accent" /> 1. ¿Dónde guardamos estos recibos?
         </h4>
-        
+
         <div className="flex flex-col md:flex-row gap-4 items-end">
           {/* Selector */}
           <div className="w-full md:w-1/2">
             <label className="text-xs text-gray-500 mb-1 block">Carpetas Existentes</label>
-            <select 
+            <select
               value={selectedFolder}
               onChange={(e) => {
                 setSelectedFolder(e.target.value);
@@ -216,15 +216,15 @@ const ReceiptProcessor = () => {
           <div className="w-full md:w-1/2 flex gap-2">
             <div className="flex-1">
               <label className="text-xs text-gray-500 mb-1 block">Crear Nueva (Ej: NOVIEMBRE_2025)</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value.toUpperCase())} // Auto mayúsculas
                 placeholder="NOMBRE_AÑO"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-cristo-primary"
               />
             </div>
-            <button 
+            <button
               onClick={createFolder}
               disabled={!newFolderName}
               className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
@@ -242,9 +242,9 @@ const ReceiptProcessor = () => {
             <span className="bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold">⚠️ Selecciona una carpeta primero</span>
           </div>
         )}
-        
+
         <input type="file" onChange={processPDF} disabled={processing || !selectedFolder} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept=".pdf" />
-        
+
         {processing ? (
           <div className="flex flex-col items-center animate-pulse">
             <Loader2 className="w-12 h-12 text-cristo-accent animate-spin mb-4" />
