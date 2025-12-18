@@ -34,13 +34,11 @@ function doPost(e) {
       }
 
       if (!sheet) {
-        // Log para depuración (retornar nombres disponibles)
         const available = sheets.map(s => s.getName()).join(", ");
         return response({ status: "error", message: `No se encontró la hoja 'Postulaciones Web'. Hojas disponibles: ${available}` });
       }
 
       // CAMBIO 2: Agregamos antigüedad antes del link
-      // Orden: Fecha | Nombre | Email | Teléfono | Cargo | Antigüedad | Link CV
       sheet.appendRow([
         new Date(),
         data.name,
@@ -50,6 +48,9 @@ function doPost(e) {
         data.antiguedad || "N/A", // Valor nuevo
         file.getUrl()
       ]);
+
+      // --- APLICAR ESTILO ---
+      applyStyles(sheet);
 
       return response({ status: "success", message: "Postulación recibida" });
     }
@@ -67,7 +68,12 @@ function doPost(e) {
       const sheet = ss.getSheetByName("Base Docentes");
       const rows = sheet.getDataRange().getValues();
       if (rows.slice(1).some(row => String(row[0]).trim() === String(data.dni).trim())) return response({ status: "error", message: "DNI registrado" });
+
       sheet.appendRow(["'" + data.dni, data.password, data.name]);
+
+      // --- APLICAR ESTILO ---
+      applyStyles(sheet);
+
       return response({ status: "success", name: data.name });
     }
 
@@ -142,6 +148,54 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+// --- FUNCIÓN DE ESTILO ---
+function applyStyles(sheet) {
+  if (sheet.getLastRow() === 0) return;
+
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+  const fullRange = sheet.getRange(1, 1, lastRow, lastCol);
+  const headerRange = sheet.getRange(1, 1, 1, lastCol);
+
+  // 1. Congelar primera fila
+  sheet.setFrozenRows(1);
+
+  // 2. Estilo Encabezado (Azul Cristo Rey + Texto Blanco Bold)
+  headerRange
+    .setBackground("#1B365D")
+    .setFontColor("#FFFFFF")
+    .setFontWeight("bold")
+    .setHorizontalAlignment("center")
+    .setVerticalAlignment("middle");
+
+  // 3. Estilo Cuerpo (Filas alternas, ajuste vertical)
+  fullRange.setVerticalAlignment("middle");
+
+  // Limpiar bandas previas para evitar conflictos y reaplicar
+  const bandit = sheet.getBandings();
+  if (bandit.length > 0) {
+    bandit.forEach(b => b.remove());
+  }
+
+  // Aplicar bandas de color alterno (Blanco Hueso #FDFBF7)
+  fullRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, false, false);
+  // Nota: Google Apps Script tiene temas predefinidos, para usar colores custom exactos
+  // tendríamos que setear background manual fila por fila o usar setBackgrounds.
+  // Para simplicidad y performance, usamos un color de fondo manual para las pares:
+
+  // Resetear fondos primero (salvo header)
+  if (lastRow > 1) {
+    const dataRange = sheet.getRange(2, 1, lastRow - 1, lastCol);
+    dataRange.setBackground("#FFFFFF");
+
+    // Bordes Dorados Suaves (#C5A059)
+    fullRange.setBorder(true, true, true, true, true, true, "#C5A059", SpreadsheetApp.BorderStyle.SOLID);
+  }
+
+  // 4. Ajustar ancho de columnas al contenido
+  sheet.autoResizeColumns(1, lastCol);
 }
 
 function response(data) {
