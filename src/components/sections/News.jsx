@@ -2,51 +2,14 @@ import { useLayoutEffect, useRef } from 'react';
 import { Newspaper, Calendar, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { newsItems } from '../../data/newsData';
+import { fullCalendar } from '../../data/calendarData';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const News = () => {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
-
-  const newsItems = [
-    {
-      title: 'Huellas de Cristo Rey en la Eucaristía 2025',
-      date: '20 Nov, 2025',
-      image: '/images/noticias/1.webp',
-      category: 'Festejos',
-      description: 'La comunidad celebró la Eucaristía de Cristo Rey 2025, agradeciendo a todos los que participaron en su organización.'
-    },
-    {
-      title: 'Huellas de fiesta, juegos y talentos',
-      date: '19 Nov, 2025',
-      image: '/images/noticias/2.webp',
-      category: 'Celebración',
-      description: 'Jornada con diversas actividades artísticas, culturales y lúdicas que reflejaron el espíritu celebrativo.'
-    },
-    {
-      title: 'Huellas de Cristo Rey',
-      date: '17 Nov, 2025',
-      image: '/images/noticias/3.webp',
-      category: 'Comunidad',
-      description: 'La comunidad expresó su gratitud hacia los estudiantes de la promoción 2025 que realizaron catequesis.'
-    }
-  ];
-
-  const fullCalendar = [
-    { month: 'Enero', event: 'Receso de Verano', date: '-' },
-    { month: 'Febrero', event: 'Inicio de Ciclo Lectivo', date: '23' },
-    { month: 'Marzo', event: 'Inicio del Ciclo Lectivo', date: '01' },
-    { month: 'Abril', event: 'Semana Santa y Pascuas', date: '15-19' },
-    { month: 'Mayo', event: 'Mes de la Virgen María', date: 'Todo el mes' },
-    { month: 'Junio', event: 'Promesa a la Bandera', date: '20' },
-    { month: 'Julio', event: 'Receso Escolar de Invierno', date: '13-24' },
-    { month: 'Agosto', event: 'Semana del Colegio', date: '12-16' },
-    { month: 'Septiembre', event: 'Día del Estudiante', date: '21' },
-    { month: 'Octubre', event: 'Expo Cristo Rey', date: '10' },
-    { month: 'Noviembre', event: 'Muestras Anuales', date: '15-30' },
-    { month: 'Diciembre', event: 'Finalizacion del Cliclo Lectivo', date: '18' }
-  ];
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {

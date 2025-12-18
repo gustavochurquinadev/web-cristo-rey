@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://colegiocristorey.edu.ar/sitemap.xml

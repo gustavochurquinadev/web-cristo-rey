@@ -42,8 +42,11 @@ const Hero = ({ onNavigate, startAnimation }) => {
           src="/images/hero-colegio.webp"
           alt="Colegio Cristo Rey"
           className="w-full h-full object-cover"
+          fetchpriority="high"
+          loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-cristo-primary/90 via-cristo-primary/40 to-transparent"></div>
+        {/* CORRECCIÓN: Gradiente un poco más oscuro para asegurar legibilidad */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cristo-primary/95 via-cristo-primary/60 to-transparent"></div>
       </div>
 
       {/* Contenido Alineado a la Izquierda */}
