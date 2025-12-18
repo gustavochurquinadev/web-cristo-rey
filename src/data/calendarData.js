@@ -1,14 +1,75 @@
 export const fullCalendar = [
-    { month: 'Enero', event: 'Receso de Verano', date: '-' },
-    { month: 'Febrero', event: 'Inicio de Ciclo Lectivo', date: '23' },
-    { month: 'Marzo', event: 'Inicio del Ciclo Lectivo', date: '01' },
-    { month: 'Abril', event: 'Semana Santa y Pascuas', date: '15-19' },
-    { month: 'Mayo', event: 'Mes de la Virgen María', date: 'Todo el mes' },
-    { month: 'Junio', event: 'Promesa a la Bandera', date: '20' },
-    { month: 'Julio', event: 'Receso Escolar de Invierno', date: '13-24' },
-    { month: 'Agosto', event: 'Semana del Colegio', date: '12-16' },
-    { month: 'Septiembre', event: 'Día del Estudiante', date: '21' },
-    { month: 'Octubre', event: 'Expo Cristo Rey', date: '10' },
-    { month: 'Noviembre', event: 'Muestras Anuales', date: '15-30' },
-    { month: 'Diciembre', event: 'Finalizacion del Cliclo Lectivo', date: '18' }
+    {
+        month: 'Enero',
+        events: [
+            { date: '-', description: 'Receso de Verano' }
+        ]
+    },
+    {
+        month: 'Febrero',
+        events: [
+            { date: '05', description: 'Primera Jornada Institucional' },
+            { date: '23', description: 'Inicio de Ciclo Lectivo' }
+        ]
+    },
+    {
+        month: 'Marzo',
+        events: [
+            { date: '01', description: 'Inicio del Ciclo Lectivo' }
+        ]
+    },
+    {
+        month: 'Abril',
+        events: [
+            { date: '15-19', description: 'Semana Santa y Pascuas' }
+        ]
+    },
+    {
+        month: 'Mayo',
+        events: [
+            { date: 'Todo el mes', description: 'Mes de la Virgen María' }
+        ]
+    },
+    {
+        month: 'Junio',
+        events: [
+            { date: '20', description: 'Promesa a la Bandera' }
+        ]
+    },
+    {
+        month: 'Julio',
+        events: [
+            { date: '13-24', description: 'Receso Escolar de Invierno' }
+        ]
+    },
+    {
+        month: 'Agosto',
+        events: [
+            { date: '12-16', description: 'Semana del Colegio' }
+        ]
+    },
+    {
+        month: 'Septiembre',
+        events: [
+            { date: '21', description: 'Día del Estudiante' }
+        ]
+    },
+    {
+        month: 'Octubre',
+        events: [
+            { date: '10', description: 'Expo Cristo Rey' }
+        ]
+    },
+    {
+        month: 'Noviembre',
+        events: [
+            { date: '15-30', description: 'Muestras Anuales' }
+        ]
+    },
+    {
+        month: 'Diciembre',
+        events: [
+            { date: '18', description: 'Finalizacion del Cliclo Lectivo' }
+        ]
+    }
 ];

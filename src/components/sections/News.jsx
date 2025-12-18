@@ -115,15 +115,22 @@ const News = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {fullCalendar.map((month, i) => (
                 <div key={i} className="calendar-item bg-gray-50 p-6 rounded-xl border border-gray-100 hover:border-cristo-accent hover:shadow-md transition-all duration-300 group">
-                  <div className="flex justify-between items-center mb-3">
+                  <div className="mb-3 border-b border-gray-100 pb-2">
                     <span className="font-serif text-lg font-bold text-cristo-primary">{month.month}</span>
-                    {month.date !== '-' && (
-                      <span className="text-xs font-bold text-cristo-accent bg-cristo-secondary/20 px-2 py-1 rounded text-right">{month.date}</span>
-                    )}
                   </div>
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wide group-hover:text-cristo-dark transition-colors">
-                    {month.event}
-                  </p>
+
+                  <div className="flex flex-col space-y-2">
+                    {month.events.map((evt, j) => (
+                      <div key={j} className="flex justify-between items-start">
+                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide group-hover:text-cristo-dark transition-colors text-left flex-1 mr-2">
+                          {evt.description}
+                        </p>
+                        {evt.date !== '-' && (
+                          <span className="text-[10px] font-bold text-cristo-accent bg-cristo-secondary/20 px-1.5 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">{evt.date}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
