@@ -19,12 +19,25 @@ function doPost(e) {
       const blob = Utilities.newBlob(Utilities.base64Decode(data.fileData), data.fileMimeType, data.fileName);
       const file = folder.createFile(blob);
 
-      // CAMBIO 1: Buscamos la hoja correcta ("postulaciones web" o "Postulaciones Web" o fallback a "Postulaciones")
-      let sheet = ss.getSheetByName("postulaciones web");
-      if (!sheet) sheet = ss.getSheetByName("Postulaciones Web"); // Intento con Mayúsculas
-      if (!sheet) sheet = ss.getSheetByName("Postulaciones");     // Fallback original
+      // CAMBIO ROBUSTO: Iterar para encontrar la hoja ignorando mayúsculas/espacios
+      const sheets = ss.getSheets();
+      let sheet = null;
 
-      if (!sheet) return response({ status: "error", message: "No se encontró la hoja 'postulaciones web'" });
+      const targetNames = ["postulaciones web", "postulaciones", "postulacionesweb"];
+
+      for (const s of sheets) {
+        const cleanName = s.getName().toLowerCase().trim().replace(/\s+/g, ' '); // Normalizar espacios
+        if (targetNames.includes(cleanName) || targetNames.includes(cleanName.replace(/\s/g, ''))) {
+          sheet = s;
+          break;
+        }
+      }
+
+      if (!sheet) {
+        // Log para depuración (retornar nombres disponibles)
+        const available = sheets.map(s => s.getName()).join(", ");
+        return response({ status: "error", message: `No se encontró la hoja 'Postulaciones Web'. Hojas disponibles: ${available}` });
+      }
 
       // CAMBIO 2: Agregamos antigüedad antes del link
       // Orden: Fecha | Nombre | Email | Teléfono | Cargo | Antigüedad | Link CV

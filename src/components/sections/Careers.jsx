@@ -71,27 +71,31 @@ const Careers = () => {
         fileData: base64File
       };
 
-      await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify(payload)
       });
 
-      toast.success("¡Postulación recibida correctamente!", { id: toastId });
+      const data = await response.json();
 
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        position: '',
-        antiguedad: '',
-        cv: null
-      });
-
-      setFileName('');
+      if (data.status === 'success') {
+        toast.success("¡Postulación recibida correctamente!", { id: toastId });
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          position: '',
+          antiguedad: '',
+          cv: null
+        });
+        setFileName('');
+      } else {
+        throw new Error(data.message || "Error desconocido del servidor");
+      }
 
     } catch (error) {
       console.error(error);
-      toast.error("Hubo un error de conexión. Intenta nuevamente.", { id: toastId });
+      toast.error(error.message || "Hubo un error de conexión. Intenta nuevamente.", { id: toastId });
     } finally {
       setIsSubmitting(false);
     }
