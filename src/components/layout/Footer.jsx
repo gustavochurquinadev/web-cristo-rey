@@ -73,7 +73,14 @@ const Footer = () => {
           <div className="flex space-x-4 mt-2 md:mt-0">
             <a href="#" className="hover:text-white">Privacidad</a>
             <a href="#" className="hover:text-white">Términos</a>
-            <a href="#" className="hover:text-white">GD – Web & Motion Design ❤️</a>
+            <a
+              href="https://wa.me/5493885016518?text=hola!%20quiero%20consultar%20por%20el%20desarrollo%20de%20una%20pagina%20web"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white"
+            >
+              GD – Web & Motion Design ❤️
+            </a>
           </div>
         </div>
       </div>
