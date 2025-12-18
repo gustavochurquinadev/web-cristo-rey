@@ -1,6 +1,6 @@
 // --- CONFIGURACIÓN ---
 const FOLDER_ID_RECIBOS = "1jXlN9xAbyMzDERjIwZmyFR99mmhDU0rs";
-const FOLDER_ID_CV = "1i7EMB1uJ_OIuzJUu790BkySYbdxUh7eL6dp5KeGLmpI"; // ID que tenías en SHEET_ID
+const FOLDER_ID_CV = "19EW5KYC3ceWqSmF_VPftRUEMde4xc6HV";
 const FOLDER_ID_DOCS = "1Zrfb-LSBtzxuuk_W3xjW54txPieEbPxF";
 const SHEET_ID = "1TAZR5kycw7gf7wc1bV9fxAgRlY7g7GMtOCuQohyX0Vk"; // ID del Sheet (Confirmado por URL)
 const SECRET_TOKEN = "CRISTOREY2026";

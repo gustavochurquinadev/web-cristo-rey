@@ -14,7 +14,7 @@ const Staff = () => {
   const [registerData, setRegisterData] = useState({ dni: '', name: '', password: '', token: '' });
 
   // 🔴 URL DE TU SCRIPT (Verifica que sea la correcta)
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXbGHgsOlRZmIBxncD-rYWNZcib79fvO0t5HcesoF4C3tLfYh0U89ne3MdniGlT-KJVg/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9RF9Cze-DeZFKLFDnbmtXZvO4b4etlr0O4yLzo_J8rftQx6oLgVZbhqnum3RmnySGMQ/exec";
 
   // --- LOGIN ---
   const handleLogin = async (e) => {

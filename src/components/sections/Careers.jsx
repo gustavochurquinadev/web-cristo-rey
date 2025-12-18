@@ -16,7 +16,7 @@ const Careers = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 🔴 TU URL DE APPS SCRIPT
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXbGHgsOlRZmIBxncD-rYWNZcib79fvO0t5HcesoF4C3tLfYh0U89ne3MdniGlT-KJVg/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9RF9Cze-DeZFKLFDnbmtXZvO4b4etlr0O4yLzo_J8rftQx6oLgVZbhqnum3RmnySGMQ/exec";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
