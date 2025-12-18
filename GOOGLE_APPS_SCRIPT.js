@@ -1,8 +1,8 @@
 // --- CONFIGURACIÓN ---
-const FOLDER_ID_RECIBOS = "1jXlN9xAbyMzDERjIwZmyFR99mmhDU0rs"; 
-const FOLDER_ID_CV = "19EW5KYC3ceWqSmF_VPftRUEMde4xc6HV";
-const FOLDER_ID_DOCS = "1Zrfb-LSBtzxuuk_W3xjW54txPieEbPxF"; 
-const SHEET_ID = "1i7EMB1uJ_OIuzJUu790BkySYbdxUh7eL6dp5KeGLmpI";     
+const FOLDER_ID_RECIBOS = "1jXlN9xAbyMzDERjIwZmyFR99mmhDU0rs";
+const FOLDER_ID_CV = "1i7EMB1uJ_OIuzJUu790BkySYbdxUh7eL6dp5KeGLmpI"; // ID que tenías en SHEET_ID
+const FOLDER_ID_DOCS = "1Zrfb-LSBtzxuuk_W3xjW54txPieEbPxF";
+const SHEET_ID = "1TAZR5kycw7gf7wc1bV9fxAgRlY7g7GMtOCuQohyX0Vk"; // ID del Sheet (Confirmado por URL)
 const SECRET_TOKEN = "CRISTOREY2026";
 
 function doPost(e) {
@@ -18,26 +18,26 @@ function doPost(e) {
       const folder = DriveApp.getFolderById(FOLDER_ID_CV);
       const blob = Utilities.newBlob(Utilities.base64Decode(data.fileData), data.fileMimeType, data.fileName);
       const file = folder.createFile(blob);
-      
+
       // CAMBIO 1: Buscamos la hoja correcta ("postulaciones web" o "Postulaciones Web" o fallback a "Postulaciones")
       let sheet = ss.getSheetByName("postulaciones web");
       if (!sheet) sheet = ss.getSheetByName("Postulaciones Web"); // Intento con Mayúsculas
       if (!sheet) sheet = ss.getSheetByName("Postulaciones");     // Fallback original
-      
+
       if (!sheet) return response({ status: "error", message: "No se encontró la hoja 'postulaciones web'" });
 
       // CAMBIO 2: Agregamos antigüedad antes del link
       // Orden: Fecha | Nombre | Email | Teléfono | Cargo | Antigüedad | Link CV
       sheet.appendRow([
-        new Date(), 
-        data.name, 
-        data.email, 
-        data.phone, 
-        data.position, 
+        new Date(),
+        data.name,
+        data.email,
+        data.phone,
+        data.position,
         data.antiguedad || "N/A", // Valor nuevo
         file.getUrl()
       ]);
-      
+
       return response({ status: "success", message: "Postulación recibida" });
     }
 
@@ -90,12 +90,12 @@ function doPost(e) {
       const folder = DriveApp.getFolderById(FOLDER_ID_DOCS);
       const files = folder.getFiles();
       const docs = [];
-      
+
       while (files.hasNext()) {
         const file = files.next();
         docs.push({
           id: file.getId(),
-          name: file.getName().replace('.pdf', '').replace('.doc', '').replace('.docx', ''), 
+          name: file.getName().replace('.pdf', '').replace('.doc', '').replace('.docx', ''),
           type: file.getMimeType(),
           url: file.getDownloadUrl().replace('&export=download', '')
         });
