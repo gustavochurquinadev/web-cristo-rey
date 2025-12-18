@@ -19,7 +19,7 @@ const ReceiptProcessor = () => {
   const [loadingFolders, setLoadingFolders] = useState(false);
 
   // 🔴 URL DE TU SCRIPT
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jDmkuZ-1pFmusACnH80M-Eqi50h1JbyBWTCHF3XGoB7r7un1wrwaqpp5XN14kyHHaw/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2-YyjICMqFXwZl4FtY53rdgCACO-CcWDWkZbP-RwgSSk_JrlqZ54ph_QALuMsYYYB/exec";
   const DNI_COLEGIO = "68738952";
 
   // Cargar carpetas al iniciar
