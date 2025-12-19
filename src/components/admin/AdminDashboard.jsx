@@ -289,9 +289,9 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-3 text-gray-600">
                         <span className={`px - 2 py - 1 rounded text - [10px] font - bold uppercase ${
-    s.nivel === 'Inicial' ? 'bg-pink-100 text-pink-600' :
-        s.nivel === 'Primario' ? 'bg-blue-100 text-blue-600' :
-            'bg-purple-100 text-purple-600'
+  s.nivel === 'Inicial' ? 'bg-pink-100 text-pink-600' :
+    s.nivel === 'Primario' ? 'bg-blue-100 text-blue-600' :
+      'bg-purple-100 text-purple-600'
 } `}>
                           {s.nivel}
                         </span>
@@ -433,9 +433,9 @@ const AdminDashboard = () => {
                          onClick={() => togglePayment(key)}
                          className={`relative p - 4 rounded - xl border - 2 transition - all duration - 200 flex flex - col items - center justify - center gap - 2 group
                            ${
-    isPaid
-        ? 'bg-green-50 border-green-500 text-green-700'
-        : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-400 hover:text-gray-600'
+  isPaid
+    ? 'bg-green-50 border-green-500 text-green-700'
+    : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-400 hover:text-gray-600'
 }
 `}
                        >
