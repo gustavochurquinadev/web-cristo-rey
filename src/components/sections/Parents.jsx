@@ -9,7 +9,7 @@ const Parents = () => {
     const [dni, setDni] = useState('');
 
     // 🔴 URL DEL SCRIPT DE PADRES (Diferente al principal)
-    const GOOGLE_SCRIPT_URL_PADRES = "TU_NUEVA_URL_DEL_SCRIPT_AQUI";
+    const GOOGLE_SCRIPT_URL_PADRES = "https://script.google.com/macros/s/AKfycbx_pcFTph81h5FcsR6KgpoJUxlF7a7gLHbscxp7GW5aqQ4pBswE2p3iS-kXjTbZND2p/exec";
 
     // --- 1. LOGIN ---
     const handleLogin = async (e) => {
@@ -165,8 +165,8 @@ const Parents = () => {
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                                 {months.map((m) => (
                                     <div key={m.key} className={`p-3 rounded-lg border text-center transition-all ${studentData.payments[m.key]
-                                            ? 'bg-white border-green-200 shadow-sm'
-                                            : 'bg-gray-50 border-gray-100 opacity-60' // O rojo si venció? Por simplicidad: verde o gris
+                                        ? 'bg-white border-green-200 shadow-sm'
+                                        : 'bg-gray-50 border-gray-100 opacity-60' // O rojo si venció? Por simplicidad: verde o gris
                                         }`}>
                                         <p className="text-xs text-gray-500 uppercase mb-1">{m.label}</p>
                                         <div className="flex justify-center">
