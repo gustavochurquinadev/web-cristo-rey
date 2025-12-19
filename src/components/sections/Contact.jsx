@@ -11,10 +11,10 @@ const Contact = () => {
   const mapContainerRef = useRef(null);
 
   const contactInternals = [
-    { area: 'Administración', ext: '101' },
-    { area: 'Secretaría General', ext: '102' },
-    { area: 'Nivel Inicial/Primario', ext: '103' },
-    { area: 'Nivel Secundario', ext: '104' }
+    { area: 'Nivel Inicial', ext: '101' },
+    { area: 'Nivel Primario', ext: '100' },
+    { area: 'Nivel Secundario', ext: '102' },
+    { area: 'Administración', ext: '103' }
   ];
 
   const institutionalEmails = [
