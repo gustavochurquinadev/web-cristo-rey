@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 // Páginas y Componentes
 import Landing from './pages/Landing';
 import Staff from './components/sections/Staff';
+import Parents from './components/sections/Parents';
 import ReceiptProcessor from './components/admin/ReceiptProcessor';
 import PageTransition from './components/layout/PageTransition';
 
@@ -45,6 +46,13 @@ const App = () => {
               <div className="bg-gray-50 min-h-screen">
                 <Staff />
               </div>
+            </WithTransition>
+          } />
+
+          {/* Ruta 3: Portal Padres */}
+          <Route path="/familias" element={
+            <WithTransition>
+              <Parents />
             </WithTransition>
           } />
 
