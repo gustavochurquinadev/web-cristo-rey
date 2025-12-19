@@ -6,6 +6,8 @@ import { Toaster } from 'sonner';
 import Landing from './pages/Landing';
 import Staff from './components/sections/Staff';
 import Parents from './components/sections/Parents';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './components/admin/AdminDashboard';
 import ReceiptProcessor from './components/admin/ReceiptProcessor';
 import PageTransition from './components/layout/PageTransition';
 
@@ -56,14 +58,11 @@ const App = () => {
             </WithTransition>
           } />
 
-          {/* Ruta 3: Admin */}
-          <Route path="/admin" element={
-            <WithTransition>
-              <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-                <ReceiptProcessor />
-              </div>
-            </WithTransition>
-          } />
+          {/* Ruta 3: Admin System */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="receipts" element={<ReceiptProcessor />} />
+          </Route>
         </Routes>
       </Suspense>
     </Router>
