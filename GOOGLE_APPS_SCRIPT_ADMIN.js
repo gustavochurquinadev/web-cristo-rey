@@ -302,15 +302,25 @@ function APPLY_FILTERS() {
 }
 
 // ==========================================
+// 📦 VERSIÓN: 3.7 (Optimización: Lecturas Rápidas sin Bloqueo) - ACTUALIZADO: 19/12/2025
+
+// ==========================================
 // ⚡ BACKEND WEB (doPost)
 // ==========================================
 
 function doPost(e) {
     const lock = LockService.getScriptLock();
-    lock.tryLock(10000);
+    // OPTIMIZACIÓN: Solo bloqueamos para escritura. Lecturas en paralelo.
+    var data;
+    try { data = JSON.parse(e.postData.contents); } catch (e) { return response({ error: "json" }); }
+
+    const isWriteAction = ["create", "edit", "delete", "promoteAll", "updatePayment", "sync"].includes(data.action);
+
+    if (isWriteAction) {
+        lock.tryLock(10000); // 10s wait solo para escribir
+    }
 
     try {
-        const data = JSON.parse(e.postData.contents);
         const props = PropertiesService.getScriptProperties();
         const sheetId = SPREADSHEET_ID !== "PONER_ID_AQUI_SI_YA_TIENES_HOJA" ? SPREADSHEET_ID : props.getProperty('SPREADSHEET_ID');
         if (!sheetId) return response({ status: "error", message: "Error Config" });

@@ -73,20 +73,27 @@ const AdminDashboard = () => {
   });
 
   // --- 3. BORRAR ---
+  // --- 3. BORRAR ---
   const handleDelete = async (id) => {
-    if (confirm("⚠️ ¿Seguro que desea dar de BAJA a este alumno?")) {
-      const toastId = toast.loading("Procesando baja...");
+    if (confirm("⚠️ ¿Seguro que desea ELIMINAR a este alumno? (Se borrará de datos y pagos)")) {
+      // Optimistic UI: Borrar inmediatamente de la vista
+      const previousStudents = [...students];
+      setStudents(prev => prev.filter(s => s.id !== id));
+
+      const toastId = toast.loading("Eliminando en segundo plano...");
+
       try {
         await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
           method: "POST",
           body: JSON.stringify({ action: "delete", id: id }),
         });
         toast.dismiss(toastId);
-        toast.success("Alumno dado de baja exitosamente");
-        fetchStudents();
+        toast.success("Alumno eliminado");
+        // No refetch needed, already removed.
       } catch (error) {
         toast.dismiss(toastId);
-        toast.error("Error al eliminar");
+        toast.error("Error al eliminar (Recargue la página)");
+        setStudents(previousStudents); // Rollback on error
       }
     }
   };
@@ -144,25 +151,51 @@ const AdminDashboard = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     const actionType = isEditing ? "edit" : "create";
-    const msgLoading = isEditing ? "Guardando cambios..." : "Inscribiendo alumno...";
 
-    const toastId = toast.loading(msgLoading);
-    try {
-      await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
-        method: "POST",
-        body: JSON.stringify({
-          action: actionType,
-          student: formData,
-          id: editId
-        }),
-      });
-      toast.dismiss(toastId);
-      toast.success(isEditing ? "Alumno editado correctamente" : "Alumno inscripto correctamente");
+    // OPTIMISTIC UPDATE PARA EDICIÓN
+    if (isEditing) {
       setShowModal(false);
-      fetchStudents();
-    } catch (error) {
-      toast.dismiss(toastId);
-      toast.error("Error al guardar");
+      const previousStudents = [...students];
+
+      // Actualizar visualmente ya
+      setStudents(prev => prev.map(s => s.id === editId ? {
+        ...s,
+        ...formData,
+        dni: String(formData.dni),
+        becaPorcentaje: formData.isBecado ? formData.becaPorcentaje : 0
+      } : s));
+
+      const toastId = toast.loading("Guardando cambios...");
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+          method: "POST",
+          body: JSON.stringify({ action: "edit", student: formData, id: editId }),
+        });
+        toast.dismiss(toastId);
+        toast.success("Cambios guardados");
+      } catch (error) {
+        toast.dismiss(toastId);
+        toast.error("Error al guardar");
+        setStudents(previousStudents); // Rollback
+      }
+
+    } else {
+      // CREACIÓN (Sigue siendo Bloqueante para asegurar ID correcto)
+      const toastId = toast.loading("Inscribiendo alumno...");
+      try {
+        await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+          method: "POST",
+          body: JSON.stringify({ action: actionType, student: formData }),
+        });
+        toast.dismiss(toastId);
+        toast.success("Alumno inscripto correctamente");
+        setShowModal(false);
+        fetchStudents(); // Para obtener el ID nuevo
+      } catch (error) {
+        toast.dismiss(toastId);
+        toast.error("Error al inscribir");
+      }
     }
   };
 
