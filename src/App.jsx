@@ -58,7 +58,7 @@ const App = () => {
             </WithTransition>
           } />
 
-          {/* Ruta 3: Admin System */}
+          {/* Admin System - Updated Route */}
           <Route path="/sistemalegajo" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="receipts" element={<div>Recibos (Próximamente)</div>} />
