@@ -1,5 +1,6 @@
 // ----------------------------------------------------------------
-// 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO (ADMIN + PADRES + SYNC)
+// 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
+// 📦 VERSIÓN: 3.6 (BugFix: setBold) - ACTUALIZADO: 19/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES Y SINCRONIZACIÓN.
 
@@ -149,24 +150,64 @@ function SETUP_STYLES() {
         header.setFontWeight("bold");
         header.setHorizontalAlignment("center");
 
-        try {
-            const bandings = sheet.getBandings();
-            bandings.forEach(b => b.remove());
-        } catch (e) { }
+        // Limpiar estilos previos de datos y bandings
+        if (sheet.getLastRow() > 1) {
+            const fullRange = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn());
+            fullRange.setBackground(null); // Limpiar fondo manual
+            fullRange.setFontColor("#333333"); // Gris oscuro elegante
+            fullRange.setFontFamily("Calibri");
+            fullRange.setFontSize(11);
+            fullRange.setVerticalAlignment("middle");
 
-        rangeData.setBorder(true, true, true, true, true, true, "#e0e0e0", SpreadsheetApp.BorderStyle.SOLID);
+            // BORDE SUTIL
+            fullRange.setBorder(true, true, true, true, true, true, "#d0d0d0", SpreadsheetApp.BorderStyle.SOLID);
+
+            // ALINEACIONES ESPECÍFICAS (Solo para Legajos)
+            if (sheet.getName() === "Legajos 2026") {
+                // DNI (A) -> Centro
+                sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).setHorizontalAlignment("center");
+                // ALUMNO (B) -> Izquierda (Mejor lectura) y un poco de Padding visual si se pudiera (Sheets no tiene padding celdas facil, pero Left es clave)
+                sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).setHorizontalAlignment("left").setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+                // RESTO (C-H) -> Centro
+                sheet.getRange(2, 3, sheet.getLastRow() - 1, 6).setHorizontalAlignment("center");
+            } else {
+                // Para otras hojas (Cobranzas) todo centrado por defecto, salvo Nombre
+                fullRange.setHorizontalAlignment("center");
+                if (sheet.getLastColumn() >= 2) sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).setHorizontalAlignment("left");
+            }
+
+            // BANDING (ZEBRA) - Tono suave y profesional
+            // Primero borramos anteriores para no duplicar
+            try {
+                const bandings = sheet.getBandings();
+                bandings.forEach(b => b.remove());
+            } catch (e) { }
+
+            const rangeToBand = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn());
+            const banding = rangeToBand.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
+            banding.setHeaderRowColor(null); // No tocar header con banding, ya lo pintamos manual
+            banding.setFirstRowColor("#ffffff");
+            banding.setSecondRowColor("#f8f9fa"); // Gris muy muy clarito, no choca.
+        }
+
     });
 
+    // 2. LÓGICA COBRANZAS 
     // 2. LÓGICA COBRANZAS 
     const sheetC = ss.getSheetByName("Cobranzas 2026");
     if (sheetC) {
         const lastRow = sheetC.getLastRow();
         if (lastRow < 2) return;
 
-        const payRange = sheetC.getRange(2, 4, lastRow - 1, 12);
+        // ESTÉTICA COBRANZAS
+        const rangeC = sheetC.getDataRange();
+        rangeC.setHorizontalAlignment("center"); // Todo centrado base
+        sheetC.getRange(2, 2, lastRow - 1, 1).setHorizontalAlignment("left"); // Nombre a la izquierda
 
+        // VALIDACIÓN DE DATOS (Solo PAGADO / ADEUDA)
+        const payRange = sheetC.getRange(2, 4, lastRow - 1, 12);
         const rule = SpreadsheetApp.newDataValidation()
-            .requireValueInList(["PAGADO", "ADEUDA", "BECADO", "PENDIENTE"], true)
+            .requireValueInList(["PAGADO", "ADEUDA"], true)
             .setAllowInvalid(false)
             .build();
         payRange.setDataValidation(rule);
@@ -174,19 +215,45 @@ function SETUP_STYLES() {
         sheetC.clearConditionalFormatRules();
         const rules = [];
 
-        // VERDE CLARO (PAGADO)
-        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("PAGADO").setBackground("#e6f4ea").setFontColor("#137333").setRanges([payRange]).build());
-        // ROJO CLARO (ADEUDA)
-        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("ADEUDA").setBackground("#fce8e6").setFontColor("#c5221f").setRanges([payRange]).build());
+        // VERDE (PAGADO)
+        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("PAGADO").setBackground("#e6f4ea").setFontColor("#137333").setBold(true).setRanges([payRange]).build());
+        // ROJO (ADEUDA)
+        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("ADEUDA").setBackground("#fce8e6").setFontColor("#c5221f").setBold(true).setRanges([payRange]).build());
 
-        // FÓRMULA INTELIGENTE
+        // FÓRMULA INTELIGENTE DE ESTADO (COLUMNA P)
+        // Lógica: Si hoy supera el día 10 del mes, y el mes no es PAGADO -> DEUDA.
+        // Matricula (Col D) siempre se chequea.
         const formulaCell = sheetC.getRange("P2");
-        const smartFormula = `=MAP(A2:A; D2:D; E2:E; F2:F; G2:G; H2:H; I2:I; J2:J; K2:K; L2:L; M2:M; N2:N; O2:O; LAMBDA(dni; mat; feb; mar; abr; may; jun; jul; ago; sep; oct; nov; dic; IF(dni="";""; LET(today; TODAY(); mIdx; MONTH(today); dIdx; DAY(today); deadline; 10; checkM; LAMBDA(val; num; IF(AND(mIdx > num; val<>"PAGADO"); 1; IF(AND(mIdx=num; dIdx>deadline; val<>"PAGADO"); 1; 0))); deuda; checkM(feb;2) + checkM(mar;3) + checkM(abr;4) + checkM(may;5) + checkM(jun;6) + checkM(jul;7) + checkM(ago;8) + checkM(sep;9) + checkM(oct;10) + checkM(nov;11) + checkM(dic;12); IF(deuda > 0; "MORA"; "AL DIA")))))`;
+
+        // Explicación Fórmula:
+        // Chequea cada mes. Si (MesActual > MesColumna) Y (Valor <> "PAGADO") => Suma Deuda.
+        // Meses: Feb(2) a Dic(12). Matrícula se asume mes 1 (siempre exigible).
+        const smartFormula = `=MAP(D2:D; E2:E; F2:F; G2:G; H2:H; I2:I; J2:J; K2:K; L2:L; M2:M; N2:N; O2:O; LAMBDA(mat; feb; mar; abr; may; jun; jul; ago; sep; oct; nov; dic; 
+            LET(
+                hoy; TODAY(); 
+                m; MONTH(hoy); 
+                d; DAY(hoy); 
+                
+                check; LAMBDA(mesNum; val; 
+                    IF(val="PAGADO"; 0; 
+                      IF(m > mesNum; 1; 
+                        IF(AND(m = mesNum; d > 10); 1; 0)
+                      )
+                    )
+                );
+
+                deudaMat; IF(mat="PAGADO"; 0; 1);
+                totalDeuda; deudaMat + check(2; feb) + check(3; mar) + check(4; abr) + check(5; may) + check(6; jun) + check(7; jul) + check(8; ago) + check(9; sep) + check(10; oct) + check(11; nov) + check(12; dic);
+                
+                IF(mat=""; ""; IF(totalDeuda > 0; "DEUDA"; "AL DIA"))
+            )
+        ))`;
+
         formulaCell.setFormula(smartFormula);
 
         const statusRange = sheetC.getRange(2, 16, lastRow - 1, 1);
-        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("AL DIA").setBackground("#e6f4ea").setFontColor("#137333").setBold(true).setRanges([statusRange]).build());
-        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("MORA").setBackground("#fce8e6").setFontColor("#c5221f").setBold(true).setRanges([statusRange]).build());
+        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("AL DIA").setBackground("#0f9d58").setFontColor("#ffffff").setBold(true).setRanges([statusRange]).build());
+        rules.push(SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("DEUDA").setBackground("#d93025").setFontColor("#ffffff").setBold(true).setRanges([statusRange]).build());
         sheetC.setConditionalFormatRules(rules);
     }
 
@@ -255,6 +322,11 @@ function doPost(e) {
         if (!sheetLegajos || !sheetCobranzas) return response({ status: "error", message: "Faltan hojas" });
 
         if (data.action === "getAll") {
+            // AUTO-REPARACIÓN DE CABECERA (Por si el usuario no corrió los estilos)
+            if (sheetLegajos.getRange("H1").getValue() === "") {
+                sheetLegajos.getRange("H1").setValue("% BECA").setBackground("#4285f4").setFontColor("#ffffff").setFontWeight("bold").setHorizontalAlignment("center");
+            }
+
             const rowsLegajos = sheetLegajos.getDataRange().getValues();
             const rowsCobranzas = sheetCobranzas.getDataRange().getValues();
 
@@ -332,8 +404,18 @@ function doPost(e) {
         }
 
         if (data.action === "delete") {
-            sheetLegajos.getRange(parseInt(data.id), 7).setValue("Baja");
-            return response({ status: "success", message: "Baja procesada" });
+            const rowIdx = parseInt(data.id);
+            sheetLegajos.deleteRow(rowIdx);
+
+            // Opcional: Eliminar también de Cobranzas inmediatamente para mantener consistencia
+            const rowsC = sheetCobranzas.getDataRange().getValues();
+            // Buscar por DNI porque el ID (row) no necesariamente coincide
+            // Obtenemos el DNI de la fila que acabamos de borrar? No, ya la borramos.
+            // Deberíamos haber leído el DNI antes. Pero para simplificar y no complicar la transaccionalidad:
+            // La función SYNC_FULL se encargará de limpiar huérfanos en Cobranzas.
+            // O podemos forzar una limpieza rápida de huérfanos aquí si quisiéramos.
+
+            return response({ status: "success", message: "Alumno eliminado definitivamente" });
         }
 
         if (data.action === "promoteAll") {

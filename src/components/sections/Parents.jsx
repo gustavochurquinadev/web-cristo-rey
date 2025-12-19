@@ -164,15 +164,15 @@ const Parents = () => {
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                                 {months.map((m) => (
                                     <div key={m.key} className={`p-3 rounded-lg border text-center transition-all ${studentData.payments[m.key]
-                                        ? 'bg-white border-green-200 shadow-sm'
-                                        : 'bg-gray-50 border-gray-100 opacity-60' // O rojo si venció? Por simplicidad: verde o gris
+                                        ? 'bg-green-50 border-green-200 shadow-sm'
+                                        : 'bg-red-50 border-red-200'
                                         }`}>
-                                        <p className="text-xs text-gray-500 uppercase mb-1">{m.label}</p>
+                                        <p className={`text-xs uppercase mb-1 ${studentData.payments[m.key] ? 'text-green-700' : 'text-red-700'}`}>{m.label}</p>
                                         <div className="flex justify-center">
                                             {studentData.payments[m.key] ? (
-                                                <CheckCircle className="w-5 h-5 text-green-500" />
+                                                <CheckCircle className="w-5 h-5 text-green-600" />
                                             ) : (
-                                                <div className="w-5 h-5 rounded-full border-2 border-gray-200"></div>
+                                                <XCircle className="w-5 h-5 text-red-500" />
                                             )}
                                         </div>
                                     </div>
