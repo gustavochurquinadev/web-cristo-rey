@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, X, DollarSign, Check, Clock } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, X, DollarSign, Check, Clock, FileText, Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdminDashboard = () => {
@@ -209,13 +209,36 @@ const AdminDashboard = () => {
           paid: newStatus
         }),
       });
-      toast.success("Pago de " + monthKey + " actualizado");
+      toast.success("Pago de " + monthLabels[monthKey] + " actualizado");
       // Opcional: Recargar estudiantes para actualizar el semáforo "AL DIA" si cambió
       // fetchStudents(); // Puede ser muy pesado, mejor dejarlo asincrono o que actualice al cerrar modal.
     } catch (error) {
       toast.error("Error al guardar el pago");
       // Rollback
       setPayments(prev => ({ ...prev, [monthKey]: currentStatus }));
+    }
+  };
+
+  const handleDownloadLibreDeuda = async () => {
+    if (!selectedStudent) return;
+    const toastId = toast.loading("Generando certificado...");
+    try {
+      const response = await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+        method: "POST",
+        body: JSON.stringify({ action: "generateLibreDeuda", dni: selectedStudent.dni }),
+      });
+      const data = await response.json();
+      if (data.status === "success" && data.url) {
+        window.open(data.url, "_blank");
+        toast.dismiss(toastId);
+        toast.success("Certificado generado");
+      } else {
+        toast.dismiss(toastId);
+        toast.error("Error: " + data.message);
+      }
+    } catch (error) {
+      toast.dismiss(toastId);
+      toast.error("Error de conexión");
     }
   };
 
@@ -342,8 +365,8 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-3 text-gray-600">
                         <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${s.nivel === 'Inicial' ? 'bg-pink-100 text-pink-600' :
-                            s.nivel === 'Primario' ? 'bg-blue-100 text-blue-600' :
-                              'bg-purple-100 text-purple-600'
+                          s.nivel === 'Primario' ? 'bg-blue-100 text-blue-600' :
+                            'bg-purple-100 text-purple-600'
                           }`}>
                           {s.nivel}
                         </span>
@@ -493,7 +516,17 @@ const AdminDashboard = () => {
                 <h3 className="font-bold text-xl">{selectedStudent.apellido}, {selectedStudent.nombre}</h3>
                 <p className="text-gray-400 text-sm">Gestionando pagos ciclo 2026</p>
               </div>
-              <button onClick={() => setShowPaymentModal(false)} className="hover:bg-white/10 p-2 rounded-full transition-colors"><X className="w-6 h-6" /></button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDownloadLibreDeuda}
+                  className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/20"
+                  title="Descargar Libre Deuda"
+                >
+                  <FileText className="w-4 h-4" />
+                  Libre Deuda
+                </button>
+                <button onClick={() => setShowPaymentModal(false)} className="hover:bg-white/10 p-2 rounded-full transition-colors"><X className="w-6 h-6" /></button>
+              </div>
             </div>
 
             {/* Body */}
