@@ -467,30 +467,98 @@ const AdminDashboard = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Nivel</label>
-                  <select className="w-full p-2 border rounded" value={formData.nivel} onChange={e => setFormData({ ...formData, nivel: e.target.value })}>
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={formData.nivel}
+                    onChange={e => {
+                      const newNivel = e.target.value;
+                      // Reset defaults when changing level
+                      let newGrado = "1";
+                      let newDiv = "A";
+                      let newTurno = "Mañana";
+
+                      if (newNivel === "Inicial") { newGrado = "3"; newDiv = "A"; }
+                      if (newNivel === "Primario") { newGrado = "1"; newDiv = "A"; }
+                      if (newNivel === "Secundario") { newGrado = "1"; newDiv = "1era"; newTurno = "Mañana"; }
+
+                      setFormData({ ...formData, nivel: newNivel, grado: newGrado, division: newDiv, turno: newTurno });
+                    }}
+                  >
                     <option value="Inicial">Inicial</option>
                     <option value="Primario">Primario</option>
                     <option value="Secundario">Secundario</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Grado/Año</label>
-                  <input required type="number" className="w-full p-2 border rounded" value={formData.grado} onChange={e => setFormData({ ...formData, grado: e.target.value })} />
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    {formData.nivel === 'Inicial' ? 'Sala' : formData.nivel === 'Secundario' ? 'Año' : 'Grado'}
+                  </label>
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={formData.grado}
+                    onChange={e => setFormData({ ...formData, grado: e.target.value })}
+                  >
+                    {formData.nivel === "Inicial" && (
+                      <>
+                        <option value="3">Sala de 3</option>
+                        <option value="4">Sala de 4</option>
+                        <option value="5">Sala de 5</option>
+                      </>
+                    )}
+                    {formData.nivel === "Primario" && (
+                      <>
+                        {[1, 2, 3, 4, 5, 6, 7].map(g => <option key={g} value={String(g)}>{g}° Grado</option>)}
+                      </>
+                    )}
+                    {formData.nivel === "Secundario" && (
+                      <>
+                        {[1, 2, 3, 4, 5].map(g => <option key={g} value={String(g)}>{g}° Año</option>)}
+                      </>
+                    )}
+                  </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">División</label>
-                  <select className="w-full p-2 border rounded" value={formData.division} onChange={e => setFormData({ ...formData, division: e.target.value })}>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={formData.division}
+                    onChange={e => {
+                      const newDiv = e.target.value;
+                      let newTurno = formData.turno;
+
+                      // Logic for Turno based on Division (Inicial/Primario)
+                      if (formData.nivel !== "Secundario") {
+                        if (newDiv === "A") newTurno = "Mañana";
+                        if (newDiv === "B") newTurno = "Tarde";
+                      }
+
+                      setFormData({ ...formData, division: newDiv, turno: newTurno });
+                    }}
+                  >
+                    {formData.nivel === "Secundario" ? (
+                      <>
+                        <option value="1era">1era</option>
+                        <option value="2da">2da</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="A">A (Mañana)</option>
+                        <option value="B">B (Tarde)</option>
+                        <option value="C">C</option>
+                      </>
+                    )}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Turno</label>
-                  <select className="w-full p-2 border rounded" value={formData.turno} onChange={e => setFormData({ ...formData, turno: e.target.value })}>
+                  <select
+                    className="w-full p-2 border rounded bg-gray-50"
+                    value={formData.turno}
+                    disabled={true} // Siempre deshabilitado porque es automático
+                  >
                     <option value="Mañana">Mañana</option>
                     <option value="Tarde">Tarde</option>
                   </select>
