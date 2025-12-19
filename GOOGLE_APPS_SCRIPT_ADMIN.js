@@ -32,9 +32,17 @@ function doPost(e) {
         // ==========================================
 
         if (data.action === "getAll") {
-            const rows = sheetLegajos.getDataRange().getValues();
-            const students = rows.slice(1).map((r, i) => ({
-                id: i + 2,
+            const rowsLegajos = sheetLegajos.getDataRange().getValues();
+            const rowsCobranzas = sheetCobranzas.getDataRange().getValues();
+
+            // Map cobranzas by DNI for O(1) lookup
+            const cobranzasMap = {};
+            rowsCobranzas.slice(1).forEach(r => {
+                cobranzasMap[String(r[0])] = r[15]; // Column 16 is 'ESTADO' (Deuda/Al Dia) - Index 15
+            });
+
+            const students = rowsLegajos.slice(1).map((r, i) => ({
+                id: i + 2, // 1-based row index (Header + 1)
                 dni: String(r[0]),
                 apellido: r[1],
                 nombre: r[2],
@@ -42,7 +50,8 @@ function doPost(e) {
                 grado: r[4],
                 division: r[5],
                 turno: r[6],
-                estado: r[7]
+                estado: r[7],
+                saldo: cobranzasMap[String(r[0])] || "PENDIENTE" // Add saldo status
             })).filter(s => s.dni !== "");
             return response({ status: "success", students: students });
         }
@@ -53,8 +62,39 @@ function doPost(e) {
             // 2. Cobranzas (Sync)
             const nombreFull = `${data.student.apellido}, ${data.student.nombre}`;
             const curso = `${data.student.grado}° ${data.student.division}`;
-            sheetCobranzas.appendRow([data.student.dni, nombreFull, curso, "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "DEUDA"]);
+            // Determinar si arranca con deuda o al día (por defecto al día si es nuevo)
+            sheetCobranzas.appendRow([data.student.dni, nombreFull, curso, "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "PENDIENTE", "AL DIA"]);
             return response({ status: "success", message: "Alumno creado" });
+        }
+
+        if (data.action === "edit") {
+            // data.id is the row index in Legajos
+            const rowIdx = parseInt(data.id);
+            const dni = data.student.dni;
+
+            // Update Legajos
+            // Columns: DNI(1), APELLIDO(2), NOMBRE(3), NIVEL(4), GRADO(5), DIVISION(6), TURNO(7)
+            sheetLegajos.getRange(rowIdx, 1).setValue(dni);
+            sheetLegajos.getRange(rowIdx, 2).setValue(data.student.apellido);
+            sheetLegajos.getRange(rowIdx, 3).setValue(data.student.nombre);
+            sheetLegajos.getRange(rowIdx, 4).setValue(data.student.nivel);
+            sheetLegajos.getRange(rowIdx, 5).setValue(data.student.grado);
+            sheetLegajos.getRange(rowIdx, 6).setValue(data.student.division);
+            sheetLegajos.getRange(rowIdx, 7).setValue(data.student.turno);
+
+            // Sync Name/Course to Cobranzas (Find by DNI)
+            const rowsC = sheetCobranzas.getDataRange().getValues();
+            const cobRowIdx = rowsC.findIndex(r => String(r[0]) === String(dni));
+
+            if (cobRowIdx !== -1) {
+                // Update Name and Course in Cobranzas
+                const nombreFull = `${data.student.apellido}, ${data.student.nombre}`;
+                const curso = `${data.student.grado}° ${data.student.division}`;
+                sheetCobranzas.getRange(cobRowIdx + 1, 2).setValue(nombreFull);
+                sheetCobranzas.getRange(cobRowIdx + 1, 3).setValue(curso);
+            }
+
+            return response({ status: "success", message: "Alumno editado correctamente" });
         }
 
         if (data.action === "delete") {
@@ -106,16 +146,48 @@ function doPost(e) {
             let rowIndex = rows.findIndex(r => String(r[0]) === String(data.dni));
             if (rowIndex === -1) return response({ status: "error", message: "No encontrado" });
 
-            const monthMap = { 'matricula': 3, 'feb': 4, 'mar': 5, 'abr': 6, 'may': 7, 'jun': 8, 'jul': 9, 'ago': 10, 'sep': 11, 'oct': 12, 'nov': 13, 'dic': 14 }; // Ajustado a 0-index? No, getValues es array. A1 notation es 1-index.
-            // Indices en array: Matrícula es [3].
-            // Columna en Sheet: A=1... D=4. 
-            // Si array index es 3, columna es 4.
+            const monthMap = { 'matricula': 3, 'feb': 4, 'mar': 5, 'abr': 6, 'may': 7, 'jun': 8, 'jul': 9, 'ago': 10, 'sep': 11, 'oct': 12, 'nov': 13, 'dic': 14 };
             const colIndex = monthMap[data.month];
-            sheetCobranzas.getRange(rowIndex + 1, colIndex + 1).setValue(data.paid ? "PAGADO" : "PENDIENTE"); // +1 porque sheet es 1-based
+            sheetCobranzas.getRange(rowIndex + 1, colIndex + 1).setValue(data.paid ? "PAGADO" : "PENDIENTE");
 
-            // Actualizar estado deuda
+            // Actualizar estado deuda (Smart Logic)
+            // Lógica: Si hay ALGUNA cuota vencida pendiente -> DEUDA.
+            // Cuota vencida = Mes actual > Mes cuota (ej: Si estamos en Abril, Feb y Mar deberian estar pagas)
+            // Simplificación pedido usuario: "Hasta el 10 de cada mes es la espera".
+
+            const today = new Date();
+            const currentDay = today.getDate();
+            const currentMonthIdx = today.getMonth(); // 0 = Enero, 1 = Feb... 11 = Dic.
+
+            // Mapa de indices de mes en el array row (matricula=3, feb=4, ... dic=14)
+            // Mes JS: 0(Jan), 1(Feb).. 
+            // Queremos saber si DEBE estar pago.
+            // Logica:
+            // Matrícula (idx 3): Siempre exigible.
+            // Feb (idx 4): Exigible si (Month > Feb) OR (Month == Feb y Day > 10)
+
             const currentRow = sheetCobranzas.getRange(rowIndex + 1, 1, 1, 16).getValues()[0];
-            const hasDebt = currentRow.slice(3, 15).some(val => !checkPaid(val));
+            let hasDebt = false;
+
+            // 1. Matrícula (Index 3)
+            if (!checkPaid(currentRow[3])) hasDebt = true;
+
+            // 2. Meses (Index 4 a 14 -> Feb a Dic)
+            // Feb es JS Month 1. Row Index 4.
+            for (let m = 1; m <= 11; m++) { // Feb(1) a Dic(11)
+                let colIdx = m + 3; // Feb(1)+3 = 4.
+
+                // ¿Es exigible?
+                let isExigible = false;
+                if (currentMonthIdx > m) isExigible = true; // Pasó el mes
+                if (currentMonthIdx === m && currentDay > 10) isExigible = true; // Mismo mes, pasó el día 10.
+
+                if (isExigible && !checkPaid(currentRow[colIdx])) {
+                    hasDebt = true;
+                    break;
+                }
+            }
+
             sheetCobranzas.getRange(rowIndex + 1, 16).setValue(hasDebt ? "DEUDA" : "AL DIA");
 
             return response({ status: "success", message: "Pago actualizado" });

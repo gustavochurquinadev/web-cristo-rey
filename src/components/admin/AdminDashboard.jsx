@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, Download, X, DollarSign, Check, AlertCircle } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, X, DollarSign, Check, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdminDashboard = () => {
@@ -9,14 +9,19 @@ const AdminDashboard = () => {
   // ESTADOS
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // FILTROS
   const [searchTerm, setSearchTerm] = useState("");
   const [filterNivel, setFilterNivel] = useState("Todos");
+  const [filterTurno, setFilterTurno] = useState("Todos"); // NUEVO FILTRO
 
   // MODALES
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false); // Sirve para CREAR y EDITAR
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  // ESTADO FORMULARIO ALUMNO
+  // ESTADO FORMULARIO ALUMNO (Alta / Edición)
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null); // ID de fila para editar
   const [formData, setFormData] = useState({
     dni: '', apellido: '', nombre: '', nivel: 'Inicial', grado: '5', division: 'A', turno: 'Mañana'
   });
@@ -59,8 +64,11 @@ const AdminDashboard = () => {
       String(student.nombre).toLowerCase().includes(term) ||
       String(student.apellido).toLowerCase().includes(term) ||
       String(student.dni).includes(term);
+
     const matchesNivel = filterNivel === "Todos" || student.nivel === filterNivel;
-    return matchesSearch && matchesNivel;
+    const matchesTurno = filterTurno === "Todos" || student.turno === filterTurno; // Lógica nuevo filtro
+
+    return matchesSearch && matchesNivel && matchesTurno;
   });
 
   // --- 3. BORRAR (DELETE) ---
@@ -74,7 +82,7 @@ const AdminDashboard = () => {
         });
         toast.dismiss(toastId);
         toast.success("Alumno dado de baja exitosamente");
-        fetchStudents(); // Recargar tabla
+        fetchStudents();
       } catch (error) {
         toast.dismiss(toastId);
         toast.error("Error al eliminar");
@@ -85,18 +93,17 @@ const AdminDashboard = () => {
   // --- 4. PROMOCIÓN AUTOMÁTICA ---
   const handlePromoteAll = async () => {
     if (confirm("⚠️ IMPORTANTE: CIERRE DE CICLO LECTIVO\n\nEsta acción ejecutará la 'Magia de Promoción':\n- Inicial 5 -> Pasa a 1° Grado\n- 7° Grado -> Pasa a 1° Año\n- 5° Año -> EGRESA\n- Todos los demás suben un grado.\n\n¿CONFIRMA EL CAMBIO DE AÑO?")) {
-      const toastId = toast.loading("⏳ Procesando cierre de ciclo... Esto puede tardar unos segundos.");
+      const toastId = toast.loading("⏳ Procesando cierre de ciclo...");
       try {
         const response = await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
           method: "POST",
           body: JSON.stringify({ action: "promoteAll" }),
         });
         const data = await response.json();
-
         toast.dismiss(toastId);
         if (data.status === "success") {
           toast.success("¡Ciclo Lectivo Cerrado! Alumnos promovidos. 🎉");
-          fetchStudents(); // Recargar para ver los cambios
+          fetchStudents();
         } else {
           toast.error("Error: " + data.message);
         }
@@ -107,19 +114,48 @@ const AdminDashboard = () => {
     }
   };
 
-  // --- 5. CREAR ALUMNO (CREATE) ---
-  const handleCreate = async (e) => {
+  // --- 5. ABRIR MODAL (ALTA/EDICIÓN) ---
+  const openNewStudentModal = () => {
+    setIsEditing(false);
+    setEditId(null);
+    setFormData({ dni: '', apellido: '', nombre: '', nivel: 'Inicial', grado: '5', division: 'A', turno: 'Mañana' });
+    setShowModal(true);
+  };
+
+  const openEditModal = (student) => {
+    setIsEditing(true);
+    setEditId(student.id); // Guardamos el ID de fila
+    setFormData({
+      dni: student.dni,
+      apellido: student.apellido,
+      nombre: student.nombre,
+      nivel: student.nivel,
+      grado: String(student.grado),
+      division: student.division,
+      turno: student.turno
+    });
+    setShowModal(true);
+  };
+
+  // --- 6. GUARDAR (CREATE / EDIT) ---
+  const handleSave = async (e) => {
     e.preventDefault();
-    const toastId = toast.loading("Inscribiendo alumno y creando legajo...");
+    const actionType = isEditing ? "edit" : "create";
+    const msgLoading = isEditing ? "Guardando cambios..." : "Inscribiendo alumno...";
+
+    const toastId = toast.loading(msgLoading);
     try {
       await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
         method: "POST",
-        body: JSON.stringify({ action: "create", student: formData }),
+        body: JSON.stringify({
+          action: actionType,
+          student: formData,
+          id: editId // Solo se usa si es action=edit
+        }),
       });
       toast.dismiss(toastId);
-      toast.success("Alumno inscripto correctamente");
+      toast.success(isEditing ? "Alumno editado correctamente" : "Alumno inscripto correctamente");
       setShowModal(false);
-      setFormData({ dni: '', apellido: '', nombre: '', nivel: 'Inicial', grado: '5', division: 'A', turno: 'Mañana' }); // Reset
       fetchStudents();
     } catch (error) {
       toast.dismiss(toastId);
@@ -127,7 +163,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // --- 6. GESTIÓN DE PAGOS ---
+  // --- 7. GESTIÓN DE PAGOS ---
   const openPaymentModal = async (student) => {
     setSelectedStudent(student);
     setShowPaymentModal(true);
@@ -174,6 +210,8 @@ const AdminDashboard = () => {
         }),
       });
       toast.success("Pago de " + monthKey + " actualizado");
+      // Opcional: Recargar estudiantes para actualizar el semáforo "AL DIA" si cambió
+      // fetchStudents(); // Puede ser muy pesado, mejor dejarlo asincrono o que actualice al cerrar modal.
     } catch (error) {
       toast.error("Error al guardar el pago");
       // Rollback
@@ -216,7 +254,7 @@ const AdminDashboard = () => {
             Cerrar Ciclo Lectivo
           </button>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={openNewStudentModal}
             className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-cristo-primary text-white font-bold rounded-lg hover:bg-cristo-dark transition-colors text-sm shadow-lg shadow-cristo-primary/20"
           >
             <Plus className="w-4 h-4" />
@@ -225,9 +263,10 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* BARRA DE HERRAMIENTAS */}
+      {/* BARRA DE HERRAMIENTAS Y FILTROS */}
       <div className="grid md:grid-cols-12 gap-4">
-        <div className="md:col-span-5 relative">
+        {/* BUSCADOR */}
+        <div className="md:col-span-4 relative">
           <input
             type="text"
             placeholder="Buscar por nombre, apellido o DNI..."
@@ -238,6 +277,7 @@ const AdminDashboard = () => {
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
         </div>
 
+        {/* FILTRO NIVEL */}
         <div className="md:col-span-3">
           <div className="relative">
             <select
@@ -251,6 +291,22 @@ const AdminDashboard = () => {
               <option value="Secundario">Nivel Secundario</option>
             </select>
             <Filter className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+          </div>
+        </div>
+
+        {/* FILTRO TURNO (NUEVO) */}
+        <div className="md:col-span-3">
+          <div className="relative">
+            <select
+              value={filterTurno}
+              onChange={(e) => setFilterTurno(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none text-sm appearance-none cursor-pointer"
+            >
+              <option value="Todos">Todos los Turnos</option>
+              <option value="Mañana">Turno Mañana</option>
+              <option value="Tarde">Turno Tarde</option>
+            </select>
+            <Clock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
           </div>
         </div>
       </div>
@@ -269,10 +325,10 @@ const AdminDashboard = () => {
                 <tr>
                   <th className="px-6 py-4 font-semibold">Alumno</th>
                   <th className="px-6 py-4 font-semibold">Nivel</th>
-                  <th className="px-6 py-4 font-semibold text-center">Grado/Año</th>
+                  <th className="px-6 py-4 font-semibold text-center">Grado</th>
                   <th className="px-6 py-4 font-semibold text-center">Div</th>
                   <th className="px-6 py-4 font-semibold">Turno</th>
-                  <th className="px-6 py-4 font-semibold text-center">Saldos</th>
+                  <th className="px-6 py-4 font-semibold text-center">Estado de Cuenta</th>
                   <th className="px-6 py-4 font-semibold text-right">Acciones</th>
                 </tr>
               </thead>
@@ -299,18 +355,47 @@ const AdminDashboard = () => {
                         </span>
                       </td>
                       <td className="px-6 py-3 text-gray-500">{s.turno}</td>
+
+                      {/* ESTADO DE CUENTA (VERDE/ROJO) */}
                       <td className="px-6 py-3 text-center">
-                        <button
-                          onClick={() => openPaymentModal(s)}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-bold hover:bg-green-100 transition-colors"
-                        >
-                          <DollarSign className="w-3 h-3" />
-                          Gestionar Pagos
-                        </button>
+                        {s.saldo === "AL DIA" ? (
+                          <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
+                            <Check className="w-3 h-3" /> AL DÍA
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-100">
+                            <DollarSign className="w-3 h-3" /> DEUDA
+                          </span>
+                        )}
                       </td>
+
                       <td className="px-6 py-3 text-right">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => handleDelete(s.id)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar/Baja">
+                        <div className="flex justify-end gap-2 opacity-100 transition-opacity">
+
+                          {/* BOTON GESTIONAR PAGOS */}
+                          <button
+                            onClick={() => openPaymentModal(s)}
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-transparent hover:border-green-200"
+                            title="Gestionar Pagos"
+                          >
+                            <DollarSign className="w-4 h-4" />
+                          </button>
+
+                          {/* BOTON EDITAR (LÁPIZ) */}
+                          <button
+                            onClick={() => openEditModal(s)}
+                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-200"
+                            title="Editar Datos"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+
+                          {/* BOTON ELIMINAR */}
+                          <button
+                            onClick={() => handleDelete(s.id)}
+                            className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
+                            title="Eliminar/Baja"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -330,16 +415,16 @@ const AdminDashboard = () => {
         )}
       </div>
 
-      {/* MODAL NUEVO ALUMNO */}
+      {/* MODAL (CREAR / EDITAR) */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[50] backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-cristo-primary p-4 flex justify-between items-center text-white">
-              <h3 className="font-bold">Nuevo Alumno</h3>
+              <h3 className="font-bold">{isEditing ? "Editar Alumno" : "Nuevo Alumno"}</h3>
               <button onClick={() => setShowModal(false)} className="hover:bg-white/10 p-1 rounded"><X className="w-5 h-5" /></button>
             </div>
 
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
+            <form onSubmit={handleSave} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">DNI</label>
@@ -390,7 +475,7 @@ const AdminDashboard = () => {
               </div>
 
               <button type="submit" className="w-full bg-cristo-accent text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition-colors mt-4">
-                Guardar e Iniciar Cobranza
+                {isEditing ? "Guardar Cambios" : "Guardar e Iniciar Cobranza"}
               </button>
             </form>
           </div>
@@ -453,9 +538,9 @@ const AdminDashboard = () => {
 
             {/* Footer */}
             <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center">
-              <span className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full"></div> Pagado</span>
+              <span className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full">AL DÍA</div></span>
               <span>Los cambios se guardan automáticamente</span>
-              <span className="flex items-center gap-2"><div className="w-2 h-2 border border-gray-300 rounded-full"></div> Pendiente</span>
+              <span className="flex items-center gap-2"><div className="w-2 h-2 border border-gray-300 rounded-full">PENDIENTE</div></span>
             </div>
 
           </div>
