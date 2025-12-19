@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, X, DollarSign, Check, Clock, FileText, Download } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, X, DollarSign, Check, Clock, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdminDashboard = () => {
@@ -13,15 +13,15 @@ const AdminDashboard = () => {
   // FILTROS
   const [searchTerm, setSearchTerm] = useState("");
   const [filterNivel, setFilterNivel] = useState("Todos");
-  const [filterTurno, setFilterTurno] = useState("Todos"); // NUEVO FILTRO
+  const [filterTurno, setFilterTurno] = useState("Todos");
 
   // MODALES
-  const [showModal, setShowModal] = useState(false); // Sirve para CREAR y EDITAR
+  const [showModal, setShowModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  // ESTADO FORMULARIO ALUMNO (Alta / Edición)
+  // ESTADO FORMULARIO ALUMNO
   const [isEditing, setIsEditing] = useState(false);
-  const [editId, setEditId] = useState(null); // ID de fila para editar
+  const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({
     dni: '', apellido: '', nombre: '', nivel: 'Inicial', grado: '5', division: 'A', turno: 'Mañana', isBecado: false, becaPorcentaje: 0
   });
@@ -31,9 +31,90 @@ const AdminDashboard = () => {
   const [payments, setPayments] = useState(null);
   const [loadingPayments, setLoadingPayments] = useState(false);
 
-  // ... (keep creating other functions unchanged if possible, jumping to openNewStudentModal)
+  // --- 1. CARGAR DATOS ---
+  const fetchStudents = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+        method: "POST",
+        body: JSON.stringify({ action: "getAll" }),
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        setStudents(data.students);
+      } else {
+        toast.error("Error al cargar alumnos: " + data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error de conexión con la base de datos");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // --- 5. ABRIR MODAL (ALTA/EDICIÓN) ---
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  // --- 2. FILTRADO ---
+  const filteredStudents = students.filter(student => {
+    const term = searchTerm.toLowerCase();
+    const matchesSearch =
+      String(student.nombre || "").toLowerCase().includes(term) ||
+      String(student.apellido || "").toLowerCase().includes(term) ||
+      String(student.dni || "").includes(term);
+
+    const matchesNivel = filterNivel === "Todos" || student.nivel === filterNivel;
+    const matchesTurno = filterTurno === "Todos" || student.turno === filterTurno;
+
+    return matchesSearch && matchesNivel && matchesTurno;
+  });
+
+  // --- 3. BORRAR ---
+  const handleDelete = async (id) => {
+    if (confirm("⚠️ ¿Seguro que desea dar de BAJA a este alumno?")) {
+      const toastId = toast.loading("Procesando baja...");
+      try {
+        await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+          method: "POST",
+          body: JSON.stringify({ action: "delete", id: id }),
+        });
+        toast.dismiss(toastId);
+        toast.success("Alumno dado de baja exitosamente");
+        fetchStudents();
+      } catch (error) {
+        toast.dismiss(toastId);
+        toast.error("Error al eliminar");
+      }
+    }
+  };
+
+  // --- 4. PROMOCIÓN AUTOMÁTICA ---
+  const handlePromoteAll = async () => {
+    if (confirm("⚠️ IMPORTANTE: CIERRE DE CICLO LECTIVO\n\nEsta acción ejecutará la 'Magia de Promoción':\n- Inicial 5 -> Pasa a 1° Grado\n- 7° Grado -> Pasa a 1° Año\n- 5° Año -> EGRESA\n- Todos los demás suben un grado.\n\n¿CONFIRMA EL CAMBIO DE AÑO?")) {
+      const toastId = toast.loading("⏳ Procesando cierre de ciclo...");
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+          method: "POST",
+          body: JSON.stringify({ action: "promoteAll" }),
+        });
+        const data = await response.json();
+        toast.dismiss(toastId);
+        if (data.status === "success") {
+          toast.success("¡Ciclo Lectivo Cerrado! Alumnos promovidos. 🎉");
+          fetchStudents();
+        } else {
+          toast.error("Error: " + data.message);
+        }
+      } catch (error) {
+        toast.dismiss(toastId);
+        toast.error("Error de conexión al promover");
+      }
+    }
+  };
+
+  // --- 5. ABRIR MODAL ---
   const openNewStudentModal = () => {
     setIsEditing(false);
     setEditId(null);
@@ -43,7 +124,7 @@ const AdminDashboard = () => {
 
   const openEditModal = (student) => {
     setIsEditing(true);
-    setEditId(student.id); // Guardamos el ID de fila
+    setEditId(student.id);
     setFormData({
       dni: student.dni,
       apellido: student.apellido,
@@ -58,7 +139,7 @@ const AdminDashboard = () => {
     setShowModal(true);
   };
 
-  // --- 6. GUARDAR (CREATE / EDIT) ---
+  // --- 6. GUARDAR ---
   const handleSave = async (e) => {
     e.preventDefault();
     const actionType = isEditing ? "edit" : "create";
@@ -71,7 +152,7 @@ const AdminDashboard = () => {
         body: JSON.stringify({
           action: actionType,
           student: formData,
-          id: editId // Solo se usa si es action=edit
+          id: editId
         }),
       });
       toast.dismiss(toastId);
@@ -131,11 +212,8 @@ const AdminDashboard = () => {
         }),
       });
       toast.success("Pago de " + monthLabels[monthKey] + " actualizado");
-      // Opcional: Recargar estudiantes para actualizar el semáforo "AL DIA" si cambió
-      // fetchStudents(); // Puede ser muy pesado, mejor dejarlo asincrono o que actualice al cerrar modal.
     } catch (error) {
       toast.error("Error al guardar el pago");
-      // Rollback
       setPayments(prev => ({ ...prev, [monthKey]: currentStatus }));
     }
   };
@@ -238,7 +316,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* FILTRO TURNO (NUEVO) */}
+        {/* FILTRO TURNO */}
         <div className="md:col-span-3">
           <div className="relative">
             <select
@@ -300,7 +378,7 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-3 text-gray-500">{s.turno}</td>
 
-                      {/* ESTADO DE CUENTA (VERDE/ROJO) */}
+                      {/* ESTADO DE CUENTA */}
                       <td className="px-6 py-3 text-center">
                         {s.saldo === "AL DIA" ? (
                           <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
@@ -325,7 +403,7 @@ const AdminDashboard = () => {
                             <DollarSign className="w-4 h-4" />
                           </button>
 
-                          {/* BOTON EDITAR (LÁPIZ) */}
+                          {/* BOTON EDITAR */}
                           <button
                             onClick={() => openEditModal(s)}
                             className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-200"
@@ -393,7 +471,6 @@ const AdminDashboard = () => {
                     value={formData.nivel}
                     onChange={e => {
                       const newNivel = e.target.value;
-                      // Reset defaults when changing level
                       let newGrado = "1";
                       let newDiv = "A";
                       let newTurno = "Mañana";
@@ -450,12 +527,10 @@ const AdminDashboard = () => {
                       const newDiv = e.target.value;
                       let newTurno = formData.turno;
 
-                      // Logic for Turno based on Division (Inicial/Primario)
                       if (formData.nivel !== "Secundario") {
                         if (newDiv === "A") newTurno = "Mañana";
                         if (newDiv === "B") newTurno = "Tarde";
                       }
-
                       setFormData({ ...formData, division: newDiv, turno: newTurno });
                     }}
                   >
@@ -478,7 +553,7 @@ const AdminDashboard = () => {
                   <select
                     className="w-full p-2 border rounded bg-gray-50"
                     value={formData.turno}
-                    disabled={true} // Siempre deshabilitado porque es automático
+                    disabled={true}
                   >
                     <option value="Mañana">Mañana</option>
                     <option value="Tarde">Tarde</option>
@@ -520,8 +595,8 @@ const AdminDashboard = () => {
                 {isEditing ? "Guardar Cambios" : "Guardar e Iniciar Cobranza"}
               </button>
             </form>
-          </div >
-        </div >
+          </div>
+        </div>
       )}
 
       {/* MODAL GESTIÓN DE PAGOS */}
@@ -529,7 +604,6 @@ const AdminDashboard = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
 
-            {/* Header Modal */}
             <div className="bg-gray-900 p-6 flex justify-between items-start text-white">
               <div>
                 <h3 className="font-bold text-xl">{selectedStudent.apellido}, {selectedStudent.nombre}</h3>
@@ -548,7 +622,6 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            {/* Body */}
             <div className="p-6 overflow-y-auto">
               {loadingPayments ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
@@ -576,8 +649,6 @@ const AdminDashboard = () => {
                         ) : (
                           <div className="w-6 h-6 rounded-full border-2 border-gray-200 group-hover:border-cristo-accent"></div>
                         )}
-
-                        {/* Indicador visual pequeño */}
                         <span className="text-[10px] uppercase font-bold mt-1">
                           {isPaid ? 'Pagado' : 'Pendiente'}
                         </span>
@@ -588,7 +659,6 @@ const AdminDashboard = () => {
               )}
             </div>
 
-            {/* Footer */}
             <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center">
               <span className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full">AL DÍA</div></span>
               <span>Los cambios se guardan automáticamente</span>
