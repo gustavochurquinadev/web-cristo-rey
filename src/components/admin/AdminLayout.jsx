@@ -12,7 +12,7 @@ const AdminLayout = () => {
     // En producción esto debería ser más robusto (JWT, etc), pero para este caso de uso local funciona.
     const handleLogin = (e) => {
         e.preventDefault();
-        if (password === 'CRISTO_ADMIN_2026') {
+        if (password === 'administracion') {
             setIsAuthenticated(true);
             toast.success("Binvenido al Sistema de Gestión");
         } else {

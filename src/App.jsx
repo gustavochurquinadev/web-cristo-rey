@@ -59,9 +59,9 @@ const App = () => {
           } />
 
           {/* Ruta 3: Admin System */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/sistemalegajo" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-            <Route path="receipts" element={<ReceiptProcessor />} />
+            <Route path="receipts" element={<div>Recibos (Próximamente)</div>} />
           </Route>
         </Routes>
       </Suspense>
