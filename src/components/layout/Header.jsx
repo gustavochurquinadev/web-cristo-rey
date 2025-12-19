@@ -16,6 +16,7 @@ const Header = ({ activeSection, onNavigate }) => {
     { id: 'news', label: 'Noticias', type: 'scroll' },
     { id: 'fees', label: 'Aranceles', type: 'scroll' },
     { id: 'careers', label: 'Trabaja con Nosotros', type: 'scroll' },
+    { id: 'familias', label: 'Portal Familias', type: 'external', path: '/familias' },
     { id: 'portal', label: 'Portal Docente', type: 'external', path: '/portal' },
   ];
 
