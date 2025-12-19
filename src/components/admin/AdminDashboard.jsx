@@ -525,83 +525,81 @@ const AdminDashboard = () => {
       )}
 
       {/* MODAL GESTIÓN DE PAGOS */}
-      {
-        showPaymentModal && selectedStudent && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+      {showPaymentModal && selectedStudent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
 
-              {/* Header Modal */}
-              <div className="bg-gray-900 p-6 flex justify-between items-start text-white">
-                <div>
-                  <h3 className="font-bold text-xl">{selectedStudent.apellido}, {selectedStudent.nombre}</h3>
-                  <p className="text-gray-400 text-sm">Gestionando pagos ciclo 2026</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleDownloadLibreDeuda}
-                    className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/20"
-                    title="Descargar Libre Deuda"
-                  >
-                    <FileText className="w-4 h-4" />
-                    Libre Deuda
-                  </button>
-                  <button onClick={() => setShowPaymentModal(false)} className="hover:bg-white/10 p-2 rounded-full transition-colors"><X className="w-6 h-6" /></button>
-                </div>
+            {/* Header Modal */}
+            <div className="bg-gray-900 p-6 flex justify-between items-start text-white">
+              <div>
+                <h3 className="font-bold text-xl">{selectedStudent.apellido}, {selectedStudent.nombre}</h3>
+                <p className="text-gray-400 text-sm">Gestionando pagos ciclo 2026</p>
               </div>
-
-              {/* Body */}
-              <div className="p-6 overflow-y-auto">
-                {loadingPayments ? (
-                  <div className="flex flex-col items-center justify-center py-12 gap-4">
-                    <div className="animate-spin w-8 h-8 border-4 border-cristo-primary border-t-transparent rounded-full"></div>
-                    <p className="text-gray-500 font-medium">Sincronizando con Banco de Datos...</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {monthOrder.map((key) => {
-                      const isPaid = payments?.[key];
-                      return (
-                        <button
-                          key={key}
-                          onClick={() => togglePayment(key)}
-                          className={`relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
-                           ${isPaid
-                              ? 'bg-green-50 border-green-500 text-green-700'
-                              : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-400 hover:text-gray-600'
-                            }
-                         `}
-                        >
-                          <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
-                          {isPaid ? (
-                            <div className="bg-green-500 text-white rounded-full p-1"><Check className="w-4 h-4" /></div>
-                          ) : (
-                            <div className="w-6 h-6 rounded-full border-2 border-gray-200 group-hover:border-cristo-accent"></div>
-                          )}
-
-                          {/* Indicador visual pequeño */}
-                          <span className="text-[10px] uppercase font-bold mt-1">
-                            {isPaid ? 'Pagado' : 'Pendiente'}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDownloadLibreDeuda}
+                  className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/20"
+                  title="Descargar Libre Deuda"
+                >
+                  <FileText className="w-4 h-4" />
+                  Libre Deuda
+                </button>
+                <button onClick={() => setShowPaymentModal(false)} className="hover:bg-white/10 p-2 rounded-full transition-colors"><X className="w-6 h-6" /></button>
               </div>
-
-              {/* Footer */}
-              <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center">
-                <span className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full">AL DÍA</div></span>
-                <span>Los cambios se guardan automáticamente</span>
-                <span className="flex items-center gap-2"><div className="w-2 h-2 border border-gray-300 rounded-full">PENDIENTE</div></span>
-              </div>
-
             </div>
-          </div>
-        )
-      }
 
-    </div >
+            {/* Body */}
+            <div className="p-6 overflow-y-auto">
+              {loadingPayments ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-4">
+                  <div className="animate-spin w-8 h-8 border-4 border-cristo-primary border-t-transparent rounded-full"></div>
+                  <p className="text-gray-500 font-medium">Sincronizando con Banco de Datos...</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {monthOrder.map((key) => {
+                    const isPaid = payments?.[key];
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => togglePayment(key)}
+                        className={`relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
+                           ${isPaid
+                            ? 'bg-green-50 border-green-500 text-green-700'
+                            : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-400 hover:text-gray-600'
+                          }
+                         `}
+                      >
+                        <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
+                        {isPaid ? (
+                          <div className="bg-green-500 text-white rounded-full p-1"><Check className="w-4 h-4" /></div>
+                        ) : (
+                          <div className="w-6 h-6 rounded-full border-2 border-gray-200 group-hover:border-cristo-accent"></div>
+                        )}
+
+                        {/* Indicador visual pequeño */}
+                        <span className="text-[10px] uppercase font-bold mt-1">
+                          {isPaid ? 'Pagado' : 'Pendiente'}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center">
+              <span className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full">AL DÍA</div></span>
+              <span>Los cambios se guardan automáticamente</span>
+              <span className="flex items-center gap-2"><div className="w-2 h-2 border border-gray-300 rounded-full">PENDIENTE</div></span>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 };
 
