@@ -136,7 +136,8 @@ function createPDF(dni, sheet, templateId, folderId) {
 // Ejecuta esta función UNA VEZ desde el editor
 function SETUP_DEMO() {
     const ss = SpreadsheetApp.create("Base Cobranzas Cristo Rey 2026");
-    const sheet = ss.renameActiveSheet("Cobranzas 2026");
+    const sheet = ss.getActiveSheet();
+    sheet.setName("Cobranzas 2026");
 
     // 1. Crear Cabeceras
     const headers = ["DNI", "ALUMNO", "CURSO", "MATRICULA", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC", "ESTADO"];
