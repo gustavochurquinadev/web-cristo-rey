@@ -63,6 +63,17 @@ const App = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="receipts" element={<div>Recibos (Próximamente)</div>} />
           </Route>
+
+          {/* Catch All - 404 */}
+          <Route path="*" element={
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold text-gray-800">404</h1>
+                <p className="text-gray-600">Página no encontrada (o versión desactualizada)</p>
+                <a href="/" className="text-cristo-primary underline mt-4 block">Volver al inicio</a>
+              </div>
+            </div>
+          } />
         </Routes>
       </Suspense>
     </Router>
