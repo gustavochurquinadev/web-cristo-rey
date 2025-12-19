@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
@@ -30,32 +30,34 @@ const App = () => {
       <ScrollToTop />
       <Toaster position="top-center" richColors />
 
-      <Routes>
-        {/* Ruta 1: Landing Page */}
-        <Route path="/" element={
-          <WithTransition>
-            <Landing />
-          </WithTransition>
-        } />
+      <Suspense fallback={null}>
+        <Routes>
+          {/* Ruta 1: Landing Page */}
+          <Route path="/" element={
+            <WithTransition>
+              <Landing />
+            </WithTransition>
+          } />
 
-        {/* Ruta 2: Portal Docente */}
-        <Route path="/portal" element={
-          <WithTransition>
-            <div className="bg-gray-50 min-h-screen">
-              <Staff />
-            </div>
-          </WithTransition>
-        } />
+          {/* Ruta 2: Portal Docente */}
+          <Route path="/portal" element={
+            <WithTransition>
+              <div className="bg-gray-50 min-h-screen">
+                <Staff />
+              </div>
+            </WithTransition>
+          } />
 
-        {/* Ruta 3: Admin */}
-        <Route path="/admin" element={
-          <WithTransition>
-            <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-              <ReceiptProcessor />
-            </div>
-          </WithTransition>
-        } />
-      </Routes>
+          {/* Ruta 3: Admin */}
+          <Route path="/admin" element={
+            <WithTransition>
+              <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+                <ReceiptProcessor />
+              </div>
+            </WithTransition>
+          } />
+        </Routes>
+      </Suspense>
     </Router>
   );
 };
