@@ -67,8 +67,9 @@ const AdminDashboard = () => {
 
     const matchesNivel = filterNivel === "Todos" || student.nivel === filterNivel;
     const matchesTurno = filterTurno === "Todos" || student.turno === filterTurno;
+    const isNotDeleted = student.estado !== "Baja";
 
-    return matchesSearch && matchesNivel && matchesTurno;
+    return matchesSearch && matchesNivel && matchesTurno && isNotDeleted;
   });
 
   // --- 3. BORRAR ---
