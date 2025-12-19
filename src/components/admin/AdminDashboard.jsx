@@ -582,8 +582,8 @@ const AdminDashboard = () => {
                         min="0"
                         max="100"
                         className="w-20 p-2 border rounded-lg text-center font-bold"
-                        value={formData.becaPorcentaje || 0}
-                        onChange={e => setFormData({ ...formData, becaPorcentaje: e.target.value })}
+                        value={formData.becaPorcentaje || ""}
+                        onChange={e => setFormData({ ...formData, becaPorcentaje: Number(e.target.value) })}
                       />
                     </div>
                   )}
