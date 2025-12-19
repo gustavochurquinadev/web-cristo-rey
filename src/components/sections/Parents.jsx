@@ -9,7 +9,7 @@ const Parents = () => {
     const [dni, setDni] = useState('');
 
     // 🔴 URL DEL SCRIPT (Usamos la misma del Admin para compartir la base de datos)
-    const GOOGLE_SCRIPT_URL_PADRES = "https://script.google.com/macros/s/AKfycbw18z2n3c7T-GTQo2BS_dvosve9Pr9590VxRDJJFCO6J7nVZg8kIZeeWwWcST0HP52o/exec";
+    const GOOGLE_SCRIPT_URL_PADRES = "https://script.google.com/macros/s/AKfycby6a9pr6g54of3nZ343bqxc6Xx3IdbWP21NUop4q6tmJJfWYmEOppw1uhfD-wVOVoLt2g/exec";
 
     // --- 1. LOGIN ---
     const handleLogin = async (e) => {
