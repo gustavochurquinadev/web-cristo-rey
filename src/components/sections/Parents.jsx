@@ -60,15 +60,13 @@ const Parents = () => {
         }
     };
 
-    // --- 2. DESCARGAR LIBRE DEUDA ---
-    const handleDownload = async () => {
-        if (!studentData.debtFree) return toast.error("Debe regularizar sus cuotas para descargar");
-
+    // --- 2. DESCARGAR DOCUMENTOS ---
+    const handleDownload = async (actionType) => {
         setLoading(true);
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL_PADRES, {
                 method: "POST",
-                body: JSON.stringify({ action: "generateLibreDeuda", dni: studentData.dni }),
+                body: JSON.stringify({ action: actionType, dni: studentData.dni }),
             });
             const data = await response.json();
 
@@ -86,6 +84,7 @@ const Parents = () => {
     };
 
     const months = [
+        { key: 'feb', label: 'Feb' },
         { key: 'mar', label: 'Mar' }, { key: 'abr', label: 'Abr' }, { key: 'may', label: 'May' },
         { key: 'jun', label: 'Jun' }, { key: 'jul', label: 'Jul' }, { key: 'ago', label: 'Ago' },
         { key: 'sep', label: 'Sep' }, { key: 'oct', label: 'Oct' }, { key: 'nov', label: 'Nov' },
@@ -189,33 +188,72 @@ const Parents = () => {
                             </h4>
 
                             <div className="space-y-4">
-                                {/* Botón Libre Deuda */}
-                                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                {/* 1. LIBRE DEUDA */}
+                                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm relative overflow-hidden">
                                     <p className="text-sm font-bold text-gray-700 mb-1">Libre Deuda</p>
-                                    <p className="text-xs text-gray-500 mb-3">Válido por 30 días para trámites adminsitrativos.</p>
+                                    <p className="text-xs text-gray-500 mb-3">Válido por 30 días.</p>
 
                                     {studentData.debtFree ? (
                                         <button
-                                            onClick={handleDownload}
+                                            onClick={() => handleDownload("generateLibreDeuda")}
                                             disabled={loading}
-                                            className="w-full bg-cristo-accent text-white py-2 rounded-lg font-bold text-sm hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
+                                            className="w-full bg-cristo-accent text-white py-2 rounded-lg font-bold text-xs hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
                                         >
-                                            {loading ? "Generando..." : <><Download className="w-4 h-4" /> Descargar PDF</>}
+                                            {loading ? "..." : <><Download className="w-3 h-3" /> Descargar PDF</>}
                                         </button>
                                     ) : (
-                                        <div className="bg-red-50 text-red-600 p-2 rounded text-xs text-center border border-red-100 flex flex-col items-center gap-1">
-                                            <AlertCircle className="w-4 h-4" />
-                                            <span>Regularice su situación para descargar.</span>
+                                        <div className="bg-red-50 text-red-600 p-2 rounded text-xs text-center border border-red-100 flex items-center justify-center gap-1">
+                                            <AlertCircle className="w-3 h-3" /> Pendiente
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="text-center">
-                                    <p className="text-xs text-gray-400">¿Dudas con un pago?</p>
+                                {/* 2. CERTIFICADO INICIO */}
+                                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                    <p className="text-sm font-bold text-gray-700 mb-1">Certificado Inicio</p>
+                                    <p className="text-xs text-gray-500 mb-3">Requiere Matrícula y Febrero.</p>
+
+                                    {studentData.payments.matricula && studentData.payments.feb ? (
+                                        <button
+                                            onClick={() => handleDownload("generateInicio")}
+                                            disabled={loading}
+                                            className="w-full bg-cristo-primary text-white py-2 rounded-lg font-bold text-xs hover:bg-cristo-dark transition-colors flex items-center justify-center gap-2"
+                                        >
+                                            {loading ? "..." : <><Download className="w-3 h-3" /> Descargar PDF</>}
+                                        </button>
+                                    ) : (
+                                        <div className="bg-gray-50 text-gray-500 p-2 rounded text-xs text-center border border-gray-100">
+                                            No disponible
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 3. CERTIFICADO FINALIZACIÓN */}
+                                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                    <p className="text-sm font-bold text-gray-700 mb-1">Fin de Ciclo</p>
+                                    <p className="text-xs text-gray-500 mb-3">Requiere Diciembre pago.</p>
+
+                                    {studentData.payments.dic ? (
+                                        <button
+                                            onClick={() => handleDownload("generateFinal")}
+                                            disabled={loading}
+                                            className="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                                        >
+                                            {loading ? "..." : <><Download className="w-3 h-3" /> Descargar PDF</>}
+                                        </button>
+                                    ) : (
+                                        <div className="bg-gray-50 text-gray-500 p-2 rounded text-xs text-center border border-gray-100">
+                                            Disponible Diciembre
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="text-center pt-2">
                                     <a href="https://wa.me/5493884912303" target="_blank" className="text-xs text-cristo-primary font-bold hover:underline">Contactar Administración</a>
                                 </div>
 
                             </div>
+
                         </div>
 
                     </div>
