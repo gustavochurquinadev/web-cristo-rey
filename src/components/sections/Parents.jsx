@@ -92,38 +92,46 @@ const Parents = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-cristo-light flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
             {/* --- PANTALLA DE LOGIN --- */}
             {loginStep ? (
-                <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-cristo-primary">
-                    <div className="text-center mb-8">
-                        <h2 className="font-serif text-3xl text-cristo-primary mb-2">Portal Familias</h2>
-                        <p className="text-gray-500 text-sm">Consulte estado de cuotas y certificados</p>
+                <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm border-t-4 border-cristo-accent transition-all duration-500">
+                    <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Search className="w-8 h-8 text-cristo-primary" />
+                        </div>
+                        <h2 className="font-serif text-2xl font-bold text-gray-800">Portal Familias</h2>
+                        <p className="text-xs text-gray-500 mt-1">Consulte estado de cuotas y certificados</p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-6">
+                    <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">DNI del Alumno</label>
+                            <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">DNI del Alumno</label>
                             <div className="relative">
                                 <input
                                     type="number"
                                     value={dni}
                                     onChange={(e) => setDni(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cristo-accent focus:border-transparent outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none"
                                     placeholder="Ingrese DNI sin puntos"
                                 />
-                                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3.5" />
+                                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3.5" />
                             </div>
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-cristo-primary text-white py-3 rounded-xl font-bold hover:bg-cristo-dark transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+                            className="w-full bg-cristo-primary text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
                         >
                             {loading ? <div className="animate-spin w-5 h-5 border-2 border-white/50 border-t-white rounded-full"></div> : "Consultar"}
                         </button>
                     </form>
+                    <div className="mt-6 text-center">
+                        <a href="/" className="text-xs text-gray-400 hover:text-gray-600 hover:underline">
+                            Volver al sitio web
+                        </a>
+                    </div>
                 </div>
             ) : (
                 /* --- DASHBOARD --- */

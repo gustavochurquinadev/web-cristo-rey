@@ -102,16 +102,16 @@ const Staff = () => {
   // --- VISTA NO LOGUEADO (LOGIN/REGISTRO) ---
   if (!isLoggedIn) {
     return (
-      <section id="staff" className="py-24 bg-gray-50 flex justify-center items-center min-h-[700px]">
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 w-full max-w-md transition-all duration-500">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-cristo-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-cristo-primary">
-              {view === 'login' ? <Lock className="w-8 h-8" /> : <UserPlus className="w-8 h-8" />}
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm border-t-4 border-cristo-accent transition-all duration-500">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              {view === 'login' ? <Lock className="w-8 h-8 text-cristo-primary" /> : <UserPlus className="w-8 h-8 text-cristo-primary" />}
             </div>
-            <h2 className="font-serif text-2xl text-cristo-primary font-bold">
-              {view === 'login' ? 'Portal Docente' : 'Crear Cuenta'}
+            <h2 className="font-serif text-2xl text-gray-800 font-bold">
+              {view === 'login' ? 'Portal Docente' : 'Registro Docente'}
             </h2>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 mt-1">
               {view === 'login' ? 'Acceso exclusivo personal docente' : 'Complete sus datos institucionales'}
             </p>
           </div>
@@ -119,57 +119,100 @@ const Staff = () => {
           {view === 'login' ? (
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">DNI</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">DNI</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input type="text" value={loginData.dni} onChange={(e) => setLoginData({ ...loginData, dni: e.target.value })} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary transition-all" placeholder="Sin puntos" required />
+                  <input
+                    type="text"
+                    value={loginData.dni}
+                    onChange={(e) => setLoginData({ ...loginData, dni: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none"
+                    placeholder="Sin puntos"
+                    required
+                  />
+                  <User className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Contraseña</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Contraseña</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input type="password" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary transition-all" placeholder="••••••••" required />
+                  <input
+                    type="password"
+                    value={loginData.password}
+                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <Lock className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 </div>
               </div>
-              <button type="submit" disabled={loading} className="w-full py-3 bg-cristo-primary text-white font-bold rounded-lg hover:bg-cristo-dark transition-all flex justify-center items-center gap-2 shadow-lg">
-                {loading ? 'Verificando...' : 'Ingresar'}
+              <button type="submit" disabled={loading} className="w-full py-3 bg-cristo-primary text-white font-bold rounded-lg hover:bg-gray-800 transition-all flex justify-center items-center gap-2">
+                {loading ? <div className="animate-spin w-5 h-5 border-2 border-white/50 border-t-white rounded-full"></div> : 'Ingresar'}
               </button>
               <div className="text-center pt-4">
-                <p className="text-sm text-gray-500">¿Es tu primera vez? <button type="button" onClick={() => setView('register')} className="text-cristo-accent font-bold hover:underline">Crear cuenta aquí</button></p>
+                <button type="button" onClick={() => setView('register')} className="text-xs text-gray-400 hover:text-cristo-accent hover:underline">¿Primera vez? Crear cuenta aquí</button>
               </div>
             </form>
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nombre Completo</label>
-                <input type="text" value={registerData.name} onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="Ej: María Perez" required />
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nombre Completo</label>
+                <input
+                  type="text"
+                  value={registerData.name}
+                  onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none"
+                  placeholder="Ej: María Perez"
+                  required
+                />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">DNI</label>
-                <input type="text" value={registerData.dni} onChange={(e) => setRegisterData({ ...registerData, dni: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="Sin puntos" required />
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">DNI</label>
+                <input
+                  type="text"
+                  value={registerData.dni}
+                  onChange={(e) => setRegisterData({ ...registerData, dni: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none"
+                  placeholder="Sin puntos"
+                  required
+                />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Crear Contraseña</label>
-                <input type="password" value={registerData.password} onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-cristo-primary" placeholder="••••••••" required />
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Crear Contraseña</label>
+                <input
+                  type="password"
+                  value={registerData.password}
+                  onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none"
+                  placeholder="••••••••"
+                  required
+                />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Código de Invitación</label>
-                <div className="relative">
-                  <Key className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input type="text" value={registerData.token} onChange={(e) => setRegisterData({ ...registerData, token: e.target.value })} className="w-full pl-10 pr-4 py-3 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:border-cristo-primary text-blue-800" placeholder="Solicitar a Administración" required />
-                </div>
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Código de Invitación</label>
+                <input
+                  type="text"
+                  value={registerData.token}
+                  onChange={(e) => setRegisterData({ ...registerData, token: e.target.value })}
+                  className="w-full px-4 py-3 border border-blue-200 bg-blue-50 text-blue-800 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none"
+                  placeholder="Solicitar a Administración"
+                  required
+                />
               </div>
-              <button type="submit" disabled={loading} className="w-full py-3 bg-cristo-accent text-white font-bold rounded-lg hover:bg-yellow-600 transition-all flex justify-center items-center gap-2 shadow-lg">
-                {loading ? 'Registrando...' : 'Confirmar Registro'}
+              <button type="submit" disabled={loading} className="w-full py-3 bg-cristo-accent text-white font-bold rounded-lg hover:bg-yellow-600 transition-all flex justify-center items-center gap-2">
+                {loading ? <div className="animate-spin w-5 h-5 border-2 border-white/50 border-t-white rounded-full"></div> : 'Confirmar Registro'}
               </button>
               <div className="text-center pt-4">
-                <button type="button" onClick={() => setView('login')} className="text-sm text-gray-500 hover:text-cristo-primary">← Volver al inicio de sesión</button>
+                <button type="button" onClick={() => setView('login')} className="text-xs text-gray-400 hover:text-cristo-primary">← Volver al inicio de sesión</button>
               </div>
             </form>
           )}
+
+          <div className="mt-6 text-center">
+            <a href="/" className="text-xs text-gray-400 hover:text-gray-600 hover:underline">Volver al sitio web</a>
+          </div>
         </div>
-      </section>
+      </div>
     );
   }
 
