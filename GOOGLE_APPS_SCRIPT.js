@@ -29,10 +29,34 @@ function onOpen() {
     .addItem('🔄 Sincronizar Todo (Legajos -> Cobranzas)', 'SYNC_FULL')
     .addSeparator()
     .addItem('🎨 Aplicar Estilo y Lógica (Premium)', 'SETUP_STYLES')
+    .addItem('💰 Configurar Hoja Aranceles', 'SETUP_FEES')
     .addItem('🔍 Aplicar Filtros Automáticos', 'APPLY_FILTERS')
     .addSeparator()
     .addItem('⚙️ Configurar Plantillas PDF', 'SETUP_DOCS')
     .addToUi();
+}
+
+function SETUP_FEES() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ui = SpreadsheetApp.getUi();
+  let sheet = ss.getSheetByName("CONF_ARANCELES");
+  if (sheet) {
+    ui.alert("⚠️ La hoja 'CONF_ARANCELES' ya existe.");
+    return;
+  }
+
+  sheet = ss.insertSheet("CONF_ARANCELES");
+  sheet.appendRow(["ID_CONCEPTO", "DESCRIPCION", "VALOR_NUMERICO", "NOTAS"]);
+  sheet.appendRow(["Inicial", "Cuota Nivel Inicial", 38500, "Valor Mensual"]);
+  sheet.appendRow(["Primario", "Cuota Nivel Primario", 33000, "Valor Mensual"]);
+  sheet.appendRow(["Secundario", "Cuota Nivel Secundario", 33000, "Valor Mensual"]);
+  sheet.appendRow(["Matricula", "Matrícula 2026", 40000, "Pago Anticipado"]);
+
+  // Estilo Header
+  sheet.getRange(1, 1, 1, 4).setBackground("#1B365D").setFontColor("#FFFFFF").setFontWeight("bold");
+  sheet.autoResizeColumns(1, 4);
+
+  ui.alert("✅ Hoja 'CONF_ARANCELES' creada.\n\nPuedes editar los valores numéricos y se reflejarán en la web.");
 }
 
 // ----------------------------------------------------------------
