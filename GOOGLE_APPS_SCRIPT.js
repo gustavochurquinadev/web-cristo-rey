@@ -1,3 +1,4 @@
+// v4.0
 // --- CONFIGURACIÓN ---
 const FOLDER_ID_RECIBOS = "1jXlN9xAbyMzDERjIwZmyFR99mmhDU0rs";
 const FOLDER_ID_CV = "19EW5KYC3ceWqSmF_VPftRUEMde4xc6HV";
