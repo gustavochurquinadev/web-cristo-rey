@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 4.0 (Unified & Dynamic Fees) - ACTUALIZADO: 20/12/2025
+// 📦 VERSIÓN: 4.1 (Unified, Dynamic Fees & Menu) - ACTUALIZADO: 20/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
