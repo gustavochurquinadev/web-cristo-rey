@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Coins, CheckCircle, Clock, CreditCard, AlertCircle, Calendar } from 'lucide-react';
 
-// URL del Script (Misma que en AdminDashboard, idealmente debería estar en un config global)
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_d_2v3K4Z5J6H7L8M9N0O1P2Q3R4S5T6U7V8W9X0Y1Z2/exec"; // Reemplazar con URL real del usuario
+// URL del Script (Misma que en AdminDashboard)
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6a9pr6g54of3nZ343bqxc6Xx3IdbWP21NUop4q6tmJJfWYmEOppw1uhfD-wVOVoLt2g/exec"; // Reemplazar con URL real del usuario
 
 const Fees = () => {
   const [fees, setFees] = useState(null);
