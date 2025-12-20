@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 4.2 (Matrícula Tardía Support) - ACTUALIZADO: 20/12/2025
+// 📦 VERSIÓN: 4.3 (Remove February) - ACTUALIZADO: 20/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
@@ -112,7 +112,7 @@ function SYNC_FULL() {
         const newRow = [
           dni, nombreFull, curso,
           "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA",
-          "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA",
+          "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA",
           "AL DIA"
         ];
         sheetCobranzas.appendRow(newRow);
@@ -256,10 +256,10 @@ function doPost(e) {
       const cobMap = {};
       rowsC.slice(1).forEach(r => {
         cobMap[String(r[0])] = {
-          matricula: check(r[3]), feb: check(r[4]), mar: check(r[5]), abr: check(r[6]),
-          may: check(r[7]), jun: check(r[8]), jul: check(r[9]), ago: check(r[10]),
-          sep: check(r[11]), oct: check(r[12]), nov: check(r[13]), dic: check(r[14]),
-          saldo: r[15]
+          matricula: check(r[3]), mar: check(r[4]), abr: check(r[5]),
+          may: check(r[6]), jun: check(r[7]), jul: check(r[8]), ago: check(r[9]),
+          sep: check(r[10]), oct: check(r[11]), nov: check(r[12]), dic: check(r[13]),
+          saldo: r[14]
         };
       });
       const students = rowsL.slice(1).map((r, i) => {
@@ -281,7 +281,7 @@ function doPost(e) {
       const nombreFull = `${data.student.apellido}, ${data.student.nombre}`;
       sheetL.appendRow([data.student.dni, nombreFull, data.student.nivel, data.student.grado, data.student.division, data.student.turno, "Regular", data.student.isBecado ? data.student.becaPorcentaje : ""]);
       const curso = getPrettyCurso(data.student.grado, data.student.division);
-      sheetC.appendRow([data.student.dni, nombreFull, curso, "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "AL DIA"]);
+      sheetC.appendRow([data.student.dni, nombreFull, curso, "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "AL DIA"]);
       return response({ status: "success", message: "Alumno creado" });
     }
 
@@ -290,7 +290,7 @@ function doPost(e) {
       const rows = sheetC.getDataRange().getValues();
       const idx = rows.findIndex(r => String(r[0]) === String(data.dni));
       if (idx === -1) return response({ status: "error", message: "No encontrado" });
-      const map = { 'matricula': 3, 'feb': 4, 'mar': 5, 'abr': 6, 'may': 7, 'jun': 8, 'jul': 9, 'ago': 10, 'sep': 11, 'oct': 12, 'nov': 13, 'dic': 14 };
+      const map = { 'matricula': 3, 'mar': 4, 'abr': 5, 'may': 6, 'jun': 7, 'jul': 8, 'ago': 9, 'sep': 10, 'oct': 11, 'nov': 12, 'dic': 13 };
       sheetC.getRange(idx + 1, map[data.month] + 1).setValue(data.paid ? "PAGADO" : "PENDIENTE");
       return response({ status: "success" });
     }
@@ -367,7 +367,7 @@ function doPost(e) {
         if (!st) return response({ status: "error", message: "DNI no encontrado" });
         // Check payments logic...
         const check = (val) => String(val).toUpperCase() === "PAGADO";
-        const payments = { matricula: check(st[3]), feb: check(st[4]), mar: check(st[5]), abr: check(st[6]), may: check(st[7]), jun: check(st[8]), jul: check(st[9]), ago: check(st[10]), sep: check(st[11]), oct: check(st[12]), nov: check(st[13]), dic: check(st[14]) };
+        const payments = { matricula: check(st[3]), mar: check(st[4]), abr: check(st[5]), may: check(st[6]), jun: check(st[7]), jul: check(st[8]), ago: check(st[9]), sep: check(st[10]), oct: check(st[11]), nov: check(st[12]), dic: check(st[13]) };
         return response({ status: "success", student: { dni: st[0], name: st[1], course: st[2], payments: payments, debtFree: st[15] === "AL DIA" } });
       }
     }
