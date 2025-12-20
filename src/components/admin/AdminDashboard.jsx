@@ -697,10 +697,10 @@ const AdminDashboard = () => {
               )}
             </div>
 
-            <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center">
-              <span className="flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full">AL DÍA</div></span>
+            <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center px-8">
+              <span className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> PAGADO</span>
               <span>Los cambios se guardan automáticamente</span>
-              <span className="flex items-center gap-2"><div className="w-2 h-2 border border-gray-300 rounded-full">PENDIENTE</div></span>
+              <span className="flex items-center gap-2"><div className="w-3 h-3 border border-gray-300 rounded-full"></div> PENDIENTE</span>
             </div>
 
           </div>
