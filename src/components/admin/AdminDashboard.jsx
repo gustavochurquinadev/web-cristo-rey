@@ -306,7 +306,7 @@ const AdminDashboard = () => {
 
   // Mapeo para Labels bonitos en el Dropdown
   const getLabelGrado = (num) => {
-    const map = { 1: "1er", 2: "2do", 3: "3er", 4: "4to", 5: "5to", 6: "6to", 7: "7mo" };
+    const map = { 1: "1ro", 2: "2do", 3: "3ro", 4: "4to", 5: "5to", 6: "6to", 7: "7mo" };
     return map[num] || `${num}°`;
   };
 
@@ -412,8 +412,9 @@ const AdminDashboard = () => {
                 <>
                   {[1, 2, 3, 4, 5].map(g => (
                     // IDs normalizados: "1_1ra", "1_2da"
+                    // Label personalizado: "1ro 1ra" (Sin 'Año')
                     [["1ra", "1ro 1ra"], ["2da", "2do 2da"]].map(([code, label]) => (
-                      <option key={`${g}_${code}`} value={`${g}_${code}`}>{getLabelGrado(g)} Año {code === "1ra" ? "1ra" : "2da"}</option>
+                      <option key={`${g}_${code}`} value={`${g}_${code}`}>{getLabelGrado(g)} {code === "1ra" ? "1ra" : "2da"}</option>
                     ))
                   ))}
                 </>
