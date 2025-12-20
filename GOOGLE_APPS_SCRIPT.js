@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 4.3 (Remove February) - ACTUALIZADO: 20/12/2025
+// 📦 VERSIÓN: 4.4 (Auto-Create Sheets) - ACTUALIZADO: 20/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
@@ -67,10 +67,24 @@ function SYNC_FULL() {
   const ui = SpreadsheetApp.getUi();
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheetLegajos = ss.getSheetByName("Legajos 2026");
-  const sheetCobranzas = ss.getSheetByName("Cobranzas 2026");
-  if (!sheetLegajos || !sheetCobranzas) {
-    ui.alert("❌ Error: Faltan las hojas 'Legajos 2026' o 'Cobranzas 2026'.");
+  let sheetCobranzas = ss.getSheetByName("Cobranzas 2026");
+
+  if (!sheetLegajos) {
+    ui.alert("❌ Error: Falta la hoja 'Legajos 2026'. Esta es la base de datos principal.");
     return;
+  }
+
+  // Auto-crear Cobranzas si no existe
+  if (!sheetCobranzas) {
+    sheetCobranzas = ss.insertSheet("Cobranzas 2026");
+    // Headers sin Febrero
+    const headers = ["ID", "ALUMNO", "CURSO", "MATRICULA", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC", "ESTADO"];
+    sheetCobranzas.appendRow(headers);
+    // Estilos básicos header
+    const hRange = sheetCobranzas.getRange(1, 1, 1, headers.length);
+    hRange.setBackground("#1B365D").setFontColor("#FFFFFF").setFontWeight("bold").setHorizontalAlignment("center");
+    sheetCobranzas.setFrozenRows(1);
+    sheetCobranzas.setFrozenColumns(2);
   }
   // 1. Leer Datos
   const dataL = sheetLegajos.getDataRange().getValues();
