@@ -152,50 +152,54 @@ const AdminDashboard = () => {
     e.preventDefault();
     const actionType = isEditing ? "edit" : "create";
 
-    // OPTIMISTIC UPDATE PARA EDICIÓN
-    if (isEditing) {
-      setShowModal(false);
-      const previousStudents = [...students];
+    // OPTIMISTIC UPDATE: ACTUAR YA, PENSAR DESPUÉS
+    setShowModal(false);
+    const previousStudents = [...students];
 
-      // Actualizar visualmente ya
+    if (isEditing) {
+      // EDICIÓN
       setStudents(prev => prev.map(s => s.id === editId ? {
         ...s,
         ...formData,
         dni: String(formData.dni),
         becaPorcentaje: formData.isBecado ? formData.becaPorcentaje : 0
       } : s));
-
-      const toastId = toast.loading("Guardando cambios...");
-
-      try {
-        await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
-          method: "POST",
-          body: JSON.stringify({ action: "edit", student: formData, id: editId }),
-        });
-        toast.dismiss(toastId);
-        toast.success("Cambios guardados");
-      } catch (error) {
-        toast.dismiss(toastId);
-        toast.error("Error al guardar");
-        setStudents(previousStudents); // Rollback
-      }
-
     } else {
-      // CREACIÓN (Sigue siendo Bloqueante para asegurar ID correcto)
-      const toastId = toast.loading("Inscribiendo alumno...");
-      try {
-        await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
-          method: "POST",
-          body: JSON.stringify({ action: actionType, student: formData }),
-        });
-        toast.dismiss(toastId);
-        toast.success("Alumno inscripto correctamente");
-        setShowModal(false);
-        fetchStudents(); // Para obtener el ID nuevo
-      } catch (error) {
-        toast.dismiss(toastId);
-        toast.error("Error al inscribir");
-      }
+      // CREACIÓN (Optimista)
+      // Generamos un ID temporal para que aparezca ya en la lista
+      const tempId = Date.now();
+      const newStudent = {
+        id: tempId,
+        ...formData,
+        dni: String(formData.dni),
+        becaPorcentaje: formData.isBecado ? formData.becaPorcentaje : 0,
+        saldo: "ADEUDA" // Default al crear
+      };
+      setStudents(prev => [newStudent, ...prev]);
+      toast.info("Inscribiendo... (Ya visible)", { duration: 2000 });
+    }
+
+    const toastId = toast.loading("Sincronizando con Google...");
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+        method: "POST",
+        body: JSON.stringify({
+          action: actionType,
+          student: formData,
+          id: isEditing ? editId : null
+        }),
+      });
+      toast.dismiss(toastId);
+      toast.success(isEditing ? "Cambios guardados" : "Alumno inscripto correctamente");
+
+      // Background sync to get real IDs (indexes)
+      fetchStudents();
+
+    } catch (error) {
+      toast.dismiss(toastId);
+      toast.error("Error al guardar (Deshaciendo cambios)");
+      setStudents(previousStudents); // Rollback si falla
     }
   };
 

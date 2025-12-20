@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 3.6 (BugFix: setBold) - ACTUALIZADO: 19/12/2025
+// 📦 VERSIÓN: 3.7 (Optimización Final: No-Lock Reads) - ACTUALIZADO: 19/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES Y SINCRONIZACIÓN.
 
@@ -300,9 +300,6 @@ function APPLY_FILTERS() {
     });
     SpreadsheetApp.getUi().alert("✅ Filtros aplicados.");
 }
-
-// ==========================================
-// 📦 VERSIÓN: 3.7 (Optimización: Lecturas Rápidas sin Bloqueo) - ACTUALIZADO: 19/12/2025
 
 // ==========================================
 // ⚡ BACKEND WEB (doPost)
