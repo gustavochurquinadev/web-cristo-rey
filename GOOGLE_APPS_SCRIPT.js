@@ -50,7 +50,8 @@ function SETUP_FEES() {
   sheet.appendRow(["Inicial", "Cuota Nivel Inicial", 38500, "Valor Mensual"]);
   sheet.appendRow(["Primario", "Cuota Nivel Primario", 33000, "Valor Mensual"]);
   sheet.appendRow(["Secundario", "Cuota Nivel Secundario", 33000, "Valor Mensual"]);
-  sheet.appendRow(["Matricula", "Matrícula 2026", 40000, "Pago Anticipado"]);
+  sheet.appendRow(["Matricula", "Matrícula 2026 (Anticipada)", 40000, "Hasta 14 Feb"]);
+  sheet.appendRow(["Matricula_Tardia", "Matrícula 2026 (Tardía)", 45000, "Post 14 Feb"]);
 
   // Estilo Header
   sheet.getRange(1, 1, 1, 4).setBackground("#1B365D").setFontColor("#FFFFFF").setFontWeight("bold");
@@ -230,7 +231,8 @@ function doPost(e) {
         sheet.appendRow(["Inicial", "Cuota Nivel Inicial", 38500, "Valor Mensual"]);
         sheet.appendRow(["Primario", "Cuota Nivel Primario", 33000, "Valor Mensual"]);
         sheet.appendRow(["Secundario", "Cuota Nivel Secundario", 33000, "Valor Mensual"]);
-        sheet.appendRow(["Matricula", "Matrícula 2026", 40000, "Pago Anticipado"]);
+        sheet.appendRow(["Matricula", "Matrícula 2026 (Anticipada)", 40000, "Hasta 14 Feb"]);
+        sheet.appendRow(["Matricula_Tardia", "Matrícula 2026 (Tardía)", 45000, "Post 14 Feb"]);
         sheet.getRange(1, 1, 1, 4).setBackground("#1B365D").setFontColor("#FFFFFF").setFontWeight("bold");
       }
       const d = sheet.getDataRange().getValues();

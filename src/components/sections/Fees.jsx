@@ -1,69 +1,157 @@
-import { Coins, CheckCircle, Clock, CreditCard } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Coins, CheckCircle, Clock, CreditCard, AlertCircle, Calendar } from 'lucide-react';
+
+// URL del Script (Misma que en AdminDashboard, idealmente debería estar en un config global)
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_d_2v3K4Z5J6H7L8M9N0O1P2Q3R4S5T6U7V8W9X0Y1Z2/exec"; // Reemplazar con URL real del usuario
 
 const Fees = () => {
-  const fees = [
-    { level: 'Nivel Inicial', amount: '$35.000', matricula: '$50.000', features: ['Materiales incluidos', 'Seguro escolar', 'Merienda'] },
-    { level: 'Nivel Primario', amount: '$30.000', matricula: '$50.000', features: ['Talleres extraprogramáticos', 'Plataforma digital', 'Salidas educativas'] },
-    { level: 'Nivel Secundario', amount: '$30.000', matricula: '$50.000', features: ['Orientación universitaria', 'Laboratorios', 'Certificaciones'] }
+  const [fees, setFees] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFees = async () => {
+      try {
+        // Intentar leer de cache primero si existe (compartido con Admin)
+        const cached = localStorage.getItem('admin_fees');
+        if (cached) {
+          setFees(JSON.parse(cached));
+          setLoading(false);
+        }
+
+        const res = await fetch("https://script.google.com/macros/s/AKfycbz_d_2v3K4Z5J6H7L8M9N0O1P2Q3R4S5T6U7V8W9X0Y1Z2/exec", { // URL GENÉRICA, DEBERÍA SER LA DE ENV
+          method: 'POST',
+          body: JSON.stringify({ action: 'getFees' })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          setFees(data.fees);
+          // Actualizar cache, pero cuidado con colisiones si Admin usa otra key. 
+          // Usaremos una key específica para publico para no romper nada.
+          localStorage.setItem('public_fees', JSON.stringify(data.fees));
+        }
+      } catch (error) {
+        console.error("Error fetching fees:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFees();
+  }, []);
+
+  // VALORES POR DEFECTO (Fallback si falla carga)
+  const displayFees = fees || {
+    Inicial: 38500,
+    Primario: 33000,
+    Secundario: 33000,
+    Matricula: 40000,
+    Matricula_Tardia: 45000
+  };
+
+  const levels = [
+    { name: 'Nivel Inicial', price: displayFees.Inicial, features: ['Jornada Simple', 'Materiales Incluidos', 'Seguro Escolar'] },
+    { name: 'Nivel Primario', price: displayFees.Primario, features: ['Jornada Extendida (Opcional)', 'Plataforma Digital', 'Talleres Extraprogramáticos'] },
+    { name: 'Nivel Secundario', price: displayFees.Secundario, features: ['Orientación Universitaria', 'Laboratorios', 'Certificaciones IT'] }
   ];
 
-  const adminSchedules = [
-    { day: 'Lunes', hours: '8:00 - 13:00 / 15:00 - 18:00' },
-    { day: 'Martes', hours: '8:00 - 13:00' },
-    { day: 'Miércoles', hours: '8:00 - 13:00 / 15:00 - 18:00' },
-    { day: 'Jueves', hours: '8:00 - 13:00' },
-    { day: 'Viernes', hours: '8:00 - 13:00' }
-  ];
+  const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
 
   return (
-    <section id="fees" className="py-24 bg-gray-50 flex items-center">
+    <section id="fees" className="py-24 bg-gray-50">
       <div className="container mx-auto px-6">
+
+        {/* HEADER */}
         <div className="text-center mb-16">
-          <span className="text-cristo-accent font-bold tracking-widest text-xs uppercase">Aranceles</span>
-          <h2 className="font-serif text-4xl text-cristo-primary mt-2">Cuotas Ciclo Lectivo 2026</h2>
+          <span className="text-cristo-accent font-bold tracking-widest text-xs uppercase">Administración</span>
+          <h2 className="font-serif text-4xl text-cristo-primary mt-2">Estructura de Aranceles 2026</h2>
+          <p className="text-gray-500 mt-4 max-w-2xl mx-auto">Valores vigentes para el Ciclo Lectivo 2026. Los montos pueden sufrir actualizaciones en Junio y Septiembre.</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
-          {fees.map((fee, idx) => (
-            <div key={idx} className="bg-white rounded-lg shadow-lg border-t-4 border-cristo-accent p-8 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <div className="text-center mb-6">
-                <h3 className="font-serif text-2xl text-cristo-primary mb-2">{fee.level}</h3>
-                <div className="text-4xl font-bold text-cristo-accent mb-1">{fee.amount}</div>
-                <span className="text-xs text-gray-400 uppercase tracking-wide">Cuota Mensual</span>
+
+        {/* 1. SECCIÓN MATRÍCULA */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-12 max-w-4xl mx-auto relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-cristo-accent text-white text-xs font-bold px-4 py-1 rounded-bl-xl">INSCRIPCIONES ABIERTAS</div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="text-left">
+              <h3 className="text-2xl font-bold text-cristo-primary flex items-center gap-2">
+                <Coins className="w-6 h-6 text-cristo-accent" /> Matrícula 2026
+              </h3>
+              <p className="text-gray-500 text-sm mt-1">Reserva de vacante anual</p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-6 w-full md:w-auto">
+              {/* Anticipada */}
+              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex-1 min-w-[200px] text-center">
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">Pago Anticipado</span>
+                <div className="text-3xl font-serif font-bold text-cristo-primary">{formatPrice(displayFees.Matricula)}</div>
+                <span className="text-[10px] text-gray-500 font-medium bg-white px-2 py-0.5 rounded-full border border-gray-100 mt-2 inline-block">
+                  Hasta 14 de Febrero
+                </span>
               </div>
-              <div className="border-t border-gray-100 pt-6 mb-6">
-                <div className="flex justify-between items-center mb-2"><span className="text-sm text-gray-600">Matrícula</span><span className="font-bold text-cristo-primary">{fee.matricula}</span></div>
-                <div className="flex justify-between items-center"><span className="text-sm text-gray-600">Vencimiento</span><span className="text-sm font-medium text-cristo-accent">Día 10</span></div>
+
+              {/* Tardía */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex-1 min-w-[200px] text-center opacity-75">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Pago Tardío</span>
+                <div className="text-3xl font-serif font-bold text-gray-400">{formatPrice(displayFees.Matricula_Tardia || 45000)}</div>
+                <span className="text-[10px] text-gray-400 font-medium mt-2 inline-block">
+                  Después del 14/02
+                </span>
               </div>
-              <ul className="space-y-3 mb-8">
-                {fee.features.map((item, i) => (
-                  <li key={i} className="flex items-center text-sm text-gray-500"><CheckCircle className="w-4 h-4 text-green-500 mr-2" />{item}</li>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. CUOTAS MENSUALES */}
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
+          {levels.map((level, idx) => (
+            <div key={idx} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-cristo-primary p-6 relative group">
+              <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-100 transition-opacity">
+                <div className="bg-cristo-accent w-2 h-2 rounded-full"></div>
+              </div>
+              <h3 className="font-serif text-xl text-cristo-primary mb-4">{level.name}</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-gray-800">{formatPrice(level.price)}</span>
+                <span className="text-sm text-gray-400 block mt-1">Mensual (Marzo - Diciembre)</span>
+              </div>
+              <ul className="space-y-3 mb-6">
+                {level.features.map((feat, i) => (
+                  <li key={i} className="flex items-center text-sm text-gray-600">
+                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" /> {feat}
+                  </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-        <div className="mt-12 bg-white p-6 rounded-lg shadow-sm border border-gray-100 grid md:grid-cols-2 gap-8">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-gray-100 rounded-full text-cristo-primary"><Clock className="w-6 h-6" /></div>
-            <div className="w-full">
-              <h4 className="font-bold text-cristo-primary mb-2">Horario de Atención</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                {adminSchedules.map((sch, i) => (
-                  <li key={i} className="flex justify-between border-b border-gray-100 pb-1 last:border-0">
-                    <span className="font-medium">{sch.day}:</span><span>{sch.hours}</span>
-                  </li>
-                ))}
+
+        {/* 3. INFO FINANCIERA (VENCIMIENTOS Y RECARGOS) */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+
+          {/* VENCIMIENTOS */}
+          <div className="bg-white p-6 rounded-xl border border-gray-100 flex gap-4">
+            <div className="p-3 bg-red-50 text-red-600 rounded-lg h-fit"><Clock className="w-6 h-6" /></div>
+            <div>
+              <h4 className="font-bold text-gray-800 mb-2">Vencimientos y Recargos</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-red-400 rounded-full"></span> Vencimiento cuota mensual: <strong>Día 20 de cada mes</strong>.</li>
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-red-400 rounded-full"></span> Mora automática: <strong>10% mensual</strong> sobre el valor vigente.</li>
+                <li className="text-xs text-gray-400 mt-2 italic">Las cuotas atrasadas se abonan al valor actualizado al momento del pago.</li>
               </ul>
             </div>
           </div>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-gray-100 rounded-full text-cristo-primary"><CreditCard className="w-6 h-6" /></div>
+
+          {/* MEDIOS DE PAGO Y BENEFICIOS */}
+          <div className="bg-white p-6 rounded-xl border border-gray-100 flex gap-4">
+            <div className="p-3 bg-green-50 text-green-600 rounded-lg h-fit"><CreditCard className="w-6 h-6" /></div>
             <div>
-              <h4 className="font-bold text-cristo-primary mb-2">Medios de Pago</h4>
-              <p className="text-sm text-gray-600">Transferencias bancarias, débito automático y pagos en efectivo en administración. Consultar por descuentos por hermanos.</p>
+              <h4 className="font-bold text-gray-800 mb-2">Beneficios y Medios de Pago</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span> <strong>Pago Anticipado Anual:</strong> Abonando las 10 cuotas en Marzo, se congelan al valor inicial sin los aumentos de Junio/Sept.</li>
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span> Transferencia bancaria o efectivo en administración.</li>
+              </ul>
             </div>
           </div>
+
         </div>
+
       </div>
     </section>
   );

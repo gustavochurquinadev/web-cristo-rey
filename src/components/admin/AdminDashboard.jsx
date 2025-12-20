@@ -848,10 +848,16 @@ const AdminDashboard = () => {
                       const isPaid = payments?.[key];
 
                       // CÁLCULO DE MONTO DINÁMICO
-                      // Usamos 'fees' del estado (que viene del Sheet) en lugar de una constante fija
-                      const baseFee = fees[selectedStudent.nivel] || fees['Primario'] || 33000;
+                      let baseFee;
+                      if (key === 'matricula') {
+                        // Usar valor específico de Matrícula
+                        baseFee = fees['Matricula'] || 40000;
+                      } else {
+                        // Usar valor de cuota mensual según nivel
+                        baseFee = fees[selectedStudent.nivel] || fees['Primario'] || 33000;
+                      }
 
-                      const scholarshipDiscount = selectedStudent.isBecado ? (baseFee * (selectedStudent.becaPorcentaje / 100)) : 0;
+                      const scholarshipDiscount = (key !== 'matricula' && selectedStudent.isBecado) ? (baseFee * (selectedStudent.becaPorcentaje / 100)) : 0;
                       const finalFee = baseFee - scholarshipDiscount;
 
                       // CÁLCULO CON MORA
