@@ -65,7 +65,7 @@ const AdminDashboard = () => {
       String(student.apellido || "").toLowerCase().includes(term) ||
       String(student.dni || "").includes(term);
 
-    const matchesNivel = filterNivel === "Todos" || student.nivel === filterNivel;
+    const matchesNivel = filterNivel === "Todos" || String(student.nivel || "").toLowerCase() === filterNivel.toLowerCase();
 
     // --- LÓGICA DE FILTRO DE CURSO ROBUSTA ---
     const matchesCurso = filterCurso === "Todos" || (() => {
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
       // 3. Construir ID Normalizado (match con los valores del option)
       // IDs definidos en el render: "sala_3_a", "1_1ra"
       let studentId = "";
-      if (student.nivel === "Inicial") {
+      if (String(student.nivel || "").toLowerCase() === "inicial") {
         studentId = `sala_${gNum}_${dRaw}`;
       } else {
         studentId = `${gNum}_${dRaw}`;
