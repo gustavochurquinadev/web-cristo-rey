@@ -61,7 +61,7 @@ const App = () => {
           {/* Admin System - Updated Route */}
           <Route path="/sistemalegajo" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-            <Route path="receipts" element={<div>Recibos (Próximamente)</div>} />
+            <Route path="receipts" element={<ReceiptProcessor />} />
           </Route>
 
           {/* Catch All - 404 */}

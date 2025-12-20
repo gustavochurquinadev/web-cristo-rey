@@ -1,127 +1,101 @@
-# 📘 Guía de Usuario - Sitio Web Colegio Católico Cristo Rey
+# 📘 Guía de Usuario - Sistema Digital Cristo Rey
 
-Bienvenido a la guía oficial de uso del sitio web institucional. Este documento está diseñado para ayudar al equipo directivo, administrativo y docente a comprender el funcionamiento de la plataforma digital, facilitando su gestión y aprovechamiento.
-
----
-
-## 📑 Índice de Contenidos
-
-1. [Visión General](#1-visión-general)
-2. [Sitio Web Público](#2-sitio-web-público)
-3. [Portal Docente](#3-portal-docente)
-4. [Sistema de Nómina (Administración)](#4-sistema-de-nómina-administración)
-5. [Gestión Técnica Básica](#5-gestión-técnica-básica)
+Bienvenido a la guía oficial de uso de la plataforma web. Este documento detalla todos los accesos disponibles y cómo utilizar las herramientas de gestión administrativa, docente y familiar.
 
 ---
 
-## 1. Visión General
+## 📑 Índice de Accesos
 
-El sitio web está construido con tecnologías modernas (**React** y **Vite**) que garantizan una navegación rápida, segura y adaptable a cualquier dispositivo (móviles, tablets y computadoras).
-
-### Funcionalidades Principales:
-- **Pública:** Información institucional, noticias, niveles educativos y contacto.
-- **Privada:** Portal para docentes con acceso a recibos de haberes y documentos.
-- **Administrativa:** Herramienta interna para procesar y distribuir recibos de sueldo digitalmente.
-
----
-
-## 2. Sitio Web Público
-
-Esta es la cara visible para padres, alumnos y futuros ingresantes. Se accede a través de la dirección web principal.
-
-### 🧭 Navegación
-La página utiliza un sistema de "página única" (Single Page Application), lo que significa que al hacer clic en el menú, el sitio se desliza suavemente hacia la sección correspondiente sin recargar la página.
-
-### 📍 Secciones Interactiva
-1.  **Inicio:** Presentación visual con el escudo y lema del colegio.
-2.  **Historia:** Línea de tiempo interactiva con los hitos de la institución.
-3.  **Niveles:** Tarjetas informativas sobre Nivel Inicial, Primario y Secundario. Al pasar el mouse, muestran detalles adicionales.
-4.  **Pastoral:** Información sobre actividades religiosas y sacramentales.
-5.  **Noticias:** Novedades recientes.
-6.  **Aranceles:** Información clara sobre matrículas y cuotas mensuales.
-7.  **Contacto:**
-    - Formulario de "Trabaja con Nosotros" (Para envío de CVs).
-    - Mapas y datos de contacto directo.
+| Módulo | Enlace / Ruta | Descripción |
+| :--- | :--- | :--- |
+| **Sitio Público** | `/` (Inicio) | Web institucional para el público general. |
+| **Portal Docente** | `/portal` | Acceso a recibos de sueldo y documentos internos. |
+| **Portal Familias** | `/familias` | Consulta de estado de cuenta para padres. |
+| **Administración** | `/sistemalegajo` | Panel de control integral (Alumnos, Pagos y Sueldos). |
 
 ---
 
-## 3. Portal Docente
-
-Zona exclusiva para el personal del colegio.
-
-### 🔗 Cómo Ingresar
-1.  Diríjase a la sección **"Portal"** o agregue `/portal` a la dirección web.
-2.  Verá dos opciones:
-    - **Iniciar Sesión:** Si ya tiene cuenta.
-    - **Crear Cuenta:** Para nuevos usuarios.
-
-### ®️ Registro de Nuevos Docentes
-El docente debe seleccionar "Crear cuenta aquí" y completar:
-- **Nombre Completo**.
-- **DNI** (Sin puntos).
-- **Contraseña** (Personal e intransferible).
-- **Código de Invitación:** Este código lo provee la Administración para asegurar que solo personal autorizado se registre.
-
-### 🖥️ Panel del Docente
-Una vez dentro, el docente tiene acceso a dos columnas principales:
-1.  **Recibos de Haberes:** Lista cronológica de sus recibos de sueldo. Puede descargarlos en PDF haciendo clic en el botón "Descargar".
-2.  **Documentación Institucional:** Acceso a reglamentos, circulares y formularios oficiales del colegio.
-
-> **Nota de Seguridad:** El sistema verifica automáticamente el DNI del usuario para mostrar ÚNICAMENTE sus propios recibos. Ningún docente puede ver recibos de otros colegas.
+## 1. 🏫 Sitio Web Público
+Disponible para toda la comunidad.
+- **Noticias y Calendario:** Se actualizan automáticamente para informar de eventos.
+- **Formularios de Contacto:** Las consultas llegan directamente al correo institucional.
+- **Niveles Educativos:** Información detallada sobre Inicial, Primaria y Secundaria.
 
 ---
 
-## 4. Sistema de Nómina (Administración)
+## 2. 👩‍🏫 Portal Docente (`/portal`)
+Exclusivo para el personal del colegio.
+1.  **Ingreso:** Requiere DNI y Contraseña.
+2.  **Recibos de Haberes:** Puede visualizar y descargar sus recibos de sueldo en PDF.
+3.  **Documentación:** Acceso a reglamentos y circulares.
 
-Herramienta interna para el equipo administrativo encargada de digitalizar los sueldos.
-**Acceso:** Ruta `/admin` (Requiere autorización).
-
-### ⚙️ Procesador de Recibos
-Esta herramienta toma el PDF único que emite el sistema contable (donde están todos los recibos juntos) y lo separa automáticamente para enviarlo a cada docente.
-
-#### Paso a Paso:
-1.  **Seleccionar Destino:**
-    - Elija una carpeta existente (ej: `OCTUBRE_2024`) del menú desplegable.
-    - O cree una nueva escribiendo el nombre (ej: `NOVIEMBRE_2025`) y haciendo clic en el botón azul de carpeta.
-
-2.  **Cargar Archivo Maestro:**
-    - Haga clic en el recuadro **"Subir PDF Maestro"**.
-    - Seleccione el archivo PDF que contiene todos los sueldos del mes.
-
-3.  **Procesamiento Automático:**
-    - El sistema leerá cada página.
-    - Identificará el **DNI** y **Legajo** de cada docente automáticamente.
-    - "Recortará" cada recibo individualmente.
-    - Lo subirá a la nube (Google Drive) en la carpeta seleccionada.
-    - Renombrará el archivo como: `CARPETA_DNI_LEG_LEGAJO.pdf`.
-
-4.  **Resultado:**
-    - Al finalizar, verá un registro (log) en pantalla verde confirmando cada subida exitosa.
-    - Los docentes podrán ver sus recibos inmediatamente en su Portal.
+**Nota:** Si es su primera vez, debe registrarse usando el **Código de Invitación** provisto por dirección.
 
 ---
 
-## 5. Gestión Técnica Básica
-
-Información para el encargado técnico o administrador del sitio.
-
-### 📂 Estructura de Archivos
-Si necesita solicitar cambios a un desarrollador, esta referencia le será útil:
-
--   **Textos y Contenidos:** La mayoría de los textos editables están en:
-    -   `src/components/sections/`: Carpetas con cada sección (Staff, Levels, etc.).
-    -   `src/pages/Landing.jsx`: Página principal.
--   **Imágenes:** Se guardan en la carpeta `public/images/`.
--   **Configuración:** Los colores y estilos bases están en `tailwind.config.js`.
-
-### ☁️ Conexión con Google
-El sistema utiliza Google Apps Script como "backend" para conectar el sitio con Google Sheets y Google Drive.
--   **Script URL:** Se encuentra configurada en `Staff.jsx` y `ReceiptProcessor.jsx`. No debe modificarse salvo que cambie el script en Google.
+## 3. 👨‍👩‍👧‍👦 Portal Familias (`/familias`)
+Herramienta rápida para que los padres consulten su situación administrativa.
+1.  **Ingreso Rápido:** Solo requiere el **DNI del Alumno**.
+2.  **Estado de Cuenta:** El sistema mostrará un semáforo de estado:
+    -   🟢 **AL DÍA:** No se registra deuda exigible.
+    -   🔴 **CON DEUDA:** Existen cuotas pendientes.
+    -   *Próximamente:* Botón para informar pagos.
 
 ---
 
-**Soporte Técnico**
-Ante cualquier duda o error en el sistema, contacte al desarrollador responsable o consulte el archivo `README.md` para detalles técnicos de instalación.
+## 4. 🛡️ Sistema de Gestión (`/sistemalegajo`)
+Panel profesional para el equipo directivo y administrativo.
+**Contraseña de Acceso:** `admin`
+
+El sistema se divide en dos grandes áreas, accesibles desde el menú superior: **Legajos** y **Sueldos**.
+
+### A. 📂 Sección LEGAJOS (Dashboard)
+Aquí se gestiona la vida del alumno y la economía escolar.
+
+#### 📊 Tablero de Control (Nuevo)
+En la parte superior verá estadísticas en tiempo real:
+-   **Matrícula Visible:** Cantidad de alumnos en pantalla.
+-   **Solvencia:** Porcentaje de alumnos al día (Verde).
+-   **Morosidad:** Porcentaje de deuda (Rojo).
+-   **Becas:** Porcentaje de alumnos becados (Azul).
+
+#### 🔍 Buscador y Filtros
+-   **Buscador Inteligente:** Escriba nombre, apellido o DNI.
+-   **Filtro por Nivel:** Seleccione Inicial, Primario o Secundario.
+-   **Filtro por Curso:** Al seleccionar un nivel, se habilita el filtro de curso (ej: "1ro 1ra", "Sala 3").
+
+#### 📝 Gestión de Alumnos
+-   **Nuevo Alumno:** Botón "Nuevo Alumno" para inscribir (impacta en Excel automáticamente).
+-   **Editar:** Clic en el lápiz para modificar datos.
+-   **Pagos:** Clic en el botón verde/rojo de estado ($). Se abre una ficha donde puede marcar mes a mes como PAGADO o PENDIENTE. Al guardar, se actualiza el estado general automáticamente.
+-   **Cerrar Ciclo Lectivo:** El botón rojo "CERRAR CICLO LECTIVO" promueve automáticamente a todos los alumnos al siguiente grado (ej: 1ro -> 2do). **Usar con precaución a fin de año.**
 
 ---
-*© 2024 Colegio Católico Cristo Rey - Documentación Interna*
+
+### B. 💼 Sección SUELDOS (Procesador de Recibos)
+Herramienta para cortar y distribuir los recibos de sueldo digitales.
+
+#### 📝 Paso a Paso para Cargar Recibos:
+1.  **Ingrese a la pestaña "Sueldos"** desde el menú superior del admin.
+2.  **Seleccione Destino:**
+    -   Si la carpeta del mes ya existe (ej: `OCTUBRE_2025`), selecciónela de la lista.
+    -   Si es un mes nuevo, escriba el nombre (ej: `NOVIEMBRE_2025`) y haga clic en el botón azul de "Crear Carpeta".
+3.  **Cargar PDF Maestro:**
+    -   Haga clic en el recuadro grande **"Subir PDF Maestro"**.
+    -   Seleccione el archivo PDF único que le entrega el sistema contable (donde están todos los recibos juntos).
+4.  **Proceso Automático:**
+    -   El sistema leerá el PDF página por página.
+    -   Detectará el DNI y Legajo de cada docente.
+    -   Recortará el recibo individual.
+    -   Lo guardará en Google Drive y lo vinculará al Portal del Docente.
+5.  **Confirmación:** Verá una lista verde confirmando "Subido con éxito".
+
+---
+
+### 🆘 Soporte Técnico
+Si el sistema presenta "pantalla azul" o errores de conexión:
+1.  Verifique su conexión a internet.
+2.  Recargue la página.
+3.  Si persiste, contacte a soporte técnico indicando el mensaje de error.
+
+*© 2025 Colegio Católico Cristo Rey - Documentación Interna*

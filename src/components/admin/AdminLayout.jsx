@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Shield, Lock, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -7,6 +7,7 @@ const AdminLayout = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
 
     // Simple hardcoded auth for demo/MVP
     // En producción esto debería ser más robusto (JWT, etc), pero para este caso de uso local funciona.
@@ -77,6 +78,22 @@ const AdminLayout = () => {
                         <p className="text-[10px] text-gray-500">Colegio Cristo Rey • Admin PWA</p>
                     </div>
                 </div>
+
+                {/* NAVIGATION MENU */}
+                <nav className="hidden md:flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+                    <button
+                        onClick={() => navigate('/sistemalegajo')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${location.pathname === '/sistemalegajo' ? 'bg-white text-cristo-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Legajos
+                    </button>
+                    <button
+                        onClick={() => navigate('/sistemalegajo/receipts')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${location.pathname.includes('receipts') ? 'bg-white text-cristo-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Sueldos
+                    </button>
+                </nav>
                 <div className="flex items-center gap-4">
                     <span className="text-xs text-gray-400 hidden md:block">Usuario: Dirección</span>
                     <button
