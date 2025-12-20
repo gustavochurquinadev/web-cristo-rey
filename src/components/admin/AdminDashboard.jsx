@@ -316,7 +316,17 @@ const AdminDashboard = () => {
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Legajos de Alumnos</h2>
           <p className="text-sm text-gray-500">
-            {loading ? "Cargando datos..." : students.length + " alumnos matriculados"}
+            {loading ? "Cargando datos..." : (
+              <>
+                <span className="font-bold text-gray-800">{filteredStudents.length}</span> alumno{filteredStudents.length !== 1 ? 's' : ''}
+                {filteredStudents.length !== students.length && (
+                  <span className="text-gray-400 font-normal ml-1">
+                    (de {students.length} totales)
+                  </span>
+                )}
+                {filteredStudents.length === students.length && " matriculados"}
+              </>
+            )}
           </p>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
