@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 3.8 (Optimización: Pagos Ultra-Rápidos) - ACTUALIZADO: 19/12/2025
+// 📦 VERSIÓN: 3.9 (Fix: Formato Curso '1ro 1ra') - ACTUALIZADO: 19/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES Y SINCRONIZACIÓN.
 
@@ -69,7 +69,7 @@ function SYNC_FULL() {
         // NUEVA ESTRUCTURA LEGAJOS: 
         // 0=DNI, 1=ALUMNO ("PEREZ, Juan"), 2=NIVEL, 3=GRADO, 4=DIV, 5=TURNO, 6=ESTADO, 7=% BECA
         const nombreFull = lData[1];
-        const curso = `${lData[3]}° ${lData[4]}`; // Antes era 4 y 5
+        const curso = getPrettyCurso(lData[3], lData[4]); // Normalizado v3.9
         const estadoLegajo = String(lData[6]).toUpperCase(); // Antes era 7
         // const becaData = lData[7]; // Not syncing TO cobranzas yet, just keeping logic clean.
 
@@ -390,7 +390,7 @@ function doPost(e) {
             // Legajos: DNI(0), ALUMNO(1), NIVEL(2), GRADO(3), DIV(4), TURNO(5), ESTADO(6), BECA(7)
             sheetLegajos.appendRow([data.student.dni, nombreFull, data.student.nivel, data.student.grado, data.student.division, data.student.turno, "Regular", becaVal]);
 
-            const curso = `${data.student.grado}° ${data.student.division}`;
+            const curso = getPrettyCurso(data.student.grado, data.student.division);
             sheetCobranzas.appendRow([data.student.dni, nombreFull, curso, "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "AL DIA"]);
             return response({ status: "success", message: "Alumno creado" });
         }
@@ -414,7 +414,7 @@ function doPost(e) {
             const cobRowIdx = rowsC.findIndex(r => String(r[0]) === String(dni));
 
             if (cobRowIdx !== -1) {
-                const curso = `${data.student.grado}° ${data.student.division}`;
+                const curso = getPrettyCurso(data.student.grado, data.student.division);
                 sheetCobranzas.getRange(cobRowIdx + 1, 2).setValue(nombreFull);
                 sheetCobranzas.getRange(cobRowIdx + 1, 3).setValue(curso);
             }
@@ -527,4 +527,16 @@ function createPDF(dni, sheet, templateId, folderId, docPrefix) {
     copy.setTrashed(true);
     pdf.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     return pdf.getDownloadUrl().replace('&export=download', '');
+}
+
+function getPrettyCurso(g, div) {
+    // Convierte 1 -> "1ro", 2 -> "2do", etc.
+    const map = {
+        "1": "1ro", "2": "2do", "3": "3ro", "4": "4to", "5": "5to", "6": "6to", "7": "7mo"
+    };
+    // Si ya viene como "1ro", lo dejamos. Si viene como "1", lo mapeamos.
+    let gStr = String(g).replace("°", "").trim(); // Limpiar "°" si viniera
+    if (map[gStr]) gStr = map[gStr];
+
+    return `${gStr} ${div}`;
 }

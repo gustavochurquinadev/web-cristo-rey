@@ -70,24 +70,21 @@ const AdminDashboard = () => {
     // --- LÓGICA DE FILTRO DE CURSO ROBUSTA ---
     const matchesCurso = filterCurso === "Todos" || (() => {
       // 1. Normalizar Grado a Número Puro
+      // El backend manda "1ro", "2do", "5". Con replace(/\D/g, "") obtenemos "1", "2", "5".
       const gRaw = String(student.grado || "");
-      const gNum = gRaw.replace(/\D/g, ""); // "1ro" -> "1", "1°" -> "1", "Sala 3" -> "3"
+      const gNum = gRaw.replace(/\D/g, "");
 
       // 2. Normalizar División (Sinónimos)
       let dRaw = String(student.division || "").trim().toLowerCase();
-      // Mapeo de sinónimos comunes
-      if (dRaw === "1era" || dRaw === "1ra") dRaw = "1ra";
+      // Mapeo de sinónimos comunes y typos vistos ("1ea")
+      if (dRaw === "1era" || dRaw === "1ra" || dRaw === "1ea") dRaw = "1ra";
       if (dRaw === "2da" || dRaw === "2do" || dRaw === "segunda") dRaw = "2da";
       if (dRaw === "3ra" || dRaw === "3er" || dRaw === "tercera") dRaw = "3ra";
-      if (dRaw === "a") dRaw = "a";
-      if (dRaw === "b") dRaw = "b";
-      if (dRaw === "c") dRaw = "c";
+      // a, b, c quedan igual
 
       // 3. Construir ID Normalizado (match con los valores del option)
-      // Inicial: "sala_3_a"
-      // Prim/Sec: "1_a" o "1_1ra"
+      // IDs definidos en el render: "sala_3_a", "1_1ra"
       let studentId = "";
-
       if (student.nivel === "Inicial") {
         studentId = `sala_${gNum}_${dRaw}`;
       } else {
@@ -462,7 +459,8 @@ const AdminDashboard = () => {
                           {s.nivel}
                         </span>
                       </td>
-                      <td className="px-6 py-3 text-center font-bold text-gray-700">{s.grado}°</td>
+                      {/* Quitamos el ° hardcodeado porque el dato ya viene como "1ro" o "1°" a veces */}
+                      <td className="px-6 py-3 text-center font-bold text-gray-700">{s.grado}</td>
                       <td className="px-6 py-3 text-center">
                         <span className="w-6 h-6 inline-flex items-center justify-center bg-gray-100 rounded-full text-xs font-bold text-gray-600">
                           {s.division}
