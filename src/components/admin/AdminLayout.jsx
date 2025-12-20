@@ -9,13 +9,19 @@ const AdminLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Configuración dinámica según la ruta
+    const isRecibos = location.pathname.includes('/recibos');
+    const pageTitle = isRecibos ? "Procesamiento de Recibos" : "Sistema de Legajos y Cobros";
+    const pageSubtitle = isRecibos ? "Acceso exclusivo RRHH" : "Gestión Académica y Administrativa";
+    const headerTitle = isRecibos ? "Procesador de Sueldos" : "Sistema de Gestión";
+
     // Simple hardcoded auth for demo/MVP
     // En producción esto debería ser más robusto (JWT, etc), pero para este caso de uso local funciona.
     const handleLogin = (e) => {
         e.preventDefault();
         if (password === 'admin') {
             setIsAuthenticated(true);
-            toast.success("Binvenido al Sistema de Gestión");
+            toast.success("Bienvenido al Sistema");
         } else {
             toast.error("Contraseña incorrecta");
         }
@@ -35,8 +41,8 @@ const AdminLayout = () => {
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Shield className="w-8 h-8 text-cristo-primary" />
                         </div>
-                        <h2 className="text-2xl font-serif font-bold text-gray-800">Acceso Administrativo</h2>
-                        <p className="text-xs text-gray-500 mt-1">Solo personal autorizado</p>
+                        <h2 className="text-2xl font-serif font-bold text-gray-800">{pageTitle}</h2>
+                        <p className="text-xs text-gray-500 mt-1">{pageSubtitle}</p>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-4">
@@ -74,7 +80,7 @@ const AdminLayout = () => {
                 <div className="flex items-center gap-3">
                     <Shield className="w-6 h-6 text-cristo-primary" />
                     <div>
-                        <h1 className="font-bold text-gray-800 text-sm leading-tight">Sistema de Gestión</h1>
+                        <h1 className="font-bold text-gray-800 text-sm leading-tight">{headerTitle}</h1>
                         <p className="text-[10px] text-gray-500">Colegio Cristo Rey • Admin PWA</p>
                     </div>
                 </div>
