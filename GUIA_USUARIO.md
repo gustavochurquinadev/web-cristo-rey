@@ -9,10 +9,10 @@ Bienvenido a la guía oficial de uso de la plataforma web. Este documento detall
 | Módulo | Enlace / Ruta | Descripción |
 | :--- | :--- | :--- |
 | **Sitio Público** | `/` (Inicio) | Web institucional para el público general. |
-| **Portal Docente** | `/portal` | Acceso a recibos de sueldo y documentos internos. |
+| **Portal Docente** | `/docente` | Acceso a recibos de sueldo y documentos internos. |
 | **Portal Familias** | `/familias` | Consulta de estado de cuenta para padres. |
-| **Sistema Legajos** | `/sistemalegajo` | Gestión de Alumnos y Economía. |
-| **Procesador Sueldos** | `/procesamientolegajo` | Herramienta oculta para RRHH. |
+| **Sistema Legajos** | `/sistema` | Gestión de Alumnos y Economía. |
+| **Procesador Sueldos** | `/recibos` | Herramienta oculta para RRHH. |
 
 ---
 
@@ -20,7 +20,7 @@ Bienvenido a la guía oficial de uso de la plataforma web. Este documento detall
 Panel profesional para el equipo directivo y administrativo.
 **Contraseña de Acceso:** `admin`
 
-### A. 📂 Sección LEGAJOS (`/sistemalegajo`)
+### A. 📂 Sección LEGAJOS (`/sistema`)
 Aquí se gestiona la vida del alumno y la economía escolar.
 
 #### 📊 Tablero de Control (Nuevo)
@@ -43,11 +43,11 @@ En la parte superior verá estadísticas en tiempo real:
 
 ---
 
-### B. 💼 Sección SUELDOS (`/procesamientolegajo`)
+### B. 💼 Sección SUELDOS (`/recibos`)
 Herramienta oculta para RRHH. Acceda ingresando la dirección manualmente.
 
 #### 📝 Paso a Paso para Cargar Recibos:
-1.  **Ingrese a: `www.tudominio.com/procesamientolegajo`**.
+1.  **Ingrese a: `www.tudominio.com/recibos`**.
 2.  **Seleccione Destino:**
     -   Si la carpeta del mes ya existe (ej: `OCTUBRE_2025`), selecciónela de la lista.
     -   Si es un mes nuevo, escriba el nombre (ej: `NOVIEMBRE_2025`) y haga clic en el botón azul de "Crear Carpeta".

@@ -43,7 +43,7 @@ const App = () => {
           } />
 
           {/* Ruta 2: Portal Docente */}
-          <Route path="/portal" element={
+          <Route path="/docente" element={
             <WithTransition>
               <div className="bg-gray-50 min-h-screen">
                 <Staff />
@@ -60,12 +60,12 @@ const App = () => {
 
           {/* Admin System - Updated Route */}
           {/* Admin System: Legajos */}
-          <Route path="/sistemalegajo" element={<AdminLayout />}>
+          <Route path="/sistema" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
           </Route>
 
           {/* Admin System: Sueldos (Separado y Oculto) */}
-          <Route path="/procesamientolegajo" element={<AdminLayout />}>
+          <Route path="/recibos" element={<AdminLayout />}>
             <Route index element={<ReceiptProcessor />} />
           </Route>
 

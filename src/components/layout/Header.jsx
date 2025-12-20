@@ -17,7 +17,7 @@ const Header = ({ activeSection, onNavigate }) => {
     { id: 'fees', label: 'Aranceles', type: 'scroll' },
     { id: 'careers', label: 'Trabaja con Nosotros', type: 'scroll' },
     { id: 'familias', label: 'Portal Familias', type: 'external', path: '/familias' },
-    { id: 'portal', label: 'Portal Docente', type: 'external', path: '/portal' },
+    { id: 'portal', label: 'Portal Docente', type: 'external', path: '/docente' },
   ];
 
   const handleNavClick = (section) => {
