@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 3.7 (Optimización Final: No-Lock Reads) - ACTUALIZADO: 19/12/2025
+// 📦 VERSIÓN: 3.8 (Optimización: Pagos Ultra-Rápidos) - ACTUALIZADO: 19/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES Y SINCRONIZACIÓN.
 
@@ -338,7 +338,16 @@ function doPost(e) {
             const rowsCobranzas = sheetCobranzas.getDataRange().getValues();
 
             const cobranzasMap = {};
-            rowsCobranzas.slice(1).forEach(r => { cobranzasMap[String(r[0])] = r[15]; });
+            // Map full row (or processed object) instead of just saldo
+            rowsCobranzas.slice(1).forEach(r => {
+                const dni = String(r[0]);
+                cobranzasMap[dni] = {
+                    matricula: checkPaid(r[3]), feb: checkPaid(r[4]), mar: checkPaid(r[5]), abr: checkPaid(r[6]),
+                    may: checkPaid(r[7]), jun: checkPaid(r[8]), jul: checkPaid(r[9]), ago: checkPaid(r[10]),
+                    sep: checkPaid(r[11]), oct: checkPaid(r[12]), nov: checkPaid(r[13]), dic: checkPaid(r[14]),
+                    saldo: r[15] // Col P
+                };
+            });
 
             const students = rowsLegajos.slice(1).map((r, i) => {
                 const fullName = r[1] || "";
@@ -353,6 +362,8 @@ function doPost(e) {
                     isBecado = true;
                 }
 
+                const cobData = cobranzasMap[String(r[0])] || {};
+
                 return {
                     id: i + 2,
                     dni: String(r[0]),
@@ -365,7 +376,8 @@ function doPost(e) {
                     estado: r[6],
                     isBecado: isBecado,
                     becaPorcentaje: beca,
-                    saldo: cobranzasMap[String(r[0])] || "ADEUDA"
+                    saldo: cobData.saldo || "ADEUDA",
+                    payments: cobData // Send all payments
                 };
             }).filter(s => s.dni !== "");
             return response({ status: "success", students: students });

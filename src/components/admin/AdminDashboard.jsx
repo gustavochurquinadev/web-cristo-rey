@@ -204,29 +204,17 @@ const AdminDashboard = () => {
   };
 
   // --- 7. GESTIÓN DE PAGOS ---
-  const openPaymentModal = async (student) => {
+  const openPaymentModal = (student) => {
     setSelectedStudent(student);
     setShowPaymentModal(true);
-    setLoadingPayments(true);
-    setPayments(null);
-
-    try {
-      const response = await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
-        method: "POST",
-        body: JSON.stringify({ action: "getPayments", dni: student.dni }),
-      });
-      const data = await response.json();
-      if (data.status === "success") {
-        setPayments(data.payments);
-      } else {
-        toast.error("No se encontraron pagos para este alumno");
-        setShowPaymentModal(false);
-      }
-    } catch (error) {
-      toast.error("Error al cargar pagos");
-      setShowPaymentModal(false);
-    } finally {
+    // Carga Instantánea desde datos locales (gracias a getAll optimizado)
+    if (student.payments) {
+      setPayments(student.payments);
       setLoadingPayments(false);
+    } else {
+      // Fallback por si acaso (aunque no debería pasar si se recargó la pág)
+      setPayments(null);
+      setLoadingPayments(false); // O true si quisieras fetchear, pero asumimos data fresca.
     }
   };
 
