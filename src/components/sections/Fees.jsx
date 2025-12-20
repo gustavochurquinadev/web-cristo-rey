@@ -56,42 +56,42 @@ const Fees = () => {
   const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
 
   return (
-    <section id="fees" className="py-24 bg-gray-50">
+    <section id="fees" className="py-12 bg-gray-50">
       <div className="container mx-auto px-6">
 
         {/* HEADER */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <span className="text-cristo-accent font-bold tracking-widest text-xs uppercase">Administración</span>
-          <h2 className="font-serif text-4xl text-cristo-primary mt-2">Estructura de Aranceles 2026</h2>
-          <p className="text-gray-500 mt-4 max-w-2xl mx-auto">Valores vigentes para el Ciclo Lectivo 2026. Los montos pueden sufrir actualizaciones en Junio y Septiembre.</p>
+          <h2 className="font-serif text-3xl md:text-4xl text-cristo-primary mt-2">Aranceles 2026</h2>
+          <p className="text-gray-500 mt-2 max-w-2xl mx-auto text-sm">Valores vigentes para el Ciclo Lectivo 2026. Sujetos a actualización en Junio y Septiembre.</p>
         </div>
 
         {/* 1. SECCIÓN MATRÍCULA */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-12 max-w-4xl mx-auto relative overflow-hidden">
-          <div className="absolute top-0 right-0 bg-cristo-accent text-white text-xs font-bold px-4 py-1 rounded-bl-xl">INSCRIPCIONES ABIERTAS</div>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8 max-w-4xl mx-auto relative overflow-hidden">
+          <div className="absolute top-0 right-0 bg-cristo-accent text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">INSCRIPCIONES ABIERTAS</div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-left">
-              <h3 className="text-2xl font-bold text-cristo-primary flex items-center gap-2">
-                <Coins className="w-6 h-6 text-cristo-accent" /> Matrícula 2026
+              <h3 className="text-xl font-bold text-cristo-primary flex items-center gap-2">
+                <Coins className="w-5 h-5 text-cristo-accent" /> Matrícula 2026
               </h3>
-              <p className="text-gray-500 text-sm mt-1">Reserva de vacante anual</p>
+              <p className="text-gray-500 text-xs mt-1">Reserva de vacante anual</p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-6 w-full md:w-auto">
+            <div className="flex flex-row gap-4 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
               {/* Anticipada */}
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex-1 min-w-[200px] text-center">
-                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">Pago Anticipado</span>
-                <div className="text-3xl font-serif font-bold text-cristo-primary">{formatPrice(displayFees.Matricula)}</div>
-                <span className="text-[10px] text-gray-500 font-medium bg-white px-2 py-0.5 rounded-full border border-gray-100 mt-2 inline-block">
+              <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 flex-1 min-w-[160px] text-center">
+                <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-1">Pago Anticipado</span>
+                <div className="text-2xl font-serif font-bold text-cristo-primary">{formatPrice(displayFees.Matricula)}</div>
+                <span className="text-[10px] text-gray-500 font-medium bg-white px-2 py-0.5 rounded-full border border-gray-100 mt-1 inline-block">
                   Hasta 14 de Febrero
                 </span>
               </div>
 
               {/* Tardía */}
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex-1 min-w-[200px] text-center opacity-75">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Pago Tardío</span>
-                <div className="text-3xl font-serif font-bold text-gray-400">{formatPrice(displayFees.Matricula_Tardia || 45000)}</div>
-                <span className="text-[10px] text-gray-400 font-medium mt-2 inline-block">
+              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex-1 min-w-[160px] text-center opacity-75">
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Pago Tardío</span>
+                <div className="text-2xl font-serif font-bold text-gray-400">{formatPrice(displayFees.Matricula_Tardia || 45000)}</div>
+                <span className="text-[10px] text-gray-400 font-medium mt-1 inline-block">
                   Después del 14/02
                 </span>
               </div>
@@ -100,21 +100,22 @@ const Fees = () => {
         </div>
 
         {/* 2. CUOTAS MENSUALES */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
+        <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto mb-10">
           {levels.map((level, idx) => (
-            <div key={idx} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-cristo-primary p-6 relative group">
-              <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-100 transition-opacity">
-                <div className="bg-cristo-accent w-2 h-2 rounded-full"></div>
+            <div key={idx} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-cristo-primary p-5 relative group">
+              <div className="absolute top-3 right-3 opacity-10 group-hover:opacity-100 transition-opacity">
+                <div className="bg-cristo-accent w-1.5 h-1.5 rounded-full"></div>
               </div>
-              <h3 className="font-serif text-xl text-cristo-primary mb-4">{level.name}</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-800">{formatPrice(level.price)}</span>
-                <span className="text-sm text-gray-400 block mt-1">Mensual (Marzo - Diciembre)</span>
+              <h3 className="font-serif text-lg text-cristo-primary mb-3">{level.name}</h3>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-gray-800">{formatPrice(level.price)}</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-400 block mt-1">Mensual (Mar-Dic)</span>
               </div>
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-2 mb-2">
                 {level.features.map((feat, i) => (
-                  <li key={i} className="flex items-center text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" /> {feat}
+                  <li key={i} className="flex items-start text-xs text-gray-600">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span className="leading-tight">{feat}</span>
                   </li>
                 ))}
               </ul>
@@ -123,29 +124,43 @@ const Fees = () => {
         </div>
 
         {/* 3. INFO FINANCIERA (VENCIMIENTOS Y RECARGOS) */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
 
           {/* VENCIMIENTOS */}
-          <div className="bg-white p-6 rounded-xl border border-gray-100 flex gap-4">
-            <div className="p-3 bg-red-50 text-red-600 rounded-lg h-fit"><Clock className="w-6 h-6" /></div>
-            <div>
-              <h4 className="font-bold text-gray-800 mb-2">Vencimientos y Recargos</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-red-400 rounded-full"></span> Vencimiento cuota mensual: <strong>Día 20 de cada mes</strong>.</li>
-                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-red-400 rounded-full"></span> Mora automática: <strong>10% mensual</strong> sobre el valor vigente.</li>
-                <li className="text-xs text-gray-400 mt-2 italic">Las cuotas atrasadas se abonan al valor actualizado al momento del pago.</li>
+          <div className="bg-white p-5 rounded-xl border border-gray-100 flex gap-4">
+            <div className="p-2 bg-red-50 text-red-600 rounded-lg h-fit"><Clock className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <h4 className="font-bold text-gray-800 mb-2 text-sm">Vencimientos y Recargos</h4>
+              <ul className="space-y-2 text-xs text-gray-600">
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 bg-red-400 rounded-full mt-1.5 shrink-0"></span>
+                  <span>Vencimiento cuota mensual: <strong>Día 20 de cada mes</strong>.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 bg-red-400 rounded-full mt-1.5 shrink-0"></span>
+                  <span>Mora automática: <strong>10% mensual</strong> sobre el valor vigente.</span>
+                </li>
+                <li className="text-[10px] text-gray-400 mt-1 italic leading-tight">Las cuotas atrasadas se abonan al valor actualizado al momento del pago.</li>
               </ul>
             </div>
           </div>
 
           {/* MEDIOS DE PAGO Y BENEFICIOS */}
-          <div className="bg-white p-6 rounded-xl border border-gray-100 flex gap-4">
-            <div className="p-3 bg-green-50 text-green-600 rounded-lg h-fit"><CreditCard className="w-6 h-6" /></div>
-            <div>
-              <h4 className="font-bold text-gray-800 mb-2">Beneficios y Medios de Pago</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span> <strong>Pago Anticipado Anual:</strong> Abonando las 10 cuotas en Marzo, se congelan al valor inicial sin los aumentos de Junio/Sept.</li>
-                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span> Transferencia bancaria o efectivo en administración.</li>
+          <div className="bg-white p-5 rounded-xl border border-gray-100 flex gap-4">
+            <div className="p-2 bg-green-50 text-green-600 rounded-lg h-fit"><CreditCard className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <h4 className="font-bold text-gray-800 mb-2 text-sm">Beneficios y Medios de Pago</h4>
+              <ul className="space-y-2 text-xs text-gray-600">
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full mt-1.5 shrink-0"></span>
+                  <span className="leading-tight">
+                    <strong>Pago Anticipado Anual:</strong> Abonando las 10 cuotas en Marzo, se congelan al valor inicial.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full mt-1.5 shrink-0"></span>
+                  <span className="leading-tight">Transferencia bancaria o efectivo en administración.</span>
+                </li>
               </ul>
             </div>
           </div>
