@@ -31,14 +31,40 @@ const AdminDashboard = () => {
   const [payments, setPayments] = useState(null);
   const [loadingPayments, setLoadingPayments] = useState(false);
 
-  // CONSTANTES DE ARANCELES 2026
-  const BASE_FEES = {
+  // CONSTANTES DE ARANCELES (Fallback)
+  const FALLBACK_FEES = {
     Inicial: 38500,
     Primario: 33000,
     Secundario: 33000
   };
 
-  const [surcharges, setSurcharges] = useState({}); // Estado para controlar recargos por mes { mar: true, abr: false }
+  const [fees, setFees] = useState(FALLBACK_FEES);
+  const [surcharges, setSurcharges] = useState({});
+
+  // --- 0. INIT (Cargar Aranceles) ---
+  useEffect(() => {
+    const loadFees = async () => {
+      try {
+        // Intentar cargar de cache primero para velocidad
+        const cached = localStorage.getItem('admin_fees');
+        if (cached) setFees(JSON.parse(cached));
+
+        // Actualizar desde Sheet
+        const res = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'getFees' })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          setFees(prev => ({ ...prev, ...data.fees }));
+          localStorage.setItem('admin_fees', JSON.stringify({ ...FALLBACK_FEES, ...data.fees }));
+        }
+      } catch (err) {
+        console.error("Error loading fees", err);
+      }
+    };
+    loadFees();
+  }, []);
 
   // --- 1. CARGAR DATOS ---
   const fetchStudents = async () => {
@@ -821,8 +847,10 @@ const AdminDashboard = () => {
                     {monthOrder.map((key) => {
                       const isPaid = payments?.[key];
 
-                      // CÁLCULO DE MONTO
-                      const baseFee = BASE_FEES[selectedStudent.nivel] || 33000;
+                      // CÁLCULO DE MONTO DINÁMICO
+                      // Usamos 'fees' del estado (que viene del Sheet) en lugar de una constante fija
+                      const baseFee = fees[selectedStudent.nivel] || fees['Primario'] || 33000;
+
                       const scholarshipDiscount = selectedStudent.isBecado ? (baseFee * (selectedStudent.becaPorcentaje / 100)) : 0;
                       const finalFee = baseFee - scholarshipDiscount;
 

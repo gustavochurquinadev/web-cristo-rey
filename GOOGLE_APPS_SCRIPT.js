@@ -143,6 +143,35 @@ function doPost(e) {
       return response({ status: "success", url: file.getUrl() });
     }
 
+    // --- 7. ARANCELES DINÁMICOS (CONF_ARANCELES) ---
+    if (data.action === "getFees") {
+      let sheet = ss.getSheetByName("CONF_ARANCELES");
+      if (!sheet) {
+        // Crear hoja de configuración si no existe
+        sheet = ss.insertSheet("CONF_ARANCELES");
+        sheet.appendRow(["ID_CONCEPTO", "DESCRIPCION", "VALOR_NUMERICO", "NOTAS"]);
+        sheet.appendRow(["Inicial", "Cuota Nivel Inicial", 38500, "Valor Mensual"]);
+        sheet.appendRow(["Primario", "Cuota Nivel Primario", 33000, "Valor Mensual"]);
+        sheet.appendRow(["Secundario", "Cuota Nivel Secundario", 33000, "Valor Mensual"]);
+        sheet.appendRow(["Matricula", "Matrícula 2026", 40000, "Pago Anticipado"]);
+
+        // Estilo Header
+        sheet.getRange(1, 1, 1, 4).setBackground("#1B365D").setFontColor("#FFFFFF").setFontWeight("bold");
+        sheet.autoResizeColumns(1, 4);
+      }
+
+      const data = sheet.getDataRange().getValues();
+      const fees = {};
+      // Leer valores (key en col 0, valor en col 2)
+      for (let i = 1; i < data.length; i++) {
+        const key = data[i][0]; // ID_CONCEPTO
+        const val = data[i][2]; // VALOR_NUMERICO
+        if (key && val) fees[key] = Number(val);
+      }
+
+      return response({ status: "success", fees: fees });
+    }
+
   } catch (e) {
     return response({ status: "error", error: e.toString() });
   } finally {
