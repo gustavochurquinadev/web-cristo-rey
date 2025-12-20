@@ -959,35 +959,24 @@ const AdminDashboard = () => {
                               </label>
                             )}
                           </div>
-                                checked = { surcharges[key] || false }
-                        onChange = {(e) => setSurcharges({...surcharges, [key]: e.target.checked })}
-                              />
-                      <span className={`text-[10px] font-bold ${surcharges[key] ? 'text-red-500' : 'text-gray-400'}`}>
-                        + Mora (10%)
-                      </span>
-                    </label>
-                    )
-                        }
 
-                  </div>
-                )
-                    })}
-              </div>
+                        )
+                      })}
+                    </div>
+
+                    <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center px-8">
+                      <span className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> PAGADO</span>
+                      <span>Los cambios se guardan automáticamente</span>
+                      <span className="flex items-center gap-2"><div className="w-3 h-3 border border-gray-300 rounded-full"></div> PENDIENTE</span>
+                    </div>
+                  </>
                 )}
+              </div>
             </div>
-
-            <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center px-8">
-              <span className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> PAGADO</span>
-              <span>Los cambios se guardan automáticamente</span>
-              <span className="flex items-center gap-2"><div className="w-3 h-3 border border-gray-300 rounded-full"></div> PENDIENTE</span>
-            </div>
-
           </div>
-          </div>
-  )
-}
-
-    </div >
+        )
+      }
+    </div>
   );
 };
 
