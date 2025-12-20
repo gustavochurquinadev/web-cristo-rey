@@ -850,8 +850,8 @@ const AdminDashboard = () => {
                       <div
                         onClick={() => togglePayment('matricula')}
                         className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${payments?.['matricula']
-                            ? 'bg-green-50 border-green-500 text-green-700'
-                            : 'bg-white border-gray-100 text-gray-500 hover:border-cristo-accent'
+                          ? 'bg-green-50 border-green-500 text-green-700'
+                          : 'bg-white border-gray-100 text-gray-500 hover:border-cristo-accent'
                           }`}
                       >
                         <div className="text-xs font-bold uppercase mb-1">Matrícula</div>
@@ -894,7 +894,7 @@ const AdminDashboard = () => {
                       </div>
 
                       {/* MESES REGULARES (Mar-Dic) */}
-                      {['mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'].map((key) => {
+                      {['Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'].map((key) => {
                         const isPaid = payments?.[key];
 
                         // Calcular monto
@@ -926,7 +926,7 @@ const AdminDashboard = () => {
 
                             {/* BOTÓN PRINCIPAL (Toggle Pago) */}
                             <div className="flex flex-col items-center cursor-pointer w-full">
-                              <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
+                              <span className="font-bold uppercase text-sm tracking-wide">{key}</span>
 
                               {isPaid ? (
                                 <>
@@ -959,41 +959,33 @@ const AdminDashboard = () => {
                               </label>
                             )}
                           </div>
-
-                          {/* CHECKBOX MORA (Solo si no está pagado) */ }
-                        {
-                          !isPaid && (
-                            <label className="flex items-center gap-1 mt-2 cursor-pointer select-none" onClick={(e) => e.stopPropagation()}>
-                              <input
-                                type="checkbox"
-                                className="w-3 h-3 rounded border-gray-300 text-red-500 focus:ring-red-500"
-                                checked={surcharges[key] || false}
-                                onChange={(e) => setSurcharges({ ...surcharges, [key]: e.target.checked })}
+                                checked = { surcharges[key] || false }
+                        onChange = {(e) => setSurcharges({...surcharges, [key]: e.target.checked })}
                               />
-                              <span className={`text-[10px] font-bold ${surcharges[key] ? 'text-red-500' : 'text-gray-400'}`}>
-                                + Mora (10%)
-                              </span>
-                            </label>
-                          )
+                      <span className={`text-[10px] font-bold ${surcharges[key] ? 'text-red-500' : 'text-gray-400'}`}>
+                        + Mora (10%)
+                      </span>
+                    </label>
+                    )
                         }
 
-                        </div>
-                    )
-                    })}
                   </div>
+                )
+                    })}
+              </div>
                 )}
-              </div>
-
-              <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center px-8">
-                <span className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> PAGADO</span>
-                <span>Los cambios se guardan automáticamente</span>
-                <span className="flex items-center gap-2"><div className="w-3 h-3 border border-gray-300 rounded-full"></div> PENDIENTE</span>
-              </div>
-
             </div>
+
+            <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center px-8">
+              <span className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> PAGADO</span>
+              <span>Los cambios se guardan automáticamente</span>
+              <span className="flex items-center gap-2"><div className="w-3 h-3 border border-gray-300 rounded-full"></div> PENDIENTE</span>
+            </div>
+
           </div>
-        )
-      }
+          </div>
+  )
+}
 
     </div >
   );
