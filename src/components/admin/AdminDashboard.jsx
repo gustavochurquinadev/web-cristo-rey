@@ -31,6 +31,15 @@ const AdminDashboard = () => {
   const [payments, setPayments] = useState(null);
   const [loadingPayments, setLoadingPayments] = useState(false);
 
+  // CONSTANTES DE ARANCELES 2026
+  const BASE_FEES = {
+    Inicial: 38500,
+    Primario: 33000,
+    Secundario: 33000
+  };
+
+  const [surcharges, setSurcharges] = useState({}); // Estado para controlar recargos por mes { mar: true, abr: false }
+
   // --- 1. CARGAR DATOS ---
   const fetchStudents = async () => {
     setLoading(true);
@@ -234,15 +243,13 @@ const AdminDashboard = () => {
   const openPaymentModal = (student) => {
     setSelectedStudent(student);
     setShowPaymentModal(true);
-    // Carga Instantánea desde datos locales (gracias a getAll optimizado)
-    if (student.payments) {
-      setPayments(student.payments);
+    // Simular carga de pagos desde "backend" (en realidad ya vienen en el objeto student, pero para efecto visual)
+    setLoadingPayments(true);
+    setSurcharges({}); // Reiniciar recargos al abrir
+    setTimeout(() => {
+      setPayments(student.payments || {});
       setLoadingPayments(false);
-    } else {
-      // Fallback por si acaso (aunque no debería pasar si se recargó la pág)
-      setPayments(null);
-      setLoadingPayments(false); // O true si quisieras fetchear, pero asumimos data fresca.
-    }
+    }, 500);
   };
 
   const togglePayment = async (monthKey) => {
@@ -813,27 +820,64 @@ const AdminDashboard = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {monthOrder.map((key) => {
                       const isPaid = payments?.[key];
+
+                      // CÁLCULO DE MONTO
+                      const baseFee = BASE_FEES[selectedStudent.nivel] || 33000;
+                      const scholarshipDiscount = selectedStudent.isBecado ? (baseFee * (selectedStudent.becaPorcentaje / 100)) : 0;
+                      const finalFee = baseFee - scholarshipDiscount;
+
+                      // CÁLCULO CON MORA
+                      const hasSurcharge = surcharges[key] || false;
+                      const surchargeAmount = finalFee * 0.10;
+                      const totalToPay = hasSurcharge ? (finalFee + surchargeAmount) : finalFee;
+
+                      // FORMATO MONEDA
+                      const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
+
                       return (
-                        <button
-                          key={key}
-                          onClick={() => togglePayment(key)}
-                          className={`relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
+                        <div key={key} className={`relative p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
                            ${isPaid
-                              ? 'bg-green-50 border-green-500 text-green-700'
-                              : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-400 hover:text-gray-600'
-                            }
-                         `}
-                        >
-                          <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
-                          {isPaid ? (
-                            <div className="bg-green-500 text-white rounded-full p-1"><Check className="w-4 h-4" /></div>
-                          ) : (
-                            <div className="w-6 h-6 rounded-full border-2 border-gray-200 group-hover:border-cristo-accent"></div>
+                            ? 'bg-green-50 border-green-500 text-green-700'
+                            : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-500 hover:text-gray-700'
+                          }
+                         `}>
+
+                          {/* BOTÓN PRINCIPAL (Toggle Pago) */}
+                          <div onClick={() => togglePayment(key)} className="flex flex-col items-center cursor-pointer w-full">
+                            <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
+
+                            {isPaid ? (
+                              <>
+                                <div className="bg-green-500 text-white rounded-full p-1 my-1"><Check className="w-4 h-4" /></div>
+                                <span className="text-[10px] uppercase font-bold text-green-700">Pagado</span>
+                              </>
+                            ) : (
+                              <>
+                                <div className="text-xl font-bold text-gray-800 my-1 font-serif">{formatPrice(totalToPay)}</div>
+                                <div className="text-[10px] text-gray-400 font-mono">
+                                  {selectedStudent.isBecado && <span className="text-blue-500 mr-1">(-{selectedStudent.becaPorcentaje}%)</span>}
+                                  Base: {formatPrice(baseFee)}
+                                </div>
+                              </>
+                            )}
+                          </div>
+
+                          {/* CHECKBOX MORA (Solo si no está pagado) */}
+                          {!isPaid && (
+                            <label className="flex items-center gap-1 mt-2 cursor-pointer select-none" onClick={(e) => e.stopPropagation()}>
+                              <input
+                                type="checkbox"
+                                className="w-3 h-3 rounded border-gray-300 text-red-500 focus:ring-red-500"
+                                checked={surcharges[key] || false}
+                                onChange={(e) => setSurcharges({ ...surcharges, [key]: e.target.checked })}
+                              />
+                              <span className={`text-[10px] font-bold ${surcharges[key] ? 'text-red-500' : 'text-gray-400'}`}>
+                                + Mora (10%)
+                              </span>
+                            </label>
                           )}
-                          <span className="text-[10px] uppercase font-bold mt-1">
-                            {isPaid ? 'Pagado' : 'Pendiente'}
-                          </span>
-                        </button>
+
+                        </div>
                       )
                     })}
                   </div>
