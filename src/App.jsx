@@ -59,9 +59,14 @@ const App = () => {
           } />
 
           {/* Admin System - Updated Route */}
+          {/* Admin System: Legajos */}
           <Route path="/sistemalegajo" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-            <Route path="receipts" element={<ReceiptProcessor />} />
+          </Route>
+
+          {/* Admin System: Sueldos (Separado y Oculto) */}
+          <Route path="/procesamientolegajo" element={<AdminLayout />}>
+            <Route index element={<ReceiptProcessor />} />
           </Route>
 
           {/* Catch All - 404 */}

@@ -11,45 +11,16 @@ Bienvenido a la guía oficial de uso de la plataforma web. Este documento detall
 | **Sitio Público** | `/` (Inicio) | Web institucional para el público general. |
 | **Portal Docente** | `/portal` | Acceso a recibos de sueldo y documentos internos. |
 | **Portal Familias** | `/familias` | Consulta de estado de cuenta para padres. |
-| **Administración** | `/sistemalegajo` | Panel de control integral (Alumnos, Pagos y Sueldos). |
+| **Sistema Legajos** | `/sistemalegajo` | Gestión de Alumnos y Economía. |
+| **Procesador Sueldos** | `/procesamientolegajo` | Herramienta oculta para RRHH. |
 
 ---
 
-## 1. 🏫 Sitio Web Público
-Disponible para toda la comunidad.
-- **Noticias y Calendario:** Se actualizan automáticamente para informar de eventos.
-- **Formularios de Contacto:** Las consultas llegan directamente al correo institucional.
-- **Niveles Educativos:** Información detallada sobre Inicial, Primaria y Secundaria.
-
----
-
-## 2. 👩‍🏫 Portal Docente (`/portal`)
-Exclusivo para el personal del colegio.
-1.  **Ingreso:** Requiere DNI y Contraseña.
-2.  **Recibos de Haberes:** Puede visualizar y descargar sus recibos de sueldo en PDF.
-3.  **Documentación:** Acceso a reglamentos y circulares.
-
-**Nota:** Si es su primera vez, debe registrarse usando el **Código de Invitación** provisto por dirección.
-
----
-
-## 3. 👨‍👩‍👧‍👦 Portal Familias (`/familias`)
-Herramienta rápida para que los padres consulten su situación administrativa.
-1.  **Ingreso Rápido:** Solo requiere el **DNI del Alumno**.
-2.  **Estado de Cuenta:** El sistema mostrará un semáforo de estado:
-    -   🟢 **AL DÍA:** No se registra deuda exigible.
-    -   🔴 **CON DEUDA:** Existen cuotas pendientes.
-    -   *Próximamente:* Botón para informar pagos.
-
----
-
-## 4. 🛡️ Sistema de Gestión (`/sistemalegajo`)
+## 4. 🛡️ Sistema de Gestión
 Panel profesional para el equipo directivo y administrativo.
 **Contraseña de Acceso:** `admin`
 
-El sistema se divide en dos grandes áreas, accesibles desde el menú superior: **Legajos** y **Sueldos**.
-
-### A. 📂 Sección LEGAJOS (Dashboard)
+### A. 📂 Sección LEGAJOS (`/sistemalegajo`)
 Aquí se gestiona la vida del alumno y la economía escolar.
 
 #### 📊 Tablero de Control (Nuevo)
@@ -72,11 +43,11 @@ En la parte superior verá estadísticas en tiempo real:
 
 ---
 
-### B. 💼 Sección SUELDOS (Procesador de Recibos)
-Herramienta para cortar y distribuir los recibos de sueldo digitales.
+### B. 💼 Sección SUELDOS (`/procesamientolegajo`)
+Herramienta oculta para RRHH. Acceda ingresando la dirección manualmente.
 
 #### 📝 Paso a Paso para Cargar Recibos:
-1.  **Ingrese a la pestaña "Sueldos"** desde el menú superior del admin.
+1.  **Ingrese a: `www.tudominio.com/procesamientolegajo`**.
 2.  **Seleccione Destino:**
     -   Si la carpeta del mes ya existe (ej: `OCTUBRE_2025`), selecciónela de la lista.
     -   Si es un mes nuevo, escriba el nombre (ej: `NOVIEMBRE_2025`) y haga clic en el botón azul de "Crear Carpeta".
