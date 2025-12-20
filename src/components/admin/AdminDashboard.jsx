@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   // FILTROS
   const [searchTerm, setSearchTerm] = useState("");
   const [filterNivel, setFilterNivel] = useState("Todos");
-  const [filterTurno, setFilterTurno] = useState("Todos");
+  const [filterCurso, setFilterCurso] = useState("Todos");
 
   // MODALES
   const [showModal, setShowModal] = useState(false);
@@ -66,10 +66,17 @@ const AdminDashboard = () => {
       String(student.dni || "").includes(term);
 
     const matchesNivel = filterNivel === "Todos" || student.nivel === filterNivel;
-    const matchesTurno = filterTurno === "Todos" || student.turno === filterTurno;
+
+    // Construir string de curso para filtrar
+    let courseStr = "";
+    if (student.nivel === "Inicial") courseStr = `Sala ${student.grado} ${student.division}`;
+    else if (student.nivel === "Secundario") courseStr = `${student.grado}° ${student.division}`;
+    else courseStr = `${student.grado}° ${student.division}`; // Primario
+
+    const matchesCurso = filterCurso === "Todos" || courseStr === filterCurso;
     const isNotDeleted = student.estado !== "Baja";
 
-    return matchesSearch && matchesNivel && matchesTurno && isNotDeleted;
+    return matchesSearch && matchesNivel && matchesCurso && isNotDeleted;
   });
 
   // --- 3. BORRAR ---
@@ -342,19 +349,41 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* FILTRO TURNO */}
+        {/* FILTRO CURSO (DINÁMICO) */}
         <div className="md:col-span-3">
           <div className="relative">
             <select
-              value={filterTurno}
-              onChange={(e) => setFilterTurno(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none text-sm appearance-none cursor-pointer"
+              value={filterCurso}
+              onChange={(e) => setFilterCurso(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none text-sm appearance-none cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+              disabled={filterNivel === "Todos"}
             >
-              <option value="Todos">Todos los Turnos</option>
-              <option value="Mañana">Turno Mañana</option>
-              <option value="Tarde">Turno Tarde</option>
+              <option value="Todos">Todos los Cursos</option>
+              {filterNivel === "Inicial" && (
+                <>
+                  <option value="Sala 3 A">Sala 3 A</option><option value="Sala 3 B">Sala 3 B</option><option value="Sala 3 C">Sala 3 C</option>
+                  <option value="Sala 4 A">Sala 4 A</option><option value="Sala 4 B">Sala 4 B</option><option value="Sala 4 C">Sala 4 C</option>
+                  <option value="Sala 5 A">Sala 5 A</option><option value="Sala 5 B">Sala 5 B</option><option value="Sala 5 C">Sala 5 C</option>
+                </>
+              )}
+              {filterNivel === "Primario" && (
+                <>
+                  {[1, 2, 3, 4, 5, 6, 7].map(g => (
+                    ["A", "B", "C"].map(d => <option key={`${g}${d}`} value={`${g}° ${d}`}>{g}° Grado {d}</option>)
+                  ))}
+                </>
+              )}
+              {filterNivel === "Secundario" && (
+                <>
+                  {[1, 2, 3, 4, 5].map(g => (
+                    // Secundario tiene divisiones 1era, 2da, pero a veces el usuario quiere ver "1ra" en frontend? 
+                    // En backend guardamos "1era". Form says "1era".
+                    ["1era", "2da"].map(d => <option key={`${g}${d}`} value={`${g}° ${d}`}>{g}° Año {d}</option>)
+                  ))}
+                </>
+              )}
             </select>
-            <Clock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+            <Filter className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
           </div>
         </div>
       </div>
