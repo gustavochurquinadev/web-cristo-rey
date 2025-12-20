@@ -74,12 +74,13 @@ const AdminDashboard = () => {
       const gRaw = String(student.grado || "");
       const gNum = gRaw.replace(/\D/g, "");
 
-      // 2. Normalizar División (Sinónimos)
+      // 2. Normalizar División (Sinónimos y formatos numéricos "1°", "2")
       let dRaw = String(student.division || "").trim().toLowerCase();
-      // Mapeo de sinónimos comunes y typos vistos ("1ea")
-      if (dRaw === "1era" || dRaw === "1ra" || dRaw === "1ea") dRaw = "1ra";
-      if (dRaw === "2da" || dRaw === "2do" || dRaw === "segunda") dRaw = "2da";
-      if (dRaw === "3ra" || dRaw === "3er" || dRaw === "tercera") dRaw = "3ra";
+      const dClean = dRaw.replace(/[^a-z0-9]/g, ""); // "1°" -> "1", "A" -> "a"
+
+      if (dRaw === "1era" || dRaw === "1ra" || dRaw === "1ea" || dClean === "1") dRaw = "1ra";
+      if (dRaw === "2da" || dRaw === "2do" || dRaw === "segunda" || dClean === "2") dRaw = "2da";
+      if (dRaw === "3ra" || dRaw === "3er" || dRaw === "tercera" || dClean === "3") dRaw = "3ra";
       // a, b, c quedan igual
 
       // 3. Construir ID Normalizado (match con los valores del option)
