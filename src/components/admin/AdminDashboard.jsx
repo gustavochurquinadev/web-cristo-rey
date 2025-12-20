@@ -354,6 +354,72 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* --- DASHBOARD ANALYTICS (NUEVO) --- */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {(() => {
+          // Cálculos Dinámicos basados en la vista actual (filteredStudents)
+          const totalList = filteredStudents.length;
+          const alDiaCount = filteredStudents.filter(s => s.saldo === "AL DIA").length;
+          const deudaCount = filteredStudents.filter(s => s.saldo !== "AL DIA").length; // ADEUDA o cualquier otra cosa
+          const becadosCount = filteredStudents.filter(s => s.isBecado || s.becaPorcentaje > 0).length;
+
+          // Porcentajes (evitando división por cero)
+          const getPct = (cnt) => totalList > 0 ? Math.round((cnt / totalList) * 100) : 0;
+
+          return (
+            <>
+              {/* CARD 1: MATRÍCULA */}
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
+                <span className="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Matrícula Visible</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-gray-800">{totalList}</span>
+                  <span className="text-xs text-gray-400 font-medium">alumnos</span>
+                </div>
+              </div>
+
+              {/* CARD 2: COBRANZA (AL DÍA) */}
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-green-100 flex flex-col justify-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 opacity-10"><CheckCircle className="w-12 h-12 text-green-500" /></div>
+                <span className="text-green-600 text-xs uppercase font-bold tracking-wider mb-1">Solvencia (Al Día)</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-green-700">{getPct(alDiaCount)}%</span>
+                  <span className="text-xs text-green-600 font-medium">{alDiaCount} alums</span>
+                </div>
+                <div className="w-full bg-green-100 h-1.5 mt-2 rounded-full overflow-hidden">
+                  <div className="bg-green-500 h-full rounded-full" style={{ width: `${getPct(alDiaCount)}%` }}></div>
+                </div>
+              </div>
+
+              {/* CARD 3: MOROSIDAD */}
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-red-100 flex flex-col justify-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 opacity-10"><AlertCircle className="w-12 h-12 text-red-500" /></div>
+                <span className="text-red-600 text-xs uppercase font-bold tracking-wider mb-1">Morosidad (Deuda)</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-red-700">{getPct(deudaCount)}%</span>
+                  <span className="text-xs text-red-600 font-medium">{deudaCount} alums</span>
+                </div>
+                <div className="w-full bg-red-100 h-1.5 mt-2 rounded-full overflow-hidden">
+                  <div className="bg-red-500 h-full rounded-full" style={{ width: `${getPct(deudaCount)}%` }}></div>
+                </div>
+              </div>
+
+              {/* CARD 4: BECADOS */}
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 opacity-10"><Info className="w-12 h-12 text-blue-500" /></div>
+                <span className="text-blue-600 text-xs uppercase font-bold tracking-wider mb-1">Becados</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-blue-700">{getPct(becadosCount)}%</span>
+                  <span className="text-xs text-blue-600 font-medium">{becadosCount} alums</span>
+                </div>
+                <div className="w-full bg-blue-100 h-1.5 mt-2 rounded-full overflow-hidden">
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: `${getPct(becadosCount)}%` }}></div>
+                </div>
+              </div>
+            </>
+          );
+        })()}
+      </div>
+
       {/* BARRA DE HERRAMIENTAS Y FILTROS */}
       <div className="grid md:grid-cols-12 gap-4 mb-6">
         {/* BUSCADOR */}
@@ -539,238 +605,242 @@ const AdminDashboard = () => {
       </div>
 
       {/* MODAL (CREAR / EDITAR) */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[50] backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-cristo-primary p-4 flex justify-between items-center text-white">
-              <h3 className="font-bold">{isEditing ? "Editar Alumno" : "Nuevo Alumno"}</h3>
-              <button onClick={() => setShowModal(false)} className="hover:bg-white/10 p-1 rounded"><X className="w-5 h-5" /></button>
-            </div>
-
-            <form onSubmit={handleSave} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">DNI</label>
-                  <input required type="number" className="w-full p-2 border rounded" value={formData.dni} onChange={e => setFormData({ ...formData, dni: e.target.value })} />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Apellido</label>
-                  <input required type="text" className="w-full p-2 border rounded" value={formData.apellido} onChange={e => setFormData({ ...formData, apellido: e.target.value })} />
-                </div>
+      {
+        showModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[50] backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="bg-cristo-primary p-4 flex justify-between items-center text-white">
+                <h3 className="font-bold">{isEditing ? "Editar Alumno" : "Nuevo Alumno"}</h3>
+                <button onClick={() => setShowModal(false)} className="hover:bg-white/10 p-1 rounded"><X className="w-5 h-5" /></button>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Nombres</label>
-                <input required type="text" className="w-full p-2 border rounded" value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Nivel</label>
-                  <select
-                    className="w-full p-2 border rounded"
-                    value={formData.nivel}
-                    onChange={e => {
-                      const newNivel = e.target.value;
-                      let newGrado = "1";
-                      let newDiv = "A";
-                      let newTurno = "Mañana";
-
-                      if (newNivel === "Inicial") { newGrado = "3"; newDiv = "A"; }
-                      if (newNivel === "Primario") { newGrado = "1"; newDiv = "A"; }
-                      if (newNivel === "Secundario") { newGrado = "1"; newDiv = "1era"; newTurno = "Mañana"; }
-
-                      setFormData({ ...formData, nivel: newNivel, grado: newGrado, division: newDiv, turno: newTurno });
-                    }}
-                  >
-                    <option value="Inicial">Inicial</option>
-                    <option value="Primario">Primario</option>
-                    <option value="Secundario">Secundario</option>
-                  </select>
+              <form onSubmit={handleSave} className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">DNI</label>
+                    <input required type="number" className="w-full p-2 border rounded" value={formData.dni} onChange={e => setFormData({ ...formData, dni: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Apellido</label>
+                    <input required type="text" className="w-full p-2 border rounded" value={formData.apellido} onChange={e => setFormData({ ...formData, apellido: e.target.value })} />
+                  </div>
                 </div>
+
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">
-                    {formData.nivel === 'Inicial' ? 'Sala' : formData.nivel === 'Secundario' ? 'Año' : 'Grado'}
-                  </label>
-                  <select
-                    className="w-full p-2 border rounded"
-                    value={formData.grado}
-                    onChange={e => setFormData({ ...formData, grado: e.target.value })}
-                  >
-                    {formData.nivel === "Inicial" && (
-                      <>
-                        <option value="3">Sala de 3</option>
-                        <option value="4">Sala de 4</option>
-                        <option value="5">Sala de 5</option>
-                      </>
-                    )}
-                    {formData.nivel === "Primario" && (
-                      <>
-                        {[1, 2, 3, 4, 5, 6, 7].map(g => <option key={g} value={String(g)}>{g}° Grado</option>)}
-                      </>
-                    )}
-                    {formData.nivel === "Secundario" && (
-                      <>
-                        {[1, 2, 3, 4, 5].map(g => <option key={g} value={String(g)}>{g}° Año</option>)}
-                      </>
-                    )}
-                  </select>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Nombres</label>
+                  <input required type="text" className="w-full p-2 border rounded" value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">División</label>
-                  <select
-                    className="w-full p-2 border rounded"
-                    value={formData.division}
-                    onChange={e => {
-                      const newDiv = e.target.value;
-                      let newTurno = formData.turno;
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Nivel</label>
+                    <select
+                      className="w-full p-2 border rounded"
+                      value={formData.nivel}
+                      onChange={e => {
+                        const newNivel = e.target.value;
+                        let newGrado = "1";
+                        let newDiv = "A";
+                        let newTurno = "Mañana";
 
-                      if (formData.nivel !== "Secundario") {
-                        if (newDiv === "A") newTurno = "Mañana";
-                        if (newDiv === "B") newTurno = "Tarde";
-                      }
-                      setFormData({ ...formData, division: newDiv, turno: newTurno });
-                    }}
-                  >
-                    {formData.nivel === "Secundario" ? (
-                      <>
-                        <option value="1era">1era</option>
-                        <option value="2da">2da</option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="A">A (Mañana)</option>
-                        <option value="B">B (Tarde)</option>
-                        <option value="C">C</option>
-                      </>
-                    )}
-                  </select>
+                        if (newNivel === "Inicial") { newGrado = "3"; newDiv = "A"; }
+                        if (newNivel === "Primario") { newGrado = "1"; newDiv = "A"; }
+                        if (newNivel === "Secundario") { newGrado = "1"; newDiv = "1era"; newTurno = "Mañana"; }
+
+                        setFormData({ ...formData, nivel: newNivel, grado: newGrado, division: newDiv, turno: newTurno });
+                      }}
+                    >
+                      <option value="Inicial">Inicial</option>
+                      <option value="Primario">Primario</option>
+                      <option value="Secundario">Secundario</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">
+                      {formData.nivel === 'Inicial' ? 'Sala' : formData.nivel === 'Secundario' ? 'Año' : 'Grado'}
+                    </label>
+                    <select
+                      className="w-full p-2 border rounded"
+                      value={formData.grado}
+                      onChange={e => setFormData({ ...formData, grado: e.target.value })}
+                    >
+                      {formData.nivel === "Inicial" && (
+                        <>
+                          <option value="3">Sala de 3</option>
+                          <option value="4">Sala de 4</option>
+                          <option value="5">Sala de 5</option>
+                        </>
+                      )}
+                      {formData.nivel === "Primario" && (
+                        <>
+                          {[1, 2, 3, 4, 5, 6, 7].map(g => <option key={g} value={String(g)}>{g}° Grado</option>)}
+                        </>
+                      )}
+                      {formData.nivel === "Secundario" && (
+                        <>
+                          {[1, 2, 3, 4, 5].map(g => <option key={g} value={String(g)}>{g}° Año</option>)}
+                        </>
+                      )}
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Turno</label>
-                  <select
-                    className="w-full p-2 border rounded bg-gray-50"
-                    value={formData.turno}
-                    disabled={true}
-                  >
-                    <option value="Mañana">Mañana</option>
-                    <option value="Tarde">Tarde</option>
-                  </select>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">División</label>
+                    <select
+                      className="w-full p-2 border rounded"
+                      value={formData.division}
+                      onChange={e => {
+                        const newDiv = e.target.value;
+                        let newTurno = formData.turno;
+
+                        if (formData.nivel !== "Secundario") {
+                          if (newDiv === "A") newTurno = "Mañana";
+                          if (newDiv === "B") newTurno = "Tarde";
+                        }
+                        setFormData({ ...formData, division: newDiv, turno: newTurno });
+                      }}
+                    >
+                      {formData.nivel === "Secundario" ? (
+                        <>
+                          <option value="1era">1era</option>
+                          <option value="2da">2da</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="A">A (Mañana)</option>
+                          <option value="B">B (Tarde)</option>
+                          <option value="C">C</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Turno</label>
+                    <select
+                      className="w-full p-2 border rounded bg-gray-50"
+                      value={formData.turno}
+                      disabled={true}
+                    >
+                      <option value="Mañana">Mañana</option>
+                      <option value="Tarde">Tarde</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              {/* SECCIÓN BECA */}
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="w-5 h-5 rounded border-gray-300 text-cristo-accent focus:ring-cristo-accent"
-                      checked={formData.isBecado || false}
-                      onChange={e => setFormData({ ...formData, isBecado: e.target.checked })}
-                    />
-                    <span className="font-bold text-gray-700 text-sm">¿Tiene Beca?</span>
-                  </label>
-
-                  {formData.isBecado && (
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs font-bold text-gray-600">% Porcentaje</label>
+                {/* SECCIÓN BECA */}
+                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        className="w-20 p-2 border rounded-lg text-center font-bold"
-                        value={formData.becaPorcentaje || ""}
-                        onChange={e => setFormData({ ...formData, becaPorcentaje: Number(e.target.value) })}
+                        type="checkbox"
+                        className="w-5 h-5 rounded border-gray-300 text-cristo-accent focus:ring-cristo-accent"
+                        checked={formData.isBecado || false}
+                        onChange={e => setFormData({ ...formData, isBecado: e.target.checked })}
                       />
-                    </div>
-                  )}
-                </div>
-                {formData.isBecado && <p className="text-xs text-blue-600 italic">El alumno aparecerá como "BECADO" en los reportes.</p>}
-              </div>
+                      <span className="font-bold text-gray-700 text-sm">¿Tiene Beca?</span>
+                    </label>
 
-              <button type="submit" className="w-full bg-cristo-accent text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition-colors mt-4">
-                {isEditing ? "Guardar Cambios" : "Guardar e Iniciar Cobranza"}
-              </button>
-            </form>
+                    {formData.isBecado && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-bold text-gray-600">% Porcentaje</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          className="w-20 p-2 border rounded-lg text-center font-bold"
+                          value={formData.becaPorcentaje || ""}
+                          onChange={e => setFormData({ ...formData, becaPorcentaje: Number(e.target.value) })}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {formData.isBecado && <p className="text-xs text-blue-600 italic">El alumno aparecerá como "BECADO" en los reportes.</p>}
+                </div>
+
+                <button type="submit" className="w-full bg-cristo-accent text-white py-3 rounded-xl font-bold hover:bg-yellow-600 transition-colors mt-4">
+                  {isEditing ? "Guardar Cambios" : "Guardar e Iniciar Cobranza"}
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* MODAL GESTIÓN DE PAGOS */}
-      {showPaymentModal && selectedStudent && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+      {
+        showPaymentModal && selectedStudent && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
 
-            <div className="bg-gray-900 p-6 flex justify-between items-start text-white">
-              <div>
-                <h3 className="font-bold text-xl">{selectedStudent.apellido}, {selectedStudent.nombre}</h3>
-                <p className="text-gray-400 text-sm">Gestionando pagos ciclo 2026</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleDownloadLibreDeuda}
-                  className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/20"
-                  title="Descargar Libre Deuda"
-                >
-                  <FileText className="w-4 h-4" />
-                  Libre Deuda
-                </button>
-                <button onClick={() => setShowPaymentModal(false)} className="hover:bg-white/10 p-2 rounded-full transition-colors"><X className="w-6 h-6" /></button>
-              </div>
-            </div>
-
-            <div className="p-6 overflow-y-auto">
-              {loadingPayments ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="animate-spin w-8 h-8 border-4 border-cristo-primary border-t-transparent rounded-full"></div>
-                  <p className="text-gray-500 font-medium">Sincronizando con Banco de Datos...</p>
+              <div className="bg-gray-900 p-6 flex justify-between items-start text-white">
+                <div>
+                  <h3 className="font-bold text-xl">{selectedStudent.apellido}, {selectedStudent.nombre}</h3>
+                  <p className="text-gray-400 text-sm">Gestionando pagos ciclo 2026</p>
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {monthOrder.map((key) => {
-                    const isPaid = payments?.[key];
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => togglePayment(key)}
-                        className={`relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleDownloadLibreDeuda}
+                    className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/20"
+                    title="Descargar Libre Deuda"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Libre Deuda
+                  </button>
+                  <button onClick={() => setShowPaymentModal(false)} className="hover:bg-white/10 p-2 rounded-full transition-colors"><X className="w-6 h-6" /></button>
+                </div>
+              </div>
+
+              <div className="p-6 overflow-y-auto">
+                {loadingPayments ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-4">
+                    <div className="animate-spin w-8 h-8 border-4 border-cristo-primary border-t-transparent rounded-full"></div>
+                    <p className="text-gray-500 font-medium">Sincronizando con Banco de Datos...</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {monthOrder.map((key) => {
+                      const isPaid = payments?.[key];
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => togglePayment(key)}
+                          className={`relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
                            ${isPaid
-                            ? 'bg-green-50 border-green-500 text-green-700'
-                            : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-400 hover:text-gray-600'
-                          }
+                              ? 'bg-green-50 border-green-500 text-green-700'
+                              : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-400 hover:text-gray-600'
+                            }
                          `}
-                      >
-                        <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
-                        {isPaid ? (
-                          <div className="bg-green-500 text-white rounded-full p-1"><Check className="w-4 h-4" /></div>
-                        ) : (
-                          <div className="w-6 h-6 rounded-full border-2 border-gray-200 group-hover:border-cristo-accent"></div>
-                        )}
-                        <span className="text-[10px] uppercase font-bold mt-1">
-                          {isPaid ? 'Pagado' : 'Pendiente'}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
+                        >
+                          <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
+                          {isPaid ? (
+                            <div className="bg-green-500 text-white rounded-full p-1"><Check className="w-4 h-4" /></div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full border-2 border-gray-200 group-hover:border-cristo-accent"></div>
+                          )}
+                          <span className="text-[10px] uppercase font-bold mt-1">
+                            {isPaid ? 'Pagado' : 'Pendiente'}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
 
-            <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center px-8">
-              <span className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> PAGADO</span>
-              <span>Los cambios se guardan automáticamente</span>
-              <span className="flex items-center gap-2"><div className="w-3 h-3 border border-gray-300 rounded-full"></div> PENDIENTE</span>
-            </div>
+              <div className="bg-gray-50 p-4 border-t border-gray-100 text-center text-xs text-gray-500 flex justify-between items-center px-8">
+                <span className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> PAGADO</span>
+                <span>Los cambios se guardan automáticamente</span>
+                <span className="flex items-center gap-2"><div className="w-3 h-3 border border-gray-300 rounded-full"></div> PENDIENTE</span>
+              </div>
 
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+    </div >
   );
 };
 
