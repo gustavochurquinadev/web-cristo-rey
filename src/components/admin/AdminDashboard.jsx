@@ -67,13 +67,18 @@ const AdminDashboard = () => {
 
     const matchesNivel = filterNivel === "Todos" || student.nivel === filterNivel;
 
-    // Construir string de curso para filtrar
-    let courseStr = "";
-    if (student.nivel === "Inicial") courseStr = `Sala ${student.grado} ${student.division}`;
-    else if (student.nivel === "Secundario") courseStr = `${student.grado}° ${student.division}`;
-    else courseStr = `${student.grado}° ${student.division}`; // Primario
+    const matchesCurso = filterCurso === "Todos" || (() => {
+      // Sanitize Data
+      const gradoClean = String(student.grado || "").replace(/\D/g, ""); // "1°" -> "1"
+      const divClean = String(student.division || "").trim();
 
-    const matchesCurso = filterCurso === "Todos" || courseStr === filterCurso;
+      let constructed = "";
+      if (student.nivel === "Inicial") constructed = `Sala ${gradoClean} ${divClean}`;
+      else constructed = `${gradoClean}° ${divClean}`; // Primario y Secundario ("1° 1era", "1° A")
+
+      return constructed === filterCurso;
+    })();
+
     const isNotDeleted = student.estado !== "Baja";
 
     return matchesSearch && matchesNivel && matchesCurso && isNotDeleted;
