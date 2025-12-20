@@ -67,16 +67,34 @@ const AdminDashboard = () => {
 
     const matchesNivel = filterNivel === "Todos" || student.nivel === filterNivel;
 
+    // --- LÓGICA DE FILTRO DE CURSO ROBUSTA ---
     const matchesCurso = filterCurso === "Todos" || (() => {
-      // Sanitize Data
-      const gradoClean = String(student.grado || "").replace(/\D/g, ""); // "1°" -> "1"
-      const divClean = String(student.division || "").trim();
+      // 1. Normalizar Grado a Número Puro
+      const gRaw = String(student.grado || "");
+      const gNum = gRaw.replace(/\D/g, ""); // "1ro" -> "1", "1°" -> "1", "Sala 3" -> "3"
 
-      let constructed = "";
-      if (student.nivel === "Inicial") constructed = `Sala ${gradoClean} ${divClean}`;
-      else constructed = `${gradoClean}° ${divClean}`; // Primario y Secundario ("1° 1era", "1° A")
+      // 2. Normalizar División (Sinónimos)
+      let dRaw = String(student.division || "").trim().toLowerCase();
+      // Mapeo de sinónimos comunes
+      if (dRaw === "1era" || dRaw === "1ra") dRaw = "1ra";
+      if (dRaw === "2da" || dRaw === "2do" || dRaw === "segunda") dRaw = "2da";
+      if (dRaw === "3ra" || dRaw === "3er" || dRaw === "tercera") dRaw = "3ra";
+      if (dRaw === "a") dRaw = "a";
+      if (dRaw === "b") dRaw = "b";
+      if (dRaw === "c") dRaw = "c";
 
-      return constructed === filterCurso;
+      // 3. Construir ID Normalizado (match con los valores del option)
+      // Inicial: "sala_3_a"
+      // Prim/Sec: "1_a" o "1_1ra"
+      let studentId = "";
+
+      if (student.nivel === "Inicial") {
+        studentId = `sala_${gNum}_${dRaw}`;
+      } else {
+        studentId = `${gNum}_${dRaw}`;
+      }
+
+      return studentId === filterCurso;
     })();
 
     const isNotDeleted = student.estado !== "Baja";
@@ -84,7 +102,6 @@ const AdminDashboard = () => {
     return matchesSearch && matchesNivel && matchesCurso && isNotDeleted;
   });
 
-  // --- 3. BORRAR ---
   // --- 3. BORRAR ---
   const handleDelete = async (id) => {
     if (confirm("⚠️ ¿Seguro que desea ELIMINAR a este alumno? (Se borrará de datos y pagos)")) {
@@ -287,11 +304,17 @@ const AdminDashboard = () => {
 
   const monthOrder = ['matricula', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
+  // Mapeo para Labels bonitos en el Dropdown
+  const getLabelGrado = (num) => {
+    const map = { 1: "1er", 2: "2do", 3: "3er", 4: "4to", 5: "5to", 6: "6to", 7: "7mo" };
+    return map[num] || `${num}°`;
+  };
+
   return (
-    <div className="space-y-6 relative">
+    <div className="min-h-screen bg-cristo-bg p-4 md:p-8 font-sans text-gray-800">
 
       {/* HEADER DE ACCIONES */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Legajos de Alumnos</h2>
           <p className="text-sm text-gray-500">
@@ -324,7 +347,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* BARRA DE HERRAMIENTAS Y FILTROS */}
-      <div className="grid md:grid-cols-12 gap-4">
+      <div className="grid md:grid-cols-12 gap-4 mb-6">
         {/* BUSCADOR */}
         <div className="md:col-span-4 relative">
           <input
@@ -342,7 +365,7 @@ const AdminDashboard = () => {
           <div className="relative">
             <select
               value={filterNivel}
-              onChange={(e) => setFilterNivel(e.target.value)}
+              onChange={(e) => { setFilterNivel(e.target.value); setFilterCurso("Todos"); }}
               className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-cristo-accent outline-none text-sm appearance-none cursor-pointer"
             >
               <option value="Todos">Todos los Niveles</option>
@@ -354,7 +377,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* FILTRO CURSO (DINÁMICO) */}
+        {/* FILTRO CURSO (DINÁMICO & ROBUSTO) */}
         <div className="md:col-span-3">
           <div className="relative">
             <select
@@ -364,26 +387,34 @@ const AdminDashboard = () => {
               disabled={filterNivel === "Todos"}
             >
               <option value="Todos">Todos los Cursos</option>
+
               {filterNivel === "Inicial" && (
                 <>
-                  <option value="Sala 3 A">Sala 3 A</option><option value="Sala 3 B">Sala 3 B</option><option value="Sala 3 C">Sala 3 C</option>
-                  <option value="Sala 4 A">Sala 4 A</option><option value="Sala 4 B">Sala 4 B</option><option value="Sala 4 C">Sala 4 C</option>
-                  <option value="Sala 5 A">Sala 5 A</option><option value="Sala 5 B">Sala 5 B</option><option value="Sala 5 C">Sala 5 C</option>
-                </>
-              )}
-              {filterNivel === "Primario" && (
-                <>
-                  {[1, 2, 3, 4, 5, 6, 7].map(g => (
-                    ["A", "B", "C"].map(d => <option key={`${g}${d}`} value={`${g}° ${d}`}>{g}° Grado {d}</option>)
+                  {[3, 4, 5].map(sala => (
+                    ["a", "b", "c"].map(div => (
+                      <option key={`sala_${sala}_${div}`} value={`sala_${sala}_${div}`}>Sala {sala} "{div.toUpperCase()}"</option>
+                    ))
                   ))}
                 </>
               )}
+
+              {filterNivel === "Primario" && (
+                <>
+                  {[1, 2, 3, 4, 5, 6, 7].map(g => (
+                    ["a", "b", "c"].map(div => (
+                      <option key={`${g}_${div}`} value={`${g}_${div}`}>{getLabelGrado(g)} Grado "{div.toUpperCase()}"</option>
+                    ))
+                  ))}
+                </>
+              )}
+
               {filterNivel === "Secundario" && (
                 <>
                   {[1, 2, 3, 4, 5].map(g => (
-                    // Secundario tiene divisiones 1era, 2da, pero a veces el usuario quiere ver "1ra" en frontend? 
-                    // En backend guardamos "1era". Form says "1era".
-                    ["1era", "2da"].map(d => <option key={`${g}${d}`} value={`${g}° ${d}`}>{g}° Año {d}</option>)
+                    // IDs normalizados: "1_1ra", "1_2da"
+                    [["1ra", "1ro 1ra"], ["2da", "2do 2da"]].map(([code, label]) => (
+                      <option key={`${g}_${code}`} value={`${g}_${code}`}>{getLabelGrado(g)} Año {code === "1ra" ? "1ra" : "2da"}</option>
+                    ))
                   ))}
                 </>
               )}
