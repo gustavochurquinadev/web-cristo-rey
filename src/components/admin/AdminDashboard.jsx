@@ -517,6 +517,7 @@ const AdminDashboard = () => {
                   <th className="px-6 py-4 font-semibold text-center">Div</th>
                   <th className="px-6 py-4 font-semibold">Turno</th>
                   <th className="px-6 py-4 font-semibold text-center">Estado de Cuenta</th>
+                  <th className="px-6 py-4 font-semibold text-center">% Beca</th>
                   <th className="px-6 py-4 font-semibold text-right">Acciones</th>
                 </tr>
               </thead>
@@ -525,7 +526,7 @@ const AdminDashboard = () => {
                   filteredStudents.map((s) => (
                     <tr key={s.id} className="hover:bg-blue-50/50 transition-colors group">
                       <td className="px-6 py-3">
-                        <div className="font-bold text-gray-800">{s.apellido}, {s.nombre}</div>
+                        <div className="font-bold text-gray-800">{s.apellido}{s.nombre ? `, ${s.nombre}` : ''}</div>
                         <div className="text-xs text-gray-400 font-mono">{s.dni}</div>
                       </td>
                       <td className="px-6 py-3 text-gray-600">
@@ -537,7 +538,11 @@ const AdminDashboard = () => {
                         </span>
                       </td>
                       {/* Quitamos el ° hardcodeado porque el dato ya viene como "1ro" o "1°" a veces */}
-                      <td className="px-6 py-3 text-center font-bold text-gray-700">{s.grado}</td>
+                      <td className="px-6 py-3 text-center">
+                        <span className="w-6 h-6 inline-flex items-center justify-center bg-gray-200 rounded-full text-xs font-bold text-gray-700 border border-gray-300">
+                          {s.grado}
+                        </span>
+                      </td>
                       <td className="px-6 py-3 text-center">
                         <span className="w-6 h-6 inline-flex items-center justify-center bg-gray-100 rounded-full text-xs font-bold text-gray-600">
                           {s.division}
@@ -555,6 +560,17 @@ const AdminDashboard = () => {
                           <span className="inline-flex items-center gap-1 bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-100">
                             <DollarSign className="w-3 h-3" /> DEUDA
                           </span>
+                        )}
+                      </td>
+
+                      {/* BECA */}
+                      <td className="px-6 py-3 text-center">
+                        {s.isBecado && s.becaPorcentaje > 0 ? (
+                          <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-bold border border-blue-100">
+                            {s.becaPorcentaje}%
+                          </span>
+                        ) : (
+                          <span className="text-gray-300">-</span>
                         )}
                       </td>
 
@@ -621,14 +637,9 @@ const AdminDashboard = () => {
                     <input required type="number" className="w-full p-2 border rounded" value={formData.dni} onChange={e => setFormData({ ...formData, dni: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Apellido</label>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Apellido y Nombre</label>
                     <input required type="text" className="w-full p-2 border rounded" value={formData.apellido} onChange={e => setFormData({ ...formData, apellido: e.target.value })} />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Nombres</label>
-                  <input required type="text" className="w-full p-2 border rounded" value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
