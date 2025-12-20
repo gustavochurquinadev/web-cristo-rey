@@ -38,8 +38,8 @@ const AdminLayout = () => {
             <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
                 <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm border-t-4 border-cristo-accent">
                     <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Shield className="w-8 h-8 text-cristo-primary" />
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
+                            <img src="/favicon-96x96.png" alt="Logo" className="w-10 h-10 object-contain" />
                         </div>
                         <h2 className="text-2xl font-serif font-bold text-gray-800">{pageTitle}</h2>
                         <p className="text-xs text-gray-500 mt-1">{pageSubtitle}</p>
@@ -78,10 +78,10 @@ const AdminLayout = () => {
             {/* Topbar */}
             <header className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center sticky top-0 z-50">
                 <div className="flex items-center gap-3">
-                    <Shield className="w-6 h-6 text-cristo-primary" />
+                    <img src="/favicon-96x96.png" alt="Logo" className="w-8 h-8 object-contain" />
                     <div>
                         <h1 className="font-bold text-gray-800 text-sm leading-tight">{headerTitle}</h1>
-                        <p className="text-[10px] text-gray-500">Colegio Cristo Rey • Admin PWA</p>
+                        <p className="text-[10px] text-gray-500">Colegio Católico Cristo Rey • Admin PWA</p>
                     </div>
                 </div>
 
