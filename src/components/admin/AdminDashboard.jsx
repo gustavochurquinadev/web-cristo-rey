@@ -843,61 +843,126 @@ const AdminDashboard = () => {
                     <p className="text-gray-500 font-medium">Sincronizando con Banco de Datos...</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {monthOrder.map((key) => {
-                      const isPaid = payments?.[key];
+                  <>
+                    {/* LISTA DE MESES */}
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-6">
+                      {/* MATRÍCULA (Special Case) */}
+                      <div
+                        onClick={() => togglePayment('matricula')}
+                        className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${payments?.['matricula']
+                            ? 'bg-green-50 border-green-500 text-green-700'
+                            : 'bg-white border-gray-100 text-gray-500 hover:border-cristo-accent'
+                          }`}
+                      >
+                        <div className="text-xs font-bold uppercase mb-1">Matrícula</div>
 
-                      // CÁLCULO DE MONTO DINÁMICO
-                      let baseFee;
-                      if (key === 'matricula') {
-                        // Usar valor específico de Matrícula
-                        baseFee = fees['Matricula'] || 40000;
-                      } else {
+                        {/* Lógica de Precio Matrícula: Base o Tardía */}
+                        {(() => {
+                          const isPaid = payments?.['matricula'];
+                          const isLate = surcharges['matricula'] || false; // Reusamos el estado "surcharges['matricula']" como toggle de "Pago Tardío"
+                          const baseMatricula = fees['Matricula'] || 40000;
+                          const lateMatricula = fees['Matricula_Tardia'] || 45000;
+                          const amount = isLate ? lateMatricula : baseMatricula;
+                          const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
+
+                          return (
+                            <>
+                              {isPaid ? (
+                                <>
+                                  <div className="bg-green-500 text-white rounded-full p-1 my-1"><Check className="w-4 h-4" /></div>
+                                  <span className="text-[10px] uppercase font-bold text-green-700">Pagado</span>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="text-lg font-bold">
+                                    {formatPrice(amount)}
+                                  </div>
+                                  <div className="text-[10px] mt-1 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                    <input
+                                      type="checkbox"
+                                      checked={isLate}
+                                      onChange={(e) => setSurcharges({ ...surcharges, ['matricula']: e.target.checked })}
+                                      className="rounded border-gray-300 text-cristo-accent focus:ring-cristo-accent"
+                                    />
+                                    <span>Pago Tardío {'>'} 14/02</span>
+                                  </div>
+                                </>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+
+                      {/* MESES REGULARES (Mar-Dic) */}
+                      {['mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'].map((key) => {
+                        const isPaid = payments?.[key];
+
+                        // Calcular monto
+                        let baseFee;
                         // Usar valor de cuota mensual según nivel
                         baseFee = fees[selectedStudent.nivel] || fees['Primario'] || 33000;
-                      }
 
-                      const scholarshipDiscount = (key !== 'matricula' && selectedStudent.isBecado) ? (baseFee * (selectedStudent.becaPorcentaje / 100)) : 0;
-                      const finalFee = baseFee - scholarshipDiscount;
+                        // Calcular descuento beca
+                        const scholarshipDiscount = (selectedStudent.isBecado) ? (baseFee * (selectedStudent.becaPorcentaje / 100)) : 0;
 
-                      // CÁLCULO CON MORA
-                      const hasSurcharge = surcharges[key] || false;
-                      const surchargeAmount = finalFee * 0.10;
-                      const totalToPay = hasSurcharge ? (finalFee + surchargeAmount) : finalFee;
+                        // Mora del 10% si aplica
+                        const finalBase = baseFee - scholarshipDiscount;
+                        const hasSurcharge = surcharges[key] || false;
+                        const surchargeAmount = hasSurcharge ? (finalBase * 0.10) : 0;
+                        const totalToPay = finalBase + surchargeAmount;
 
-                      // FORMATO MONEDA
-                      const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
+                        const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
 
-                      return (
-                        <div key={key} className={`relative p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
-                           ${isPaid
-                            ? 'bg-green-50 border-green-500 text-green-700'
-                            : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-500 hover:text-gray-700'
-                          }
-                         `}>
+                        return (
+                          <div
+                            key={key}
+                            onClick={() => togglePayment(key)}
+                            className={`relative p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 group
+                            ${isPaid
+                                ? 'bg-green-50 border-green-500 text-green-700'
+                                : 'bg-white border-gray-100 hover:border-cristo-accent hover:shadow-md text-gray-500 hover:text-gray-700'
+                              }
+                          `}>
 
-                          {/* BOTÓN PRINCIPAL (Toggle Pago) */}
-                          <div onClick={() => togglePayment(key)} className="flex flex-col items-center cursor-pointer w-full">
-                            <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
+                            {/* BOTÓN PRINCIPAL (Toggle Pago) */}
+                            <div className="flex flex-col items-center cursor-pointer w-full">
+                              <span className="font-bold uppercase text-sm tracking-wide">{monthLabels[key]}</span>
 
-                            {isPaid ? (
-                              <>
-                                <div className="bg-green-500 text-white rounded-full p-1 my-1"><Check className="w-4 h-4" /></div>
-                                <span className="text-[10px] uppercase font-bold text-green-700">Pagado</span>
-                              </>
-                            ) : (
-                              <>
-                                <div className="text-xl font-bold text-gray-800 my-1 font-serif">{formatPrice(totalToPay)}</div>
-                                <div className="text-[10px] text-gray-400 font-mono">
-                                  {selectedStudent.isBecado && <span className="text-blue-500 mr-1">(-{selectedStudent.becaPorcentaje}%)</span>}
-                                  Base: {formatPrice(baseFee)}
-                                </div>
-                              </>
+                              {isPaid ? (
+                                <>
+                                  <div className="bg-green-500 text-white rounded-full p-1 my-1"><Check className="w-4 h-4" /></div>
+                                  <span className="text-[10px] uppercase font-bold text-green-700">Pagado</span>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="text-xl font-bold text-gray-800 my-1 font-serif">{formatPrice(totalToPay)}</div>
+                                  <div className="text-[10px] text-gray-400 font-mono">
+                                    {selectedStudent.isBecado && <span className="text-blue-500 mr-1">(-{selectedStudent.becaPorcentaje}%)</span>}
+                                    Base: {formatPrice(baseFee)}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+
+                            {/* CHECKBOX MORA (Solo si no está pagado) */}
+                            {!isPaid && (
+                              <label className="flex items-center gap-1 mt-2 cursor-pointer select-none" onClick={(e) => e.stopPropagation()}>
+                                <input
+                                  type="checkbox"
+                                  className="w-3 h-3 rounded border-gray-300 text-red-500 focus:ring-red-500"
+                                  checked={surcharges[key] || false}
+                                  onChange={(e) => setSurcharges({ ...surcharges, [key]: e.target.checked })}
+                                />
+                                <span className={`text-[10px] font-bold ${surcharges[key] ? 'text-red-500' : 'text-gray-400'}`}>
+                                  + Mora (10%)
+                                </span>
+                              </label>
                             )}
                           </div>
 
-                          {/* CHECKBOX MORA (Solo si no está pagado) */}
-                          {!isPaid && (
+                          {/* CHECKBOX MORA (Solo si no está pagado) */ }
+                        {
+                          !isPaid && (
                             <label className="flex items-center gap-1 mt-2 cursor-pointer select-none" onClick={(e) => e.stopPropagation()}>
                               <input
                                 type="checkbox"
@@ -909,10 +974,11 @@ const AdminDashboard = () => {
                                 + Mora (10%)
                               </span>
                             </label>
-                          )}
+                          )
+                        }
 
                         </div>
-                      )
+                    )
                     })}
                   </div>
                 )}
