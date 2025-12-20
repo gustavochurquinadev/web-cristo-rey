@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Download, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -10,6 +10,20 @@ const Parents = () => {
 
     // 🔴 URL DEL SCRIPT (Usamos la misma del Admin para compartir la base de datos)
     const GOOGLE_SCRIPT_URL_PADRES = "https://script.google.com/macros/s/AKfycby6a9pr6g54of3nZ343bqxc6Xx3IdbWP21NUop4q6tmJJfWYmEOppw1uhfD-wVOVoLt2g/exec";
+
+    // --- 0. CACHE (Auto-Login) ---
+    useEffect(() => {
+        const cachedDni = localStorage.getItem('parent_dni');
+        const cachedData = localStorage.getItem('parent_data');
+
+        if (cachedDni) setDni(cachedDni);
+
+        if (cachedData) {
+            setStudentData(JSON.parse(cachedData));
+            setLoginStep(false);
+            // Opcional: Re-validar en background si fuera necesario, pero para este caso asumimos cache válido para velocidad.
+        }
+    }, []);
 
     // --- 1. LOGIN ---
     const handleLogin = async (e) => {
@@ -48,6 +62,10 @@ const Parents = () => {
             if (data.status === "success") {
                 setStudentData(data.student);
                 setLoginStep(false);
+                // GUARDAR EN CACHE
+                localStorage.setItem('parent_dni', dni);
+                localStorage.setItem('parent_data', JSON.stringify(data.student));
+
                 toast.success(`Bienvenido/a familia de ${data.student.name}`);
             } else {
                 toast.error("Alumno no encontrado o DNI incorrecto");
@@ -143,7 +161,12 @@ const Parents = () => {
                             <p className="text-cristo-secondary opacity-90">{studentData.course} • DNI: {studentData.dni}</p>
                         </div>
                         <button
-                            onClick={() => setLoginStep(true)}
+                            onClick={() => {
+                                setLoginStep(true);
+                                setStudentData(null);
+                                localStorage.removeItem('parent_data');
+                                localStorage.removeItem('parent_dni');
+                            }}
                             className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors self-start md:self-auto"
                         >
                             Cerrar Sesión

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Lock, User, FileText, Download, LogOut, UserPlus, Key, Calendar, BookOpen, FileCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -16,6 +16,26 @@ const Staff = () => {
   // 🔴 URL DE TU SCRIPT (Verifica que sea la correcta)
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2-YyjICMqFXwZl4FtY53rdgCACO-CcWDWkZbP-RwgSSk_JrlqZ54ph_QALuMsYYYB/exec";
 
+  // --- 0. CACHE (Auto-Login) ---
+  useEffect(() => {
+    const cachedUser = localStorage.getItem('staff_user');
+    const cachedReceipts = localStorage.getItem('staff_receipts');
+    const cachedDocs = localStorage.getItem('staff_docs');
+
+    if (cachedUser) {
+      const userData = JSON.parse(cachedUser);
+      setUser(userData);
+      setIsLoggedIn(true);
+
+      // Background Refresh
+      fetchReceipts(userData.dni);
+      fetchPublicDocs();
+    }
+
+    if (cachedReceipts) setReceipts(JSON.parse(cachedReceipts));
+    if (cachedDocs) setDocuments(JSON.parse(cachedDocs));
+  }, []);
+
   // --- LOGIN ---
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,6 +50,8 @@ const Staff = () => {
       if (data.status === 'success') {
         setIsLoggedIn(true);
         setUser({ name: data.name, dni: loginData.dni });
+        localStorage.setItem('staff_user', JSON.stringify({ name: data.name, dni: loginData.dni }));
+
         toast.success(`Bienvenido/a ${data.name}`);
         fetchReceipts(loginData.dni);
         fetchPublicDocs();
@@ -76,7 +98,10 @@ const Staff = () => {
         body: JSON.stringify({ dni, action: 'getReceipts' })
       });
       const data = await res.json();
-      if (data.status === 'success') setReceipts(data.receipts);
+      if (data.status === 'success') {
+        setReceipts(data.receipts);
+        localStorage.setItem('staff_receipts', JSON.stringify(data.receipts));
+      }
     } catch (error) { console.error(error); }
   };
 
@@ -87,7 +112,10 @@ const Staff = () => {
         body: JSON.stringify({ action: 'getPublicDocs' })
       });
       const data = await res.json();
-      if (data.status === 'success') setDocuments(data.docs);
+      if (data.status === 'success') {
+        setDocuments(data.docs);
+        localStorage.setItem('staff_docs', JSON.stringify(data.docs));
+      }
     } catch (error) { console.error(error); }
   };
 
@@ -97,6 +125,9 @@ const Staff = () => {
     setReceipts([]);
     setDocuments([]);
     setLoginData({ dni: '', password: '' });
+    localStorage.removeItem('staff_user');
+    localStorage.removeItem('staff_receipts');
+    localStorage.removeItem('staff_docs');
   };
 
   // --- VISTA NO LOGUEADO (LOGIN/REGISTRO) ---
@@ -251,26 +282,26 @@ const Staff = () => {
 
             {/* Contenido Scrolleable */}
             <div className="p-6 overflow-y-auto custom-scrollbar flex-grow">
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-3">
                 {receipts.length > 0 ? receipts.map((receipt) => (
-                  <div key={receipt.id} className="bg-white p-5 rounded-xl border border-gray-100 hover:border-blue-300 shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col items-center text-center relative overflow-hidden">
+                  <div key={receipt.id} className="bg-white p-3 rounded-xl border border-gray-100 hover:border-blue-300 shadow-sm hover:shadow-md transition-all duration-300 group flex items-center justify-between">
 
-                    {/* Decoración de fondo */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                    <div className="flex items-center gap-4">
+                      {/* Icono del Mes */}
+                      <div className="w-10 h-10 bg-blue-50 text-blue-700 rounded-lg flex flex-col items-center justify-center font-bold shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <span className="text-[8px] uppercase opacity-70 leading-none mb-0.5">MES</span>
+                        <span className="text-sm leading-none">{receipt.periodo.substring(0, 3)}</span>
+                      </div>
 
-                    {/* Icono del Mes */}
-                    <div className="w-12 h-12 bg-blue-50 text-blue-700 rounded-lg flex flex-col items-center justify-center font-bold shadow-inner mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                      <span className="text-[10px] uppercase opacity-70 leading-none mb-0.5">MES</span>
-                      <span className="text-lg leading-none">{receipt.periodo.substring(0, 3)}</span>
-                    </div>
-
-                    {/* Info */}
-                    <h4 className="font-bold text-gray-800 text-sm uppercase tracking-wide mb-1">
-                      {receipt.periodo.replace(/_/g, ' ')}
-                    </h4>
-
-                    <div className="text-[10px] text-gray-500 uppercase tracking-wide mb-4 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
-                      Leg: {receipt.legajo}
+                      {/* Info */}
+                      <div>
+                        <h4 className="font-bold text-gray-800 text-sm uppercase tracking-wide">
+                          {receipt.periodo.replace(/_/g, ' ')}
+                        </h4>
+                        <span className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 inline-block mt-1">
+                          Leg: {receipt.legajo}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Botón */}
@@ -278,9 +309,9 @@ const Staff = () => {
                       href={receipt.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full px-3 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-lg hover:border-blue-500 hover:text-blue-600 transition-all flex items-center justify-center gap-2"
+                      className="px-3 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:border-blue-500 hover:text-blue-600 transition-all flex items-center gap-2"
                     >
-                      <Download className="w-3 h-3" /> Descargar
+                      <Download className="w-4 h-4" /> <span className="hidden sm:inline">Descargar</span>
                     </a>
                   </div>
                 )) : (
