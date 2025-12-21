@@ -625,7 +625,14 @@ const AdminDashboard = () => {
                   filteredStudents.map((s) => (
                     <tr key={s.id} className="hover:bg-blue-50/50 transition-colors group">
                       <td className="px-6 py-3">
-                        <div className="font-bold text-gray-800">{s.apellido}{s.nombre ? `, ${s.nombre}` : ''}</div>
+                        <div className="font-bold text-gray-800 flex items-center gap-2">
+                          {s.apellido}{s.nombre ? `, ${s.nombre}` : ''}
+                          {s.estado === "Egresado" && (
+                            <span className="bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded border border-gray-600 uppercase tracking-wider flex items-center gap-1">
+                              🎓 Egresado
+                            </span>
+                          )}
+                        </div>
                         <div className="text-xs text-gray-400 font-mono">{s.dni}</div>
                       </td>
                       <td className="px-6 py-3 text-gray-600">
