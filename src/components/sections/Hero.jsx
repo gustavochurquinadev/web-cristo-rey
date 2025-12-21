@@ -71,7 +71,7 @@ const Hero = ({ onNavigate, startAnimation }) => {
           </div>
 
           <p className="text-lg md:text-xl text-gray-100 mb-10 font-light leading-relaxed max-w-lg text-pretty drop-shadow-sm opacity-0">
-            Formamos personas íntegras y líderes compasivos, uniendo la excelencia académica con los valores del Evangelio.
+            Tu familia forma parte de un sueño... el sueño de José Gras.
           </p>
 
 
