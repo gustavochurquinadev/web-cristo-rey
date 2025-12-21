@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 4.4 (Auto-Create Sheets) - ACTUALIZADO: 20/12/2025
+// 📦 VERSIÓN: 4.5 (Concurrency Fix + Bulk Updates) - ACTUALIZADO: 20/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
@@ -219,8 +219,14 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
 
     // Lock only for write actions
-    const isWriteAction = ["create", "edit", "delete", "promoteAll", "updatePayment", "sync", "register", "uploadReceipt"].includes(data.action);
-    if (isWriteAction) lock.tryLock(10000);
+    const isWriteAction = ["create", "edit", "delete", "promoteAll", "updatePayment", "updatePayments", "sync", "register", "uploadReceipt"].includes(data.action);
+    if (isWriteAction) {
+      try {
+        lock.waitLock(30000); // Esperar hasta 30s por el lock
+      } catch (e) {
+        return response({ status: "error", message: "Servidor ocupado, intente nuevamente." });
+      }
+    }
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
@@ -306,6 +312,27 @@ function doPost(e) {
       if (idx === -1) return response({ status: "error", message: "No encontrado" });
       const map = { 'matricula': 3, 'mar': 4, 'abr': 5, 'may': 6, 'jun': 7, 'jul': 8, 'ago': 9, 'sep': 10, 'oct': 11, 'nov': 12, 'dic': 13 };
       sheetC.getRange(idx + 1, map[data.month] + 1).setValue(data.paid ? "PAGADO" : "PENDIENTE");
+      return response({ status: "success" });
+    }
+
+    if (data.action === "updatePayments") {
+      const sheetC = ss.getSheetByName("Cobranzas 2026");
+      const rows = sheetC.getDataRange().getValues();
+      const idx = rows.findIndex(r => String(r[0]) === String(data.dni));
+      if (idx === -1) return response({ status: "error", message: "No encontrado" });
+
+      const map = { 'matricula': 3, 'mar': 4, 'abr': 5, 'may': 6, 'jun': 7, 'jul': 8, 'ago': 9, 'sep': 10, 'oct': 11, 'nov': 12, 'dic': 13 };
+      const updates = data.updates; // Object { month: boolean }
+
+      // Batch update logic could be optimized, but single cell updates are fine for now as they are in same row usually?
+      // Actually, better to get the range row and setValues if possible, but columns are scattered?
+      // No, columns are contiguous-ish but not strictly (wait, 3,4,5...13 are contiguous).
+      // Let's do simple loop for now, lock protects us.
+      for (const [key, paid] of Object.entries(updates)) {
+        if (map.hasOwnProperty(key)) {
+          sheetC.getRange(idx + 1, map[key] + 1).setValue(paid ? "PAGADO" : "PENDIENTE");
+        }
+      }
       return response({ status: "success" });
     }
 
