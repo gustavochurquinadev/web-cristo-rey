@@ -304,6 +304,31 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleMarkAllPaid = async () => {
+    if (!confirm("¿Confirmar PAGO TOTAL (Todo el año completado)?")) return;
+
+    const previousPayments = { ...payments };
+    const allPaid = {};
+    monthOrder.forEach(key => allPaid[key] = true);
+
+    setPayments(allPaid);
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "updatePayments", // Nueva acción "plural"
+          dni: selectedStudent.dni,
+          updates: allPaid
+        }),
+      });
+      toast.success("¡Año completo registrado como PAGADO! 🎉");
+    } catch (error) {
+      toast.error("Error al registrar pagos masivos");
+      setPayments(previousPayments);
+    }
+  };
+
   const handleDownloadLibreDeuda = async () => {
     if (!selectedStudent) return;
     const toastId = toast.loading("Generando certificado...");
@@ -329,11 +354,11 @@ const AdminDashboard = () => {
 
   const monthLabels = {
     matricula: "Matrícula",
-    feb: "Febrero", mar: "Marzo", abr: "Abril", may: "Mayo", jun: "Junio",
+    mar: "Marzo", abr: "Abril", may: "Mayo", jun: "Junio",
     jul: "Julio", ago: "Agosto", sep: "Septiembre", oct: "Octubre", nov: "Noviembre", dic: "Diciembre"
   };
 
-  const monthOrder = ['matricula', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const monthOrder = ['matricula', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
   // Mapeo para Labels bonitos en el Dropdown
   const getLabelGrado = (num) => {
@@ -824,6 +849,14 @@ const AdminDashboard = () => {
                   <p className="text-gray-400 text-sm">Gestionando pagos ciclo 2026</p>
                 </div>
                 <div className="flex gap-2">
+                  <button
+                    onClick={handleMarkAllPaid}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-green-600 hover:bg-green-700 rounded-lg text-sm transition-colors text-white font-bold shadow-sm"
+                    title="Marcar TODO como Pagado"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Todo Pagado
+                  </button>
                   <button
                     onClick={handleDownloadLibreDeuda}
                     className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors border border-white/20"
