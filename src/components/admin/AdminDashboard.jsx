@@ -899,7 +899,7 @@ const AdminDashboard = () => {
                           const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
 
                           return (
-                            <>
+                            <div className="flex flex-col items-center cursor-pointer w-full">
                               {isPaid ? (
                                 <>
                                   <div className="bg-green-500 text-white rounded-full p-1 my-1"><Check className="w-4 h-4" /></div>
@@ -921,7 +921,7 @@ const AdminDashboard = () => {
                                   </div>
                                 </>
                               )}
-                            </>
+                            </div>
                           );
                         })()}
                       </div>
