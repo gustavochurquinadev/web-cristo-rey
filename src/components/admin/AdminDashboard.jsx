@@ -136,7 +136,7 @@ const AdminDashboard = () => {
   });
 
   // --- 3. BORRAR ---
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, dni) => {
     if (confirm("⚠️ ¿Seguro que desea ELIMINAR a este alumno? (Se borrará de datos y pagos)")) {
       // Optimistic UI: Borrar inmediatamente de la vista
       const previousStudents = [...students];
@@ -147,11 +147,11 @@ const AdminDashboard = () => {
       try {
         await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
           method: "POST",
-          body: JSON.stringify({ action: "delete", id: id }),
+          body: JSON.stringify({ action: "delete", id: id, dni: dni }),
         });
         toast.dismiss(toastId);
         toast.success("Alumno eliminado");
-        // No refetch needed, already removed.
+        fetchStudents(); // Recargar para actualizar índices de fila
       } catch (error) {
         toast.dismiss(toastId);
         toast.error("Error al eliminar (Recargue la página)");
@@ -665,7 +665,7 @@ const AdminDashboard = () => {
 
                           {/* BOTON ELIMINAR */}
                           <button
-                            onClick={() => handleDelete(s.id)}
+                            onClick={() => handleDelete(s.id, s.dni)}
                             className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200"
                             title="Eliminar/Baja"
                           >

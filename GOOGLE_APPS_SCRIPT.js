@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 4.6 (UI & UX Fixes: Color Feedback) - ACTUALIZADO: 20/12/2025
+// 📦 VERSIÓN: 4.7 (Fix: Deletion Logic & UI Persistence) - ACTUALIZADO: 20/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
@@ -303,6 +303,35 @@ function doPost(e) {
       const curso = getPrettyCurso(data.student.grado, data.student.division);
       sheetC.appendRow([data.student.dni, nombreFull, curso, "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "ADEUDA", "AL DIA"]);
       return response({ status: "success", message: "Alumno creado" });
+    }
+
+    if (data.action === "delete") {
+      const sheetL = ss.getSheetByName("Legajos 2026");
+      const sheetC = ss.getSheetByName("Cobranzas 2026");
+
+      // 1. Borrar de Legajos (Buscar por DNI para seguridad)
+      // Nota: data.dni viene del frontend actualizado. Si no, fallback a ID.
+      let dniToDelete = data.dni;
+      if (!dniToDelete && data.id) {
+        // Si el frontend viejo manda solo ID, buscamos DNI en esa fila antes de borrar
+        dniToDelete = sheetL.getRange(Number(data.id), 1).getValue();
+      }
+
+      const rowsL = sheetL.getDataRange().getValues();
+      const idxL = rowsL.findIndex(r => String(r[0]) === String(dniToDelete));
+      if (idxL !== -1) {
+        sheetL.deleteRow(idxL + 1);
+      }
+
+
+      // 2. Borrar de Cobranzas
+      const rowsC = sheetC.getDataRange().getValues();
+      const idxC = rowsC.findIndex(r => String(r[0]) === String(dniToDelete));
+      if (idxC !== -1) {
+        sheetC.deleteRow(idxC + 1);
+      }
+
+      return response({ status: "success", message: "Eliminado" });
     }
 
     if (data.action === "updatePayment") {
