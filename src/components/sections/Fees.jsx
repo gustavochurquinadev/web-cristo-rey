@@ -56,7 +56,7 @@ const Fees = () => {
   const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
 
   return (
-    <section id="fees" className="py-12 bg-gray-50">
+    <section id="fees" className="py-24 bg-gray-50">
       <div className="container mx-auto px-6">
 
         {/* HEADER */}

@@ -91,7 +91,7 @@ const News = () => {
                   <span className="text-xs text-cristo-accent font-bold mb-3 flex items-center uppercase tracking-wide">
                     <Calendar className="w-3 h-3 mr-1" /> {news.date}
                   </span>
-                  <h3 className="text-xl font-serif font-bold text-cristo-primary mb-3 leading-tight group-hover:text-cristo-accent transition-colors">
+                  <h3 className="text-2xl font-serif font-bold text-cristo-primary mb-3 leading-tight group-hover:text-cristo-accent transition-colors">
                     {news.title}
                   </h3>
                   <p className="text-sm text-gray-600 leading-relaxed mb-4 flex-grow line-clamp-3">
