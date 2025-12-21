@@ -284,8 +284,12 @@ const AdminDashboard = () => {
     // Optimistic UI Update
     const currentStatus = payments[monthKey];
     const newStatus = !currentStatus;
+    const newPayments = { ...payments, [monthKey]: newStatus };
 
-    setPayments(prev => ({ ...prev, [monthKey]: newStatus }));
+    setPayments(newPayments);
+    // Persist in main list locally
+    setStudents(prev => prev.map(s => s.dni === selectedStudent.dni ? { ...s, payments: newPayments } : s));
+
 
     try {
       await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
@@ -297,10 +301,13 @@ const AdminDashboard = () => {
           paid: newStatus
         }),
       });
-      toast.success("Pago de " + monthLabels[monthKey] + " actualizado");
+      // toast.success("Pago actualizado"); // Optional, reduce noise
     } catch (error) {
       toast.error("Error al guardar el pago");
-      setPayments(prev => ({ ...prev, [monthKey]: currentStatus }));
+      // Rollback
+      const oldPayments = { ...payments, [monthKey]: currentStatus };
+      setPayments(oldPayments);
+      setStudents(prev => prev.map(s => s.dni === selectedStudent.dni ? { ...s, payments: oldPayments } : s));
     }
   };
 
@@ -312,6 +319,8 @@ const AdminDashboard = () => {
     monthOrder.forEach(key => allPaid[key] = true);
 
     setPayments(allPaid);
+    // Persist in main list locally
+    setStudents(prev => prev.map(s => s.dni === selectedStudent.dni ? { ...s, payments: allPaid } : s));
 
     try {
       await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
@@ -326,6 +335,7 @@ const AdminDashboard = () => {
     } catch (error) {
       toast.error("Error al registrar pagos masivos");
       setPayments(previousPayments);
+      setStudents(prev => prev.map(s => s.dni === selectedStudent.dni ? { ...s, payments: previousPayments } : s));
     }
   };
 
