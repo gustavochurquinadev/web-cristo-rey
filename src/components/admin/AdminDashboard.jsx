@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, X, DollarSign, Check, Clock, FileText, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, ArrowUpCircle, X, DollarSign, Check, Clock, FileText, CheckCircle, AlertCircle, Info, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdminDashboard = () => {
@@ -180,6 +180,29 @@ const AdminDashboard = () => {
       } catch (error) {
         toast.dismiss(toastId);
         toast.error("Error de conexión al promover");
+      }
+    }
+  };
+
+  const handleRestoreBackup = async () => {
+    if (confirm("⚠️ ¿DESHACER EL CIERRE DE CICLO? ⚠️\n\nEsta acción restaurará la base de datos de alumnos al estado PREVIO al último cierre. Se perderán cambios recientes.\n\n¿Confirmar restauración?")) {
+      const toastId = toast.loading("⏳ Restaurando backup...");
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL_ADMIN, {
+          method: "POST",
+          body: JSON.stringify({ action: "restoreBackup" }),
+        });
+        const data = await response.json();
+        toast.dismiss(toastId);
+        if (data.status === "success") {
+          toast.success("Sistema restaurado. 🛡️");
+          fetchStudents();
+        } else {
+          toast.error("Error: " + data.message);
+        }
+      } catch (error) {
+        toast.dismiss(toastId);
+        toast.error("Error al restaurar");
       }
     }
   };
@@ -411,6 +434,14 @@ const AdminDashboard = () => {
           >
             <ArrowUpCircle className="w-4 h-4" />
             Cerrar Ciclo Lectivo
+          </button>
+          <button
+            onClick={handleRestoreBackup}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 font-bold rounded-lg border border-red-100 hover:bg-gray-100 transition-colors text-xs uppercase tracking-wide"
+            title="Restaurar copia de seguridad (Deshacer Cierre)"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Deshacer
           </button>
           <button
             onClick={openNewStudentModal}

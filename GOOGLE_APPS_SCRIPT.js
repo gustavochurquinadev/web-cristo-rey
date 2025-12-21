@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 4.7 (Fix: Deletion Logic & UI Persistence) - ACTUALIZADO: 20/12/2025
+// 📦 VERSIÓN: 4.8 (NEW: Backup & Restore Magic) - ACTUALIZADO: 20/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
@@ -348,6 +348,101 @@ function doPost(e) {
         cell.setValue("PENDIENTE").setBackground(null).setFontWeight("normal");
       }
       return response({ status: "success" });
+    }
+
+    if (data.action === "promoteAll") {
+      const sheetL = ss.getSheetByName("Legajos 2026");
+      if (!sheetL) return response({ status: "error", message: "No se encontró Legajos 2026" });
+
+      // 1. BACKUP AUTOMÁTICO (Safeguard)
+      const backupName = "BACKUP_LEGAJOS_PRE_CIERRE";
+      const oldBackup = ss.getSheetByName(backupName);
+      if (oldBackup) ss.deleteSheet(oldBackup);
+
+      const backup = sheetL.copyTo(ss);
+      backup.setName(backupName);
+      backup.hideSheet();
+
+      // 2. PROMOCIÓN
+      const range = sheetL.getDataRange();
+      const rows = range.getValues();
+      const newData = rows.slice(1).map(r => {
+        let nivel = r[2];
+        let grado = Number(r[3]);
+        let estado = r[6];
+
+        if (estado === "Baja" || estado === "Egresado") return r;
+
+        // Logica Promocion
+        if (String(nivel).includes("Inicial")) {
+          if (grado < 5) grado++;
+          else { nivel = "Primario"; grado = 1; }
+        } else if (String(nivel).includes("Primario")) {
+          if (grado < 7) grado++;
+          else { nivel = "Secundario"; grado = 1; }
+        } else if (String(nivel).includes("Secundario")) {
+          if (grado < 5) grado++;
+          else { estado = "Egresado"; }
+        }
+
+        const newRow = [...r];
+        newRow[2] = nivel;
+        newRow[3] = grado;
+        newRow[6] = estado;
+        return newRow;
+      });
+
+      if (newData.length > 0) {
+        sheetL.getRange(2, 1, newData.length, newData[0].length).setValues(newData);
+      }
+
+      // 3. Mini Sync Cobranzas (Actualizar cursos)
+      const sheetC = ss.getSheetByName("Cobranzas 2026");
+      const dataC = sheetC.getDataRange().getValues();
+      const mapC = {};
+      dataC.slice(1).forEach((r, i) => mapC[String(r[0])] = i + 1);
+
+      newData.forEach(r => {
+        const dni = String(r[0]);
+        const row = mapC[dni];
+        if (row) {
+          const cursoPretty = `${r[3]}° ${r[4]}`;
+          sheetC.getRange(row + 1, 3).setValue(cursoPretty); // Col 3: Curso
+        }
+      });
+
+      return response({ status: "success", message: "Ciclo cerrado y backup creado." });
+    }
+
+    if (data.action === "restoreBackup") {
+      const backupName = "BACKUP_LEGAJOS_PRE_CIERRE";
+      const backup = ss.getSheetByName(backupName);
+      if (!backup) return response({ status: "error", message: "No hay backup disponible." });
+
+      const sheetL = ss.getSheetByName("Legajos 2026");
+      if (sheetL) ss.deleteSheet(sheetL);
+
+      const restored = backup.copyTo(ss);
+      restored.setName("Legajos 2026");
+      restored.showSheet();
+
+      // Sync Cobranzas (Revertir cursos)
+      const newRows = restored.getDataRange().getValues();
+      const sheetC = ss.getSheetByName("Cobranzas 2026");
+      const dataC = sheetC.getDataRange().getValues();
+      const mapC = {};
+      dataC.slice(1).forEach((r, i) => mapC[String(r[0])] = i + 1);
+
+      newRows.slice(1).forEach(r => {
+        const dni = String(r[0]);
+        const row = mapC[dni];
+        if (row) {
+          const cursoPretty = `${r[3]}° ${r[4]}`;
+          sheetC.getRange(row + 1, 3).setValue(cursoPretty);
+        }
+      });
+
+      return response({ status: "success", message: "Sistema restaurado con éxito." });
     }
 
     if (data.action === "updatePayments") {
