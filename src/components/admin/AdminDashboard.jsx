@@ -927,7 +927,7 @@ const AdminDashboard = () => {
                       </div>
 
                       {/* MESES REGULARES (Mar-Dic) */}
-                      {['Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'].map((key) => {
+                      {['mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'].map((key) => {
                         const isPaid = payments?.[key];
 
                         // Calcular monto
@@ -959,7 +959,7 @@ const AdminDashboard = () => {
 
                             {/* BOTÓN PRINCIPAL (Toggle Pago) */}
                             <div className="flex flex-col items-center cursor-pointer w-full">
-                              <span className="font-bold uppercase text-sm tracking-wide">{key}</span>
+                              <span className="font-bold uppercase text-sm tracking-wide">{key.toUpperCase()}</span>
 
                               {isPaid ? (
                                 <>
@@ -1005,11 +1005,11 @@ const AdminDashboard = () => {
                   </>
                 )}
               </div>
-            </div>
-          </div>
+            </div >
+          </div >
         )
       }
-    </div>
+    </div >
   );
 };
 
