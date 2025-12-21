@@ -219,31 +219,67 @@ const Parents = () => {
 
                             <div className="space-y-4">
                                 {/* 1. LIBRE DEUDA */}
-                                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm relative overflow-hidden">
-                                    <p className="text-sm font-bold text-gray-700 mb-1">Libre Deuda</p>
-                                    <p className="text-xs text-gray-500 mb-3">Válido por 30 días.</p>
+                                {/* Regla: Mes anterior pagado (o Diciembre si es Diciembre) */}
+                                {(() => {
+                                    const date = new Date();
+                                    const currentMonth = date.getMonth(); // 0=Jan, 1=Feb, 2=Mar... 11=Dic
+                                    const p = studentData.payments;
 
-                                    {studentData.debtFree ? (
-                                        <button
-                                            onClick={() => handleDownload("generateLibreDeuda")}
-                                            disabled={loading}
-                                            className="w-full bg-cristo-accent text-white py-2 rounded-lg font-bold text-xs hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            {loading ? "..." : <><Download className="w-3 h-3" /> Descargar PDF</>}
-                                        </button>
-                                    ) : (
-                                        <div className="bg-red-50 text-red-600 p-2 rounded text-xs text-center border border-red-100 flex items-center justify-center gap-1">
-                                            <AlertCircle className="w-3 h-3" /> Pendiente
+                                    // Determinar requisito según fecha actual
+                                    let isEligible = false;
+                                    let requirementText = "";
+
+                                    // Enero (0) / Febrero (1) -> Requiere Matrícula (Marzo aún no vence)
+                                    if (currentMonth < 2) {
+                                        isEligible = p.matricula;
+                                        requirementText = "Requiere Matrícula al día.";
+                                    }
+                                    // Marzo (2) -> Requiere Matrícula (Mes anterior real de pago)
+                                    else if (currentMonth === 2) {
+                                        isEligible = p.matricula;
+                                        requirementText = "Requiere Matrícula al día.";
+                                    }
+                                    // Abril (3) a Noviembre (10) -> Requiere mes anterior
+                                    else if (currentMonth > 2 && currentMonth < 11) {
+                                        const monthsMap = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+                                        const prevMonthKey = monthsMap[currentMonth - 1]; // Ej: Abr(3) -> mar(2)
+                                        isEligible = p[prevMonthKey];
+                                        requirementText = `Requiere cuota de ${monthsMap[currentMonth - 1].toUpperCase()} al día.`;
+                                    }
+                                    // Diciembre (11) -> Requiere Diciembre
+                                    else if (currentMonth === 11) {
+                                        isEligible = p.dic;
+                                        requirementText = "Requiere cuota de DICIEMBRE al día.";
+                                    }
+
+                                    return (
+                                        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm relative overflow-hidden">
+                                            <p className="text-sm font-bold text-gray-700 mb-1">Libre Deuda</p>
+                                            <p className="text-xs text-gray-500 mb-3">{requirementText}</p>
+
+                                            {isEligible ? (
+                                                <button
+                                                    onClick={() => handleDownload("generateLibreDeuda")}
+                                                    disabled={loading}
+                                                    className="w-full bg-cristo-accent text-white py-2 rounded-lg font-bold text-xs hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    {loading ? "..." : <><Download className="w-3 h-3" /> Descargar PDF</>}
+                                                </button>
+                                            ) : (
+                                                <div className="bg-red-50 text-red-600 p-2 rounded text-xs text-center border border-red-100 flex items-center justify-center gap-1">
+                                                    <AlertCircle className="w-3 h-3" /> Requisito Pendiente
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
+                                    );
+                                })()}
 
                                 {/* 2. CERTIFICADO INICIO */}
                                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                                     <p className="text-sm font-bold text-gray-700 mb-1">Certificado Inicio</p>
-                                    <p className="text-xs text-gray-500 mb-3">Requiere Matrícula y Febrero.</p>
+                                    <p className="text-xs text-gray-500 mb-3">Requiere Matrícula y Marzo.</p>
 
-                                    {studentData.payments.matricula && studentData.payments.feb ? (
+                                    {studentData.payments.matricula && studentData.payments.mar ? (
                                         <button
                                             onClick={() => handleDownload("generateInicio")}
                                             disabled={loading}
@@ -260,8 +296,8 @@ const Parents = () => {
 
                                 {/* 3. CERTIFICADO FINALIZACIÓN */}
                                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                                    <p className="text-sm font-bold text-gray-700 mb-1">Fin de Ciclo</p>
-                                    <p className="text-xs text-gray-500 mb-3">Requiere Diciembre pago.</p>
+                                    <p className="text-sm font-bold text-gray-700 mb-1">Certificado Finalización</p>
+                                    <p className="text-xs text-gray-500 mb-3">Requiere Diciembre pagado.</p>
 
                                     {studentData.payments.dic ? (
                                         <button
