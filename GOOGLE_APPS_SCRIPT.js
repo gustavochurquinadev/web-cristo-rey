@@ -1,12 +1,17 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 4.8 (NEW: Backup & Restore Magic) - ACTUALIZADO: 20/12/2025
+// 📦 VERSIÓN: 5.4 (Debug Mode & Reset Fix) - ACTUALIZADO: 21/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
 // --- CONFIGURACIÓN PRINCIPAL ---
 const SPREADSHEET_ID = "1cxdXNmtKZc2kSyB6iqDUXbqOZykwSag5BFPHiaaEOII"; // ID PROVEÍDO POR USUARIO
 const SHEET_ID = SPREADSHEET_ID; // Alias para compatibilidad
+
+// --- NUEVA BBDD DOCENTES (OPCIÓN A - Separada) ---
+// 1. Crea una NUEVA hoja de cálculo en blanco llamada "SISTEMA_DOCENTES"
+// 2. Copia su ID y pégalo aquí:
+const SPREADSHEET_ID_DOCENTES = "1IphomCjQ3-vSCOr5C2LEmM2PCsXU6-hYPx8QbKZ0dLs";
 
 // IDs CARPETAS Y DOCS (SE PUEDEN CONFIGURAR DESDE EL MENÚ)
 const FOLDER_ID_RECIBOS = "1jXlN9xAbyMzDERjIwZmyFR99mmhDU0rs"; // ID ORIGINAL (Mantener si es correcto)
@@ -33,6 +38,8 @@ function onOpen() {
     .addItem('🔍 Aplicar Filtros Automáticos', 'APPLY_FILTERS')
     .addSeparator()
     .addItem('⚙️ Configurar Plantillas PDF', 'SETUP_DOCS')
+    .addItem('👨‍🏫 Configurar Base Docentes (Externa)', 'SETUP_TEACHERS_DB')
+    .addItem('🗑️ RESETEAR Base Docentes (Borrar Todo)', 'RESET_TEACHERS_DB')
     .addToUi();
 }
 
@@ -58,6 +65,98 @@ function SETUP_FEES() {
   sheet.autoResizeColumns(1, 4);
 
   ui.alert("✅ Hoja 'CONF_ARANCELES' creada.\n\nPuedes editar los valores numéricos y se reflejarán en la web.");
+}
+
+function SETUP_TEACHERS_DB() {
+  const ui = SpreadsheetApp.getUi();
+
+  if (!SPREADSHEET_ID_DOCENTES || SPREADSHEET_ID_DOCENTES.includes("PONER")) {
+    ui.alert("❌ Error: Debes configurar la variable SPREADSHEET_ID_DOCENTES en el script primero.");
+    return;
+  }
+
+  try {
+    const ssDocentes = SpreadsheetApp.openById(SPREADSHEET_ID_DOCENTES);
+    let sheet = ssDocentes.getSheetByName("Base Docentes");
+
+    if (sheet) {
+      const resp = ui.alert("⚠️ La hoja 'Base Docentes' ya existe en el archivo externo.", "¿Deseas reformatearla y mantener los datos?", ui.ButtonSet.YES_NO);
+      if (resp !== ui.Button.YES) return;
+    } else {
+      sheet = ssDocentes.insertSheet("Base Docentes");
+      // Si hay una hoja default vacía (Hoja 1), la borramos para limpiar
+      const defaultSheet = ssDocentes.getSheetByName("Hoja 1");
+      if (defaultSheet) ssDocentes.deleteSheet(defaultSheet);
+    }
+
+    // Headers si está vacía
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(["DNI_FULL", "CONTRASEÑA", "NOMBRE"]);
+    }
+
+    // Estilos
+    const range = sheet.getDataRange();
+    range.setFontFamily("Calibri").setFontSize(11).setVerticalAlignment("middle");
+
+    // Header Style
+    const headers = sheet.getRange(1, 1, 1, 3);
+    headers.setBackground("#1B365D").setFontColor("#FFFFFF").setFontWeight("bold").setHorizontalAlignment("center");
+
+    sheet.autoResizeColumns(1, 3);
+    sheet.setFrozenRows(1);
+
+    ui.alert(`✅ ¡Base de Datos Docente Configurada!\n\nArchivo: ${ssDocentes.getName()}\nHoja: Base Docentes`);
+
+  } catch (e) {
+    ui.alert("❌ Error al conectar: " + e.toString());
+  }
+}
+
+function RESET_TEACHERS_DB() {
+  const ui = SpreadsheetApp.getUi();
+
+  if (!SPREADSHEET_ID_DOCENTES || SPREADSHEET_ID_DOCENTES.includes("PONER")) {
+    ui.alert("❌ Error: ID de Base Docentes externa no configurado.");
+    return;
+  }
+
+  // ALERTA DE SEGURIDAD
+  const confirm = ui.alert(
+    "⚠️ PELIGRO: ESTO BORRARÁ TODOS LOS DOCENTES REGISTRADOS",
+    "¿Estás 100% seguro de que quieres VACIAR la base de datos?\n\nTodos los usuarios deberán registrarse nuevamente.",
+    ui.ButtonSet.YES_NO
+  );
+
+  if (confirm !== ui.Button.YES) return;
+
+  const doubleConfirm = ui.alert(
+    "⚠️ CONFIRMACIÓN FINAL",
+    "Esta acción es irreversible. ¿Proceder?",
+    ui.ButtonSet.YES_NO
+  );
+
+  if (doubleConfirm !== ui.Button.YES) return;
+
+  try {
+    const ssDocentes = SpreadsheetApp.openById(SPREADSHEET_ID_DOCENTES);
+    const sheet = ssDocentes.getSheetByName("Base Docentes");
+
+    if (!sheet) {
+      ui.alert("❌ No se encontró la hoja 'Base Docentes'. Ejecuta 'Configurar Base Docentes' primero.");
+      return;
+    }
+
+    // Limpiar todo excepto headers
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
+    }
+
+    ui.alert("✅ Base de Datos VACIADA correctamente.\n\nAhora está limpia para nuevos registros.");
+
+  } catch (e) {
+    ui.alert("❌ Error: " + e.toString());
+  }
 }
 
 // ----------------------------------------------------------------
@@ -470,11 +569,30 @@ function doPost(e) {
     // --- DOCENTE / STAFF (Faltaba en el paste del usuario) ---
     if (data.action === "register") {
       if (data.token !== SECRET_TOKEN) return response({ status: "error", message: "Token inválido" });
-      let sheet = ss.getSheetByName("Base Docentes");
-      if (!sheet) sheet = ss.insertSheet("Base Docentes"); // Auto-create if missing
+
+      // USAR HOJA DE DOCENTES EXTERNA
+      if (!SPREADSHEET_ID_DOCENTES || SPREADSHEET_ID_DOCENTES.includes("PONER")) return response({ status: "error", message: "Falta configurar ID Hoja Docentes" });
+      const ssDocentes = SpreadsheetApp.openById(SPREADSHEET_ID_DOCENTES);
+
+      let sheet = ssDocentes.getSheetByName("Base Docentes");
+      // Si es una hoja nueva vacía, quizás se llame "Hoja 1".
+      if (!sheet) {
+        sheet = ssDocentes.getSheets()[0];
+        sheet.setName("Base Docentes");
+        sheet.appendRow(["DNI_FULL", "CONTRASEÑA", "NOMBRE"]); // Headers
+      }
+
       const rows = sheet.getDataRange().getValues();
-      if (rows.some(r => String(r[0]) === String(data.dni))) return response({ status: "error", message: "DNI ya registrado" });
-      sheet.appendRow(["'" + data.dni, data.password, data.name]);
+      const dniClean = String(data.dni).trim();
+
+      // Buscar DNI (Columna A/0)
+      if (rows.some(r => String(r[0]).replace(/'/g, "") === dniClean)) {
+        return response({ status: "error", message: `DNI ya registrado en Base Docente (${ssDocentes.getName()}). Si crees que es error, contacta a soporte.` });
+      }
+
+      // Guardar con comilla simple para forzar texto
+      sheet.appendRow(["'" + dniClean, data.password, data.name]);
+
       return response({ status: "success", name: data.name });
     }
 
@@ -525,10 +643,14 @@ function doPost(e) {
     if (data.action === "login") {
       // A) Si trae password -> Es DOCENTE
       if (data.password) {
-        const sheet = ss.getSheetByName("Base Docentes");
-        if (!sheet) return response({ status: "error", message: "Base Docentes no existe" });
+        if (!SPREADSHEET_ID_DOCENTES || SPREADSHEET_ID_DOCENTES.includes("PONER")) return response({ status: "error", message: "Falta configurar ID Hoja Docentes" });
+        const ssDocentes = SpreadsheetApp.openById(SPREADSHEET_ID_DOCENTES);
+        const sheet = ssDocentes.getSheetByName("Base Docentes") || ssDocentes.getSheets()[0];
+
         const rows = sheet.getDataRange().getValues();
-        const user = rows.find(r => String(r[0]) === String(data.dni) && String(r[1]) === String(data.password));
+        // Col 0: DNI, Col 1: Pass, Col 2: Nombre
+        const user = rows.find(r => String(r[0]).replace(/'/g, "") === String(data.dni) && String(r[1]) === String(data.password));
+
         return user ? response({ status: "success", name: user[2] }) : response({ status: "error", message: "Credenciales inválidas" });
       }
       // B) Si NO trae password -> Es PADRE/ALUMNO
@@ -546,9 +668,28 @@ function doPost(e) {
 
     // --- PDF GENERATION ---
     if (data.action.startsWith("generate")) {
-      // ... (Logic from User Paste) ...
-      // Placeholder for brevity
-      return response({ status: "success", url: "https://example.com/pdf" });
+      const props = PropertiesService.getScriptProperties();
+      // Usar constantes globales si están definidas, sino buscar en Properties
+      const folderId = FOLDER_ID_PDFS !== "PONER_ID_CARPETA_PDFS" ? FOLDER_ID_PDFS : props.getProperty('FOLDER_ID_PDFS');
+      let templateId = null;
+      let docName = "";
+
+      if (data.action === "generateLibreDeuda") {
+        templateId = DOC_ID_PLANTILLA !== "PONER_ID_DOC_LIBRE_DEUDA" ? DOC_ID_PLANTILLA : props.getProperty('DOC_ID_PLANTILLA');
+        docName = "Libre Deuda";
+      } else if (data.action === "generateInicio") {
+        templateId = DOC_ID_INICIO !== "PONER_ID_DOC_INICIO" ? DOC_ID_INICIO : props.getProperty('DOC_ID_INICIO');
+        docName = "Certificado Inicio";
+      } else if (data.action === "generateFinal") {
+        templateId = DOC_ID_FINAL !== "PONER_ID_DOC_FINAL" ? DOC_ID_FINAL : props.getProperty('DOC_ID_FINAL');
+        docName = "Certificado Finalización";
+      }
+
+      if (!templateId || !folderId) return response({ status: "error", message: "Falta configurar Plantilla o Carpeta (Ejecutar SETUP_DOCS)" });
+
+      const sheetC = ss.getSheetByName("Cobranzas 2026");
+      const url = createPDF(data.dni, sheetC, templateId, folderId, docName);
+      return response({ status: "success", url: url });
     }
 
   } catch (e) {
@@ -561,3 +702,31 @@ function doPost(e) {
 // --- UTILS ---
 function response(data) { return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON); }
 function getPrettyCurso(g, d) { return `${g}° ${d}`; }
+
+function createPDF(dni, sheet, templateId, folderId, docPrefix) {
+  const rows = sheet.getDataRange().getValues();
+  const student = rows.slice(1).find(r => String(r[0]) === String(dni));
+  if (!student) throw new Error("Alumno no encontrado");
+
+  const folder = DriveApp.getFolderById(folderId);
+  const template = DriveApp.getFileById(templateId);
+  const copy = template.makeCopy(`${docPrefix} - ${student[1]}`, folder);
+  const doc = DocumentApp.openById(copy.getId());
+  const body = doc.getBody();
+
+  // Reemplazos comunes
+  body.replaceText("{{NOMBRE}}", student[1]);
+  body.replaceText("{{DNI}}", student[0]);
+  body.replaceText("{{CURSO}}", student[2]);
+  body.replaceText("{{FECHA}}", new Date().toLocaleDateString());
+  body.replaceText("{{VENCIMIENTO}}", new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString());
+
+  doc.saveAndClose();
+
+  const pdfBlob = copy.getAs(MimeType.PDF);
+  const pdf = folder.createFile(pdfBlob);
+  copy.setTrashed(true);
+  pdf.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  return pdf.getDownloadUrl().replace('&export=download', '');
+}

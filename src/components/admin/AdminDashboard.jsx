@@ -643,7 +643,6 @@ const AdminDashboard = () => {
                           {s.nivel}
                         </span>
                       </td>
-                      {/* Quitamos el ° hardcodeado porque el dato ya viene como "1ro" o "1°" a veces */}
                       <td className="px-6 py-3 text-center">
                         <span className="w-6 h-6 inline-flex items-center justify-center bg-gray-200 rounded-full text-xs font-bold text-gray-700 border border-gray-300">
                           {s.grado}
@@ -715,16 +714,16 @@ const AdminDashboard = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center text-gray-400">
+                    <td colSpan="8" className="px-6 py-8 text-center text-gray-400">
                       No se encontraron alumnos.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
-          </div>
+          </div >
         )}
-      </div>
+      </div >
 
       {/* MODAL (CREAR / EDITAR) */}
       {
