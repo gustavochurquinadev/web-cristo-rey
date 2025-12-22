@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 5.4 (Debug Mode & Reset Fix) - ACTUALIZADO: 21/12/2025
+// 📦 VERSIÓN: 5.0 (Multi-Database Support) - REVERTIDO: 21/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
@@ -38,8 +38,6 @@ function onOpen() {
     .addItem('🔍 Aplicar Filtros Automáticos', 'APPLY_FILTERS')
     .addSeparator()
     .addItem('⚙️ Configurar Plantillas PDF', 'SETUP_DOCS')
-    .addItem('👨‍🏫 Configurar Base Docentes (Externa)', 'SETUP_TEACHERS_DB')
-    .addItem('🗑️ RESETEAR Base Docentes (Borrar Todo)', 'RESET_TEACHERS_DB')
     .addToUi();
 }
 
@@ -67,97 +65,7 @@ function SETUP_FEES() {
   ui.alert("✅ Hoja 'CONF_ARANCELES' creada.\n\nPuedes editar los valores numéricos y se reflejarán en la web.");
 }
 
-function SETUP_TEACHERS_DB() {
-  const ui = SpreadsheetApp.getUi();
 
-  if (!SPREADSHEET_ID_DOCENTES || SPREADSHEET_ID_DOCENTES.includes("PONER")) {
-    ui.alert("❌ Error: Debes configurar la variable SPREADSHEET_ID_DOCENTES en el script primero.");
-    return;
-  }
-
-  try {
-    const ssDocentes = SpreadsheetApp.openById(SPREADSHEET_ID_DOCENTES);
-    let sheet = ssDocentes.getSheetByName("Base Docentes");
-
-    if (sheet) {
-      const resp = ui.alert("⚠️ La hoja 'Base Docentes' ya existe en el archivo externo.", "¿Deseas reformatearla y mantener los datos?", ui.ButtonSet.YES_NO);
-      if (resp !== ui.Button.YES) return;
-    } else {
-      sheet = ssDocentes.insertSheet("Base Docentes");
-      // Si hay una hoja default vacía (Hoja 1), la borramos para limpiar
-      const defaultSheet = ssDocentes.getSheetByName("Hoja 1");
-      if (defaultSheet) ssDocentes.deleteSheet(defaultSheet);
-    }
-
-    // Headers si está vacía
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["DNI_FULL", "CONTRASEÑA", "NOMBRE"]);
-    }
-
-    // Estilos
-    const range = sheet.getDataRange();
-    range.setFontFamily("Calibri").setFontSize(11).setVerticalAlignment("middle");
-
-    // Header Style
-    const headers = sheet.getRange(1, 1, 1, 3);
-    headers.setBackground("#1B365D").setFontColor("#FFFFFF").setFontWeight("bold").setHorizontalAlignment("center");
-
-    sheet.autoResizeColumns(1, 3);
-    sheet.setFrozenRows(1);
-
-    ui.alert(`✅ ¡Base de Datos Docente Configurada!\n\nArchivo: ${ssDocentes.getName()}\nHoja: Base Docentes`);
-
-  } catch (e) {
-    ui.alert("❌ Error al conectar: " + e.toString());
-  }
-}
-
-function RESET_TEACHERS_DB() {
-  const ui = SpreadsheetApp.getUi();
-
-  if (!SPREADSHEET_ID_DOCENTES || SPREADSHEET_ID_DOCENTES.includes("PONER")) {
-    ui.alert("❌ Error: ID de Base Docentes externa no configurado.");
-    return;
-  }
-
-  // ALERTA DE SEGURIDAD
-  const confirm = ui.alert(
-    "⚠️ PELIGRO: ESTO BORRARÁ TODOS LOS DOCENTES REGISTRADOS",
-    "¿Estás 100% seguro de que quieres VACIAR la base de datos?\n\nTodos los usuarios deberán registrarse nuevamente.",
-    ui.ButtonSet.YES_NO
-  );
-
-  if (confirm !== ui.Button.YES) return;
-
-  const doubleConfirm = ui.alert(
-    "⚠️ CONFIRMACIÓN FINAL",
-    "Esta acción es irreversible. ¿Proceder?",
-    ui.ButtonSet.YES_NO
-  );
-
-  if (doubleConfirm !== ui.Button.YES) return;
-
-  try {
-    const ssDocentes = SpreadsheetApp.openById(SPREADSHEET_ID_DOCENTES);
-    const sheet = ssDocentes.getSheetByName("Base Docentes");
-
-    if (!sheet) {
-      ui.alert("❌ No se encontró la hoja 'Base Docentes'. Ejecuta 'Configurar Base Docentes' primero.");
-      return;
-    }
-
-    // Limpiar todo excepto headers
-    const lastRow = sheet.getLastRow();
-    if (lastRow > 1) {
-      sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
-    }
-
-    ui.alert("✅ Base de Datos VACIADA correctamente.\n\nAhora está limpia para nuevos registros.");
-
-  } catch (e) {
-    ui.alert("❌ Error: " + e.toString());
-  }
-}
 
 // ----------------------------------------------------------------
 // 🔄 FUNCIÓN MAESTRA DE SINCRONIZACIÓN (ADMIN)
@@ -587,7 +495,7 @@ function doPost(e) {
 
       // Buscar DNI (Columna A/0)
       if (rows.some(r => String(r[0]).replace(/'/g, "") === dniClean)) {
-        return response({ status: "error", message: `DNI ya registrado en Base Docente (${ssDocentes.getName()}). Si crees que es error, contacta a soporte.` });
+        return response({ status: "error", message: "DNI ya registrado" });
       }
 
       // Guardar con comilla simple para forzar texto

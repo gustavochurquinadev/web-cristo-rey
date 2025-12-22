@@ -12,7 +12,6 @@ const Staff = () => {
 
   const [loginData, setLoginData] = useState({ dni: '', password: '' });
   const [registerData, setRegisterData] = useState({ dni: '', name: '', password: '', token: '' });
-  const [registerError, setRegisterError] = useState(''); // Estado para errores persistentes
 
   // 🔴 URL DE TU SCRIPT (Verifica que sea la correcta)
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2-YyjICMqFXwZl4FtY53rdgCACO-CcWDWkZbP-RwgSSk_JrlqZ54ph_QALuMsYYYB/exec";
@@ -82,11 +81,8 @@ const Staff = () => {
         setView('login');
         setLoginData({ dni: registerData.dni, password: '' });
         setLoginData({ dni: registerData.dni, password: '' });
-        setRegisterError('');
       } else {
-        const msg = data.message || "Error al registrarse";
-        toast.error(msg);
-        setRegisterError(msg); // Guardamos el error para mostrarlo en rojo
+        toast.error(data.message || "Error al registrarse");
       }
     } catch (error) {
       toast.error("Error de conexión");
@@ -192,13 +188,7 @@ const Staff = () => {
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
 
-              {/* ALERTA DE ERROR PERSISTENTE */}
-              {registerError && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-lg text-xs font-bold border border-red-200 flex items-start gap-2">
-                  <span className="mt-0.5">⚠️</span>
-                  <span>{registerError}</span>
-                </div>
-              )}
+
 
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nombre Completo</label>
