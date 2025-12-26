@@ -137,7 +137,7 @@ const News = () => {
                         <span className={`font-serif text-lg font-bold ${isNovember ? 'text-white' : 'text-cristo-primary'}`}>
                           {month.month}
                         </span>
-                        {isNovember && <span className="text-[9px] uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full text-white font-bold">Patronal</span>}
+                        {isNovember && <span className="text-[9px] uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full text-white font-bold"></span>}
                       </div>
                     </div>
 

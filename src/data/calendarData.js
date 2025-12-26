@@ -9,15 +9,15 @@ export const fullCalendar = [
         month: 'Febrero',
         events: [
             { date: '18', description: 'Inicio del período escolar' },
-            { date: '18-19', description: 'Exámenes materias pendientes (Secundario)' },
-            { date: '20', description: 'Primera Jornada Institucional (Sin clases)' },
+            { date: '18-19', description: 'Exámenes (Secundario)' },
+            { date: '20', description: '1ra Jornada Institucional' },
             { date: '23', description: 'Inicio de clases' }
         ]
     },
     {
         month: 'Marzo',
         events: [
-            { date: '01', description: 'Inicio del Ciclo Lectivo' }
+            { date: '', description: '  ' }
         ]
     },
     {
@@ -29,7 +29,7 @@ export const fullCalendar = [
     {
         month: 'Mayo',
         events: [
-            { date: 'Todo el mes', description: 'Mes de la Virgen María' }
+            { date: '', description: '' }
         ]
     },
     {
@@ -41,15 +41,15 @@ export const fullCalendar = [
     {
         month: 'Julio',
         events: [
-            { date: '02', description: 'Segunda Jornada Institucional' },
+            { date: '02', description: '2da Jornada Institucional' },
             { date: '13-24', description: 'Receso Escolar de Invierno' }
         ]
     },
     {
         month: 'Agosto',
         events: [
-            { date: '12-13', description: 'Exámenes materias pendientes (Sin clases Secundario)' },
-            { date: '12-16', description: 'Semana del Colegio' }
+            { date: '12-13', description: 'Exámenes (Secundario)' },
+            { date: '', description: '' }
         ]
     },
     {
@@ -62,14 +62,14 @@ export const fullCalendar = [
     {
         month: 'Octubre',
         events: [
-            { date: '13-14', description: 'Exámenes (Con suspensión de clases Secundaria)' }
+            { date: '13-14', description: 'Exámenes (Secundaria)' }
         ]
     },
     {
         month: 'Noviembre',
         events: [
-            { date: '11', description: 'Tercera Jornada Institucional' }
-        ]
+            { date: '11', description: '3ra Jornada Institucional' }
+        
     },
     {
         month: 'Diciembre',
