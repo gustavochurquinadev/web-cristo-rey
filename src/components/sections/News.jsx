@@ -113,26 +113,57 @@ const News = () => {
           </div>
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {fullCalendar.map((month, i) => (
-                <div key={i} className="calendar-item bg-gray-50 p-6 rounded-xl border border-gray-100 hover:border-cristo-accent hover:shadow-md transition-all duration-300 group">
-                  <div className="mb-3 border-b border-gray-100 pb-2">
-                    <span className="font-serif text-lg font-bold text-cristo-primary">{month.month}</span>
-                  </div>
+              {fullCalendar.map((month, i) => {
+                const isNovember = month.month.toLowerCase().includes('noviembre');
 
-                  <div className="flex flex-col space-y-2">
-                    {month.events.map((evt, j) => (
-                      <div key={j} className="flex justify-between items-start">
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide group-hover:text-cristo-dark transition-colors text-left flex-1 mr-2">
-                          {evt.description}
-                        </p>
-                        {evt.date !== '-' && (
-                          <span className="text-[10px] font-bold text-cristo-accent bg-cristo-secondary/20 px-1.5 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">{evt.date}</span>
-                        )}
+                return (
+                  <div
+                    key={i}
+                    className={`calendar-item p-6 rounded-xl border transition-all duration-300 group relative overflow-hidden
+                      ${isNovember
+                        ? 'bg-cristo-primary border-cristo-primary text-white shadow-lg transform hover:-translate-y-1'
+                        : 'bg-gray-50 border-gray-100 hover:border-cristo-accent hover:shadow-md'
+                      }`}
+                  >
+                    {/* Decoración Noviembre */}
+                    {isNovember && (
+                      <div className="absolute -top-4 -right-4 opacity-10 pointer-events-none rotate-12">
+                        <img src="/images/logo.png" alt="Logo" className="w-32 h-32 object-contain grayscale brightness-200" />
                       </div>
-                    ))}
+                    )}
+
+                    <div className={`mb-3 pb-2 border-b ${isNovember ? 'border-white/20' : 'border-gray-100'}`}>
+                      <div className="flex justify-between items-center">
+                        <span className={`font-serif text-lg font-bold ${isNovember ? 'text-white' : 'text-cristo-primary'}`}>
+                          {month.month}
+                        </span>
+                        {isNovember && <span className="text-[9px] uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full text-white font-bold">Patronal</span>}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col space-y-1">
+                      {month.events.map((evt, j) => (
+                        <div
+                          key={j}
+                          className={`flex justify-between items-start p-1.5 rounded-lg transition-colors
+                            ${isNovember ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}
+                        >
+                          <p className={`text-xs font-medium uppercase tracking-wide text-left flex-1 mr-2 transition-colors
+                            ${isNovember ? 'text-blue-50' : 'text-gray-500 group-hover:text-gray-700'}`}>
+                            {evt.description}
+                          </p>
+                          {evt.date !== '-' && (
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap
+                              ${isNovember ? 'bg-white text-cristo-primary' : 'bg-cristo-secondary/20 text-cristo-accent'}`}>
+                              {evt.date}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
