@@ -106,8 +106,8 @@ const Fees = () => {
 
               {/* Overlay Sin Vacantes */}
               {!level.hasVacancies && (
-                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                  <div className="bg-red-500 text-white font-bold text-sm uppercase tracking-wider px-4 py-2 rounded-lg shadow-lg transform -rotate-3 border-2 border-white">
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-20 flex items-center justify-center">
+                  <div className="bg-gray-100 text-gray-500 font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full border border-gray-200 shadow-sm">
                     Sin Vacantes
                   </div>
                 </div>
