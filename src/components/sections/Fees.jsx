@@ -63,35 +63,35 @@ const Fees = () => {
         <div className="text-center mb-10">
           <span className="text-cristo-accent font-bold tracking-widest text-xs uppercase">Administración</span>
           <h2 className="font-serif text-3xl md:text-4xl text-cristo-primary mt-2">Aranceles 2026</h2>
-          <p className="text-gray-500 mt-2 max-w-2xl mx-auto text-sm">Valores vigentes para el Ciclo Lectivo 2026. Sujetos a actualización en Junio y Septiembre.</p>
+          <p className="text-gray-500 mt-2 max-w-2xl mx-auto text-lg">Valores vigentes para el Ciclo Lectivo 2026. Sujetos a actualización en Junio y Septiembre.</p>
         </div>
 
         {/* 1. SECCIÓN MATRÍCULA */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8 max-w-4xl mx-auto relative overflow-hidden">
-          <div className="absolute top-0 right-0 bg-cristo-accent text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">INSCRIPCIONES ABIERTAS</div>
+          <div className="absolute top-0 right-0 bg-cristo-accent text-white text-xs font-bold px-3 py-1 rounded-bl-lg">INSCRIPCIONES ABIERTAS</div>
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-left">
               <h3 className="text-xl font-bold text-cristo-primary flex items-center gap-2">
                 <Coins className="w-5 h-5 text-cristo-accent" /> Matrícula 2026
               </h3>
-              <p className="text-gray-500 text-xs mt-1">Reserva de vacante anual</p>
+              <p className="text-gray-500 text-sm mt-1">Reserva de vacante anual</p>
             </div>
 
             <div className="flex flex-row gap-4 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
               {/* Anticipada */}
               <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 flex-1 min-w-[160px] text-center">
-                <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-1">Pago Anticipado</span>
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">Pago Anticipado</span>
                 <div className="text-2xl font-serif font-bold text-cristo-primary">{formatPrice(displayFees.Matricula)}</div>
-                <span className="text-[10px] text-gray-500 font-medium bg-white px-2 py-0.5 rounded-full border border-gray-100 mt-1 inline-block">
+                <span className="text-xs text-gray-500 font-medium bg-white px-2 py-0.5 rounded-full border border-gray-100 mt-1 inline-block">
                   Hasta 14 de Febrero
                 </span>
               </div>
 
               {/* Tardía */}
               <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex-1 min-w-[160px] text-center opacity-75">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Pago Tardío</span>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Pago Tardío</span>
                 <div className="text-2xl font-serif font-bold text-gray-400">{formatPrice(displayFees.Matricula_Tardia || 45000)}</div>
-                <span className="text-[10px] text-gray-400 font-medium mt-1 inline-block">
+                <span className="text-xs text-gray-400 font-medium mt-1 inline-block">
                   Después del 14/02
                 </span>
               </div>
@@ -109,11 +109,11 @@ const Fees = () => {
               <h3 className="font-serif text-lg text-cristo-primary mb-3">{level.name}</h3>
               <div className="mb-4">
                 <span className="text-3xl font-bold text-gray-800">{formatPrice(level.price)}</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-400 block mt-1">Mensual (Mar-Dic)</span>
+                <span className="text-xs uppercase tracking-wide text-gray-400 block mt-1">Mensual (Mar-Dic)</span>
               </div>
               <ul className="space-y-2 mb-2">
                 {level.features.map((feat, i) => (
-                  <li key={i} className="flex items-start text-xs text-gray-600">
+                  <li key={i} className="flex items-start text-sm text-gray-600">
                     <CheckCircle className="w-3.5 h-3.5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
                     <span className="leading-tight">{feat}</span>
                   </li>
@@ -131,7 +131,7 @@ const Fees = () => {
             <div className="p-2 bg-red-50 text-red-600 rounded-lg h-fit"><Clock className="w-5 h-5" /></div>
             <div className="flex-1">
               <h4 className="font-bold text-gray-800 mb-2 text-sm">Vencimientos y Recargos</h4>
-              <ul className="space-y-2 text-xs text-gray-600">
+              <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 bg-red-400 rounded-full mt-1.5 shrink-0"></span>
                   <span>Vencimiento cuota mensual: <strong>Día 20 de cada mes</strong>.</span>
@@ -140,7 +140,7 @@ const Fees = () => {
                   <span className="w-1.5 h-1.5 bg-red-400 rounded-full mt-1.5 shrink-0"></span>
                   <span>Mora automática: <strong>10% mensual</strong> sobre el valor vigente.</span>
                 </li>
-                <li className="text-[10px] text-gray-400 mt-1 italic leading-tight">Las cuotas atrasadas se abonan al valor actualizado al momento del pago.</li>
+                <li className="text-xs text-gray-400 mt-1 italic leading-tight">Las cuotas atrasadas se abonan al valor actualizado al momento del pago.</li>
               </ul>
             </div>
           </div>
@@ -150,7 +150,7 @@ const Fees = () => {
             <div className="p-2 bg-green-50 text-green-600 rounded-lg h-fit"><CreditCard className="w-5 h-5" /></div>
             <div className="flex-1">
               <h4 className="font-bold text-gray-800 mb-2 text-sm">Beneficios y Medios de Pago</h4>
-              <ul className="space-y-2 text-xs text-gray-600">
+              <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start gap-2">
                   <span className="w-1.5 h-1.5 bg-green-400 rounded-full mt-1.5 shrink-0"></span>
                   <span className="leading-tight">

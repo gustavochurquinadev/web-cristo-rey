@@ -41,10 +41,10 @@ const Parents = () => {
                 dni: dni,
                 payments: {
                   matricula: true,
-                  mar: true, abr: true, may: true, jun: true,
+                  feb: true, mar: true, abr: true, may: true, jun: true,
                   jul: true, ago: false, sep: false, oct: false, nov: false, dic: false
                 },
-                debtFree: false // Cambiar a true para probar descarga
+                debtFree: false
               });
               setLoginStep(false);
               setLoading(false);
@@ -102,7 +102,7 @@ const Parents = () => {
     };
 
     const months = [
-        { key: 'mar', label: 'Mar' }, { key: 'abr', label: 'Abr' }, { key: 'may', label: 'May' },
+        { key: 'feb', label: 'Feb' }, { key: 'mar', label: 'Mar' }, { key: 'abr', label: 'Abr' }, { key: 'may', label: 'May' },
         { key: 'jun', label: 'Jun' }, { key: 'jul', label: 'Jul' }, { key: 'ago', label: 'Ago' },
         { key: 'sep', label: 'Sep' }, { key: 'oct', label: 'Oct' }, { key: 'nov', label: 'Nov' },
         { key: 'dic', label: 'Dic' }
@@ -234,15 +234,10 @@ const Parents = () => {
                                         isEligible = p.matricula;
                                         requirementText = "Requiere Matrícula al día.";
                                     }
-                                    // Marzo (2) -> Requiere Matrícula (Mes anterior real de pago)
-                                    else if (currentMonth === 2) {
-                                        isEligible = p.matricula;
-                                        requirementText = "Requiere Matrícula al día.";
-                                    }
-                                    // Abril (3) a Noviembre (10) -> Requiere mes anterior
-                                    else if (currentMonth > 2 && currentMonth < 11) {
+                                    // Marzo (2) a Noviembre (10) -> Requiere mes anterior (Feb a Oct)
+                                    else if (currentMonth >= 2 && currentMonth < 11) {
                                         const monthsMap = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-                                        const prevMonthKey = monthsMap[currentMonth - 1]; // Ej: Abr(3) -> mar(2)
+                                        const prevMonthKey = monthsMap[currentMonth - 1]; // Ej: Mar(2) -> feb(1)
                                         isEligible = p[prevMonthKey];
                                         requirementText = `Requiere cuota de ${monthsMap[currentMonth - 1].toUpperCase()} al día.`;
                                     }

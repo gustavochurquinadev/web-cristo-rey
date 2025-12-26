@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 // 🎓 SISTEMA CRISTO REY - BACKEND SUPREMO
-// 📦 VERSIÓN: 5.0 (Multi-Database Support) - REVERTIDO: 21/12/2025
+// 📦 VERSIÓN: 5.3 (Fix Validación Col O) - ACTUALIZADO: 26/12/2025
 // ----------------------------------------------------------------
 // ESTE SCRIPT MANEJA TODO: ADMIN, PAGOS, PORTAL PADRES, DOCENTES Y SINCRONIZACIÓN.
 
@@ -159,43 +159,106 @@ function SETUP_STYLES() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheets = [ss.getSheetByName("Legajos 2026"), ss.getSheetByName("Cobranzas 2026")];
   const ui = SpreadsheetApp.getUi();
+
   sheets.forEach(sheet => {
     if (!sheet) return;
-    const lastCol = sheet.getLastColumn();
-    if (sheet.getName() === "Legajos 2026") {
-      const headers = [["DNI", "ALUMNO", "NIVEL", "GRADO", "DIVISION", "TURNO", "ESTADO", "% BECA"]];
-      sheet.getRange(1, 1, 1, 8).setValues(headers);
-    }
+
+    // --- ESTILOS GENERALES ---
     const rangeData = sheet.getDataRange();
     rangeData.setFontFamily("Calibri");
     rangeData.setFontSize(11);
     rangeData.setVerticalAlignment("middle");
+
+    // Header Color
     const header = sheet.getRange(1, 1, 1, sheet.getLastColumn());
-    header.setBackground("#4285f4");
+    header.setBackground("#1B365D"); // Azul Oscuro Institucional
     header.setFontColor("#ffffff");
     header.setFontWeight("bold");
     header.setHorizontalAlignment("center");
+
+    // Banding y Bordes
     if (sheet.getLastRow() > 1) {
       const fullRange = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn());
-      fullRange.setBackground(null);
       fullRange.setBorder(true, true, true, true, true, true, "#d0d0d0", SpreadsheetApp.BorderStyle.SOLID);
-      if (sheet.getName() === "Legajos 2026") {
-        sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).setHorizontalAlignment("left");
-      }
+
       try { sheet.getBandings().forEach(b => b.remove()); } catch (e) { }
       fullRange.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY).setSecondRowColor("#f8f9fa");
     }
   });
-  // LOGICA COBRANZAS
+
+  // --- LÓGICA ESPECÍFICA COBRANZAS ---
   const sheetC = ss.getSheetByName("Cobranzas 2026");
   if (sheetC) {
-    // ... (Data validation and Conditional formatting as in user paste) ...
-    const payRange = sheetC.getRange(2, 4, sheetC.getLastRow() - 1, 12);
-    const rule = SpreadsheetApp.newDataValidation().requireValueInList(["PAGADO", "ADEUDA"], true).build();
-    payRange.setDataValidation(rule);
-    // Smart Formula and Formatting logic omitted for brevity but assumed present
+    const lastRow = sheetC.getLastRow();
+    if (lastRow > 1) {
+      // 1. APLICAR FÓRMULA INTELIGENTE EN COLUMNA O ("ESTADO")
+      // Traducción a Inglés para GAS: SI->IF, MES->MONTH, HOY->TODAY, DIA->DAY, MAX->MAX, MIN->MIN, INDICE->INDEX, CONTAR.SI->COUNTIF
+      const formula = `=LET(
+        mes_actual, MONTH(TODAY()),
+        dia_actual, DAY(TODAY()),
+        limite_mes, IF(dia_actual >= 20, mes_actual, mes_actual - 1),
+        cantidad_meses, MAX(0, MIN(11, limite_mes - 1)),
+        rango_a_revisar, D2:INDEX(D2:N2, 1, cantidad_meses),
+        IF(cantidad_meses = 0, "AL DIA",
+          IF(COUNTIF(rango_a_revisar, "<>PAGADO") > 0, "ADEUDA", "AL DIA")
+        )
+      )`;
+
+      // Aplicar fórmula a toda la columna O desde la fila 2
+      sheetC.getRange(2, 15, lastRow - 1, 1).setFormula(formula);
+
+      // Limpiar validacion anterior en columna O (por si habia desplegables)
+      sheetC.getRange(2, 15, lastRow - 1, 1).clearDataValidations();
+
+      // 2. VALIDACIÓN DE DATOS (MESES - Columns D a N = 11 columnas)
+      const payRange = sheetC.getRange(2, 4, lastRow - 1, 11);
+      const rule = SpreadsheetApp.newDataValidation().requireValueInList(["PAGADO", "ADEUDA"], true).build();
+      payRange.setDataValidation(rule);
+
+      // 3. FORMATO CONDICIONAL
+      sheetC.clearConditionalFormatRules();
+      const rules = [];
+
+      // A) COLUMNA O (ESTADO) - Colores Fuertes
+      // AL DIA -> Verde Fuerte (#38761d) + Texto Blanco
+      rules.push(SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo("AL DIA")
+        .setBackground("#38761d")
+        .setFontColor("#ffffff")
+        .setRanges([sheetC.getRange(2, 15, lastRow - 1, 1)])
+        .build());
+
+      // ADEUDA -> Rojo Fuerte (#cc0000) + Texto Blanco
+      rules.push(SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo("ADEUDA")
+        .setBackground("#cc0000")
+        .setFontColor("#ffffff")
+        .setBold(true)
+        .setRanges([sheetC.getRange(2, 15, lastRow - 1, 1)])
+        .build());
+
+      // B) COLUMNAS D:N (MESES) - Colores Suaves
+      // PAGADO -> Verde Suave (#d9ead3) + Texto Verde Oscuro
+      rules.push(SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo("PAGADO")
+        .setBackground("#d9ead3")
+        .setFontColor("#274e13")
+        .setRanges([sheetC.getRange(2, 4, lastRow - 1, 11)]) // D a N
+        .build());
+
+      // ADEUDA -> Rojo Suave (#fce8e6) + Texto Rojo
+      rules.push(SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo("ADEUDA")
+        .setBackground("#fce8e6")
+        .setFontColor("#c5221f")
+        .setRanges([sheetC.getRange(2, 4, lastRow - 1, 11)])
+        .build());
+
+      sheetC.setConditionalFormatRules(rules);
+    }
   }
-  ui.alert("🎨 ¡Estructura Actualizada!");
+
+  ui.alert("🎨 ¡Estilos, Fórmulas y Formatos Aplicados con Éxito!");
 }
 
 function SETUP_DOCS() {
