@@ -137,11 +137,7 @@ const News = () => {
                         <span className={`font-serif text-lg font-bold ${isNovember ? 'text-white' : 'text-cristo-primary'}`}>
                           {month.month}
                         </span>
-                        {isNovember && (
-                          <div className="bg-white/20 p-2 rounded-full flex items-center justify-center">
-                            <img src="/favicon.ico" alt="Logo" className="w-8 h-8" />
-                          </div>
-                        )}
+                        {isNovember && <span className="text-[9px] uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full text-white font-bold">Mes de Cristo Rey</span>}
                       </div>
                     </div>
 
