@@ -48,9 +48,9 @@ const Fees = () => {
   };
 
   const levels = [
-    { name: 'Nivel Inicial', price: displayFees.Inicial, features: ['Jornada Simple', 'Materiales Incluidos', 'Seguro Escolar'] },
-    { name: 'Nivel Primario', price: displayFees.Primario, features: ['Jornada Extendida (Opcional)', 'Plataforma Digital', 'Talleres Extraprogramáticos'] },
-    { name: 'Nivel Secundario', price: displayFees.Secundario, features: ['Orientación Universitaria', 'Laboratorios', 'Certificaciones IT'] }
+    { name: 'Nivel Inicial', price: displayFees.Inicial, features: ['Jornada Simple', 'Materiales Incluidos', 'Seguro Escolar'], hasVacancies: false },
+    { name: 'Nivel Primario', price: displayFees.Primario, features: ['Jornada Extendida (Opcional)', 'Plataforma Digital', 'Talleres Extraprogramáticos'], hasVacancies: true },
+    { name: 'Nivel Secundario', price: displayFees.Secundario, features: ['Orientación Universitaria', 'Laboratorios', 'Certificaciones IT'], hasVacancies: true }
   ];
 
   const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
@@ -102,19 +102,29 @@ const Fees = () => {
         {/* 2. CUOTAS MENSUALES */}
         <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto mb-10">
           {levels.map((level, idx) => (
-            <div key={idx} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-cristo-primary p-5 relative group">
+            <div key={idx} className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 p-5 relative group overflow-hidden ${!level.hasVacancies ? 'border-gray-300' : 'border-cristo-primary'}`}>
+
+              {/* Overlay Sin Vacantes */}
+              {!level.hasVacancies && (
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                  <div className="bg-red-500 text-white font-bold text-sm uppercase tracking-wider px-4 py-2 rounded-lg shadow-lg transform -rotate-3 border-2 border-white">
+                    Sin Vacantes
+                  </div>
+                </div>
+              )}
+
               <div className="absolute top-3 right-3 opacity-10 group-hover:opacity-100 transition-opacity">
-                <div className="bg-cristo-accent w-1.5 h-1.5 rounded-full"></div>
+                <div className={`bg-cristo-accent w-1.5 h-1.5 rounded-full ${!level.hasVacancies ? 'hidden' : ''}`}></div>
               </div>
-              <h3 className="font-serif text-lg text-cristo-primary mb-3">{level.name}</h3>
+              <h3 className={`font-serif text-lg mb-3 ${!level.hasVacancies ? 'text-gray-400' : 'text-cristo-primary'}`}>{level.name}</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-800">{formatPrice(level.price)}</span>
+                <span className={`text-3xl font-bold ${!level.hasVacancies ? 'text-gray-300' : 'text-gray-800'}`}>{formatPrice(level.price)}</span>
                 <span className="text-xs uppercase tracking-wide text-gray-400 block mt-1">Mensual (Mar-Dic)</span>
               </div>
               <ul className="space-y-2 mb-2">
                 {level.features.map((feat, i) => (
-                  <li key={i} className="flex items-start text-sm text-gray-600">
-                    <CheckCircle className="w-3.5 h-3.5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <li key={i} className={`flex items-start text-sm ${!level.hasVacancies ? 'text-gray-300' : 'text-gray-600'}`}>
+                    <CheckCircle className={`w-3.5 h-3.5 mr-2 flex-shrink-0 mt-0.5 ${!level.hasVacancies ? 'text-gray-300' : 'text-green-500'}`} />
                     <span className="leading-tight">{feat}</span>
                   </li>
                 ))}
