@@ -10,8 +10,7 @@ export const fullCalendar = [
         events: [
             { date: '18', description: 'Inicio del período escolar' },
             { date: '18-19', description: 'Exámenes (Secundario)' },
-            { date: '20', description: '1ra Jornada Institucional' },
-            { date: '23', description: 'Inicio de clases' }
+            { date: '20', description: '1ra Jornada Institucional' }
         ]
     },
     {

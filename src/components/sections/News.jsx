@@ -138,8 +138,8 @@ const News = () => {
                           {month.month}
                         </span>
                         {isNovember && (
-                          <div className="bg-white/20 p-1.5 rounded-full flex items-center justify-center">
-                            <img src="/favicon.ico" alt="Logo" className="w-4 h-4" />
+                          <div className="bg-white/20 p-2 rounded-full flex items-center justify-center">
+                            <img src="/favicon.ico" alt="Logo" className="w-8 h-8" />
                           </div>
                         )}
                       </div>
