@@ -104,14 +104,11 @@ const Fees = () => {
           {levels.map((level, idx) => (
             <div key={idx} className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 p-5 relative group overflow-hidden ${!level.hasVacancies ? 'border-gray-300' : 'border-cristo-primary'}`}>
 
-              {/* Overlay Sin Vacantes */}
-              {!level.hasVacancies && (
-                <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-20 flex items-center justify-center">
-                  <div className="bg-gray-100 text-gray-500 font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-                    Sin Vacantes
-                  </div>
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-20 flex items-center justify-center">
+                <div className="bg-red-100 text-red-600 font-bold text-sm uppercase tracking-widest px-6 py-2 rounded-lg border-2 border-red-200 shadow-sm transform -rotate-12">
+                  Sin Vacantes
                 </div>
-              )}
+              </div>
 
               <div className="absolute top-3 right-3 opacity-10 group-hover:opacity-100 transition-opacity">
                 <div className={`bg-cristo-accent w-1.5 h-1.5 rounded-full ${!level.hasVacancies ? 'hidden' : ''}`}></div>
