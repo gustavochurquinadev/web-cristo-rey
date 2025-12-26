@@ -69,7 +69,7 @@ export const fullCalendar = [
         month: 'Noviembre',
         events: [
             { date: '11', description: '3ra Jornada Institucional' }
-        
+        ]
     },
     {
         month: 'Diciembre',
