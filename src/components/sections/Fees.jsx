@@ -48,9 +48,9 @@ const Fees = () => {
   };
 
   const levels = [
-    { name: 'Nivel Inicial', price: displayFees.Inicial, features: ['Jornada Simple', 'Materiales Incluidos', 'Seguro Escolar'], hasVacancies: false },
-    { name: 'Nivel Primario', price: displayFees.Primario, features: ['Jornada Extendida (Opcional)', 'Plataforma Digital', 'Talleres Extraprogramáticos'], hasVacancies: true },
-    { name: 'Nivel Secundario', price: displayFees.Secundario, features: ['Orientación Universitaria', 'Laboratorios', 'Certificaciones IT'], hasVacancies: true }
+    { name: 'Nivel Inicial', price: displayFees.Inicial, features: ['Jornada Simple', 'Materiales Incluidos', 'Seguro Escolar'], sinVacantes: true },
+    { name: 'Nivel Primario', price: displayFees.Primario, features: ['Jornada Extendida (Opcional)', 'Plataforma Digital', 'Talleres Extraprogramáticos'], sinVacantes: false },
+    { name: 'Nivel Secundario', price: displayFees.Secundario, features: ['Orientación Universitaria', 'Laboratorios', 'Certificaciones IT'], sinVacantes: false }
   ];
 
   const formatPrice = (amount) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
@@ -102,26 +102,28 @@ const Fees = () => {
         {/* 2. CUOTAS MENSUALES */}
         <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto mb-10">
           {levels.map((level, idx) => (
-            <div key={idx} className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 p-5 relative group overflow-hidden ${!level.hasVacancies ? 'border-gray-300' : 'border-cristo-primary'}`}>
+            <div key={idx} className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 p-5 relative group overflow-hidden ${level.sinVacantes ? 'border-gray-300' : 'border-cristo-primary'}`}>
 
-              <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-20 flex items-center justify-center">
-                <div className="bg-red-100 text-red-600 font-bold text-sm uppercase tracking-widest px-6 py-2 rounded-lg border-2 border-red-200 shadow-sm transform -rotate-12">
-                  Sin Vacantes
+              {level.sinVacantes && (
+                <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-20 flex items-center justify-center">
+                  <div className="bg-red-100 text-red-600 font-bold text-sm uppercase tracking-widest px-6 py-2 rounded-lg border-2 border-red-200 shadow-sm transform -rotate-12">
+                    Sin Vacantes
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="absolute top-3 right-3 opacity-10 group-hover:opacity-100 transition-opacity">
-                <div className={`bg-cristo-accent w-1.5 h-1.5 rounded-full ${!level.hasVacancies ? 'hidden' : ''}`}></div>
+                <div className={`bg-cristo-accent w-1.5 h-1.5 rounded-full ${level.sinVacantes ? 'hidden' : ''}`}></div>
               </div>
-              <h3 className={`font-serif text-lg mb-3 ${!level.hasVacancies ? 'text-gray-400' : 'text-cristo-primary'}`}>{level.name}</h3>
+              <h3 className={`font-serif text-lg mb-3 ${level.sinVacantes ? 'text-gray-400' : 'text-cristo-primary'}`}>{level.name}</h3>
               <div className="mb-4">
-                <span className={`text-3xl font-bold ${!level.hasVacancies ? 'text-gray-300' : 'text-gray-800'}`}>{formatPrice(level.price)}</span>
+                <span className={`text-3xl font-bold ${level.sinVacantes ? 'text-gray-300' : 'text-gray-800'}`}>{formatPrice(level.price)}</span>
                 <span className="text-xs uppercase tracking-wide text-gray-400 block mt-1">Mensual (Mar-Dic)</span>
               </div>
               <ul className="space-y-2 mb-2">
                 {level.features.map((feat, i) => (
-                  <li key={i} className={`flex items-start text-sm ${!level.hasVacancies ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <CheckCircle className={`w-3.5 h-3.5 mr-2 flex-shrink-0 mt-0.5 ${!level.hasVacancies ? 'text-gray-300' : 'text-green-500'}`} />
+                  <li key={i} className={`flex items-start text-sm ${level.sinVacantes ? 'text-gray-300' : 'text-gray-600'}`}>
+                    <CheckCircle className={`w-3.5 h-3.5 mr-2 flex-shrink-0 mt-0.5 ${level.sinVacantes ? 'text-gray-300' : 'text-green-500'}`} />
                     <span className="leading-tight">{feat}</span>
                   </li>
                 ))}
